@@ -96,7 +96,7 @@ app.layout = html.Div([
                         'Drag and Drop or ',
                         html.A('Select',
                                style={
-                                   'color': 'blue'
+                                   'color': 'red'
                                }),
                         ' a GeoJSON file.'
                     ]),
