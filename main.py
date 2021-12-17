@@ -64,7 +64,7 @@ app.layout = html.Div(
     Input('upload_geojson', 'contents'),
     State('upload_geojson', 'filename'),
 )
-def upload(is_open, content, filename):
+def callback(is_open, content, filename):
     if filename and content is not None: 
         children = GeoJSON(content, filename).upload()
         if children is not None:
