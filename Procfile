@@ -1,1 +1,1 @@
-web: gunicorn CPSimulator:server
+web: gunicorn main:server
