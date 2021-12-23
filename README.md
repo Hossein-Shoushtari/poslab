@@ -6,7 +6,7 @@ https://simulation2evaluation.herokuapp.com/
 
 ## short overview of navigation
 ### Python files
-main.py : website is build | server is established | functions are called  
+main.py : website is built | server is established | functions are called  
 - -_layout.py = layout of tabs | no funcionality  
 - -_func.py = functions of tabs  -> this would be the space to add new functions; I will do the correct connecting to the buttons  
 ### assets
