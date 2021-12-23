@@ -1,25 +1,11 @@
-import os
-from base64 import b64decode
-from dash import html, dcc, Dash, Output, Input, State, no_update
+from dash import html, Dash, Output, Input, State, no_update, callback_context
 import dash_bootstrap_components as dbc
-from maps import _map
-from simulator import simulator_card, GeoJSON
-from evaluator import evaluator_card
-from coming_soon import coming_soon_card
-from home import home_card
+from simulator_layout import simulator_card
+from simulator_func import get_map, geojson_decoder, crs32632_converter
+from evaluator_layout import evaluator_card
+from coming_soon_layout import coming_soon_card
+from home_layout import home_card
 
-# ==============================================================================
-# -------- INITIALIZING THE MAP -------- #
-geojson = GeoJSON()
-# making layers out of existing data
-for filename in os.listdir('assets/floorplans_raw'):
-    if filename not in os.listdir('assets/floorplans_converted'): # assuming there is no converted version of this GeoJSON file
-        geojson.convert_to_crs32632(filename) # making a layer
-# adding all layers to the map
-geojson.add_layer()
-# in case of an empty floorplans_converted directory, a layerless map should be created
-if len(os.listdir('assets/floorplans_converted')) == 0: _map()
-# ==============================================================================
 # ---------------- HTML ---------------- #
 # designing the webpage using dash
 ex_ss = [dbc.themes.DARKLY]
@@ -43,9 +29,9 @@ app.layout = html.Div(
     [
         dbc.Tabs(
             [
-                dbc.Tab(home_tab_content, label='Level 5 Indoor Navigation'),
-                dbc.Tab(sim_tab_content, label='Simulator'),
-                dbc.Tab(ev_tab_content, label='Evaluator'),
+                dbc.Tab(home_tab_content, label='Level 5 Indoor Navigation', active_label_style={"color": "#DC7633"}),
+                dbc.Tab(sim_tab_content, label='Simulator', active_label_style={"color": "#DC7633"}),
+                dbc.Tab(ev_tab_content, label='Evaluator', active_label_style={"color": "#DC7633"}),
                 dbc.Tab(cs_tab_content, label='Coming Soon', disabled=True),
             ]
         )
@@ -60,27 +46,33 @@ app.layout = html.Div(
     ### Inputs ###
     # modal
     State('sim_modal', 'is_open'),
-    # geojson
-    Input('upload_geojson', 'contents'),
-    State('upload_geojson', 'filename'),
+    # maps
+    Input('ul_map', 'contents'),
+    State('ul_map', 'filename'),
+    # waypoints
+    Input('ul_way', 'contents'),
+    State('ul_way', 'filename'),
 )
-def callback(is_open, content, filename):
-    if filename and content is not None: 
-        children = GeoJSON(content, filename).upload()
-        if children is not None:
-            # returning the new Iframe
-            return is_open, children
-        else:
-            # activating modal for warning reasons
-            return not is_open, no_update
+def callback(is_open, map_contents, map_filenames, way_contents, way_filenames):
+    # getting clicked button
+    changed_id = [p['prop_id'] for p in callback_context.triggered][0]
+    #============ MAP ==============
+    if 'ul_map' in changed_id:
+        for i in range(len(map_filenames)):
+            if 'geojson' != map_filenames[i].split('.')[-1]:
+                return not is_open, no_update # activating modal -> warning
+            else: # assuming user uploaded right file format
+                decoded_content = geojson_decoder(map_contents[i]) # decoding uploaded base64 file
+                crs32632_converter(map_filenames[i], decoded_content) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
+        # if everything went fine ...
+        return is_open, get_map() # returning an html.Iframe with refreshed map
+    #=========== WAYPOINTS ==========
+    elif 'ul_way' in changed_id:
+        return not is_open, no_update  
+    #======= no button clicked =======
     else:
         # this else-section is always activated, when the page refreshes
-        # returning the current Iframe
-        return is_open, html.Iframe(srcDoc=open('index.html').read(),
-                                      style={
-                                        'width': '100%',
-                                        'height': '80vh'
-                                      })
+        return is_open, get_map() # returning the current Iframe/map
 
 
 # pushing the map to the web

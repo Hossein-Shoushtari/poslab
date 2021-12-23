@@ -1,7 +1,6 @@
-import os
-from folium import Map, GeoJson, LayerControl, TileLayer
+from folium import Map
 from folium.plugins import Fullscreen, MiniMap, MeasureControl, Draw
-from geopandas import GeoDataFrame, read_file
+from geopandas import read_file
 from datetime import datetime
 
 def _map():
