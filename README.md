@@ -13,7 +13,7 @@ main.py : website is built | server is established | functions are called
 - Floorplans = the original floorplans | no further need; already converted  
 - floorplans_converted = all converted and usable flooplans/maps | will be displayed on the map  
 ### HTML file
-- index.html = automatically created with folium to get the map as an Iframe with dash  
+- map.html = automatically created with folium to get the map as an Iframe with dash  
 ### for heroku deploy
 - .gitignore
 - Procfile
