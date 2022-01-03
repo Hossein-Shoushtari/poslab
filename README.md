@@ -4,7 +4,7 @@ official website:
 https://simulation2evaluation.herokuapp.com/
 
 
-## short overview of navigation
+## short overview of file-navigation
 ### Python files
 main.py : website is built | server is established | functions are called  
 - -_layout.py = layout of tabs | no funcionality  
