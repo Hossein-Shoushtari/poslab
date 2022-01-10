@@ -12,7 +12,7 @@ def get_map() -> 'html.Iframe':
         -> then parsing through all geojson files
         -> simultaneously adding layers to map
     - adds LayerControl
-    - saves base_map as 'index.html'
+    - saves base_map as 'map.html'
     - returns map as html.Iframe 
     '''
     base_map = _map() # (re)creating blank base_map
@@ -23,9 +23,9 @@ def get_map() -> 'html.Iframe':
         GeoJson(f'assets/floorplans_converted/{geojson_file}', name=name, show=False).add_to(base_map)
     # saving map as an html file with LayerControl
     LayerControl().add_to(base_map)
-    base_map.save('index.html')
+    base_map.save('map.html')
     return html.Iframe(
-            srcDoc=open('index.html').read(),
+            srcDoc=open('map.html').read(),
             style=
             {
                 'width': '100%',

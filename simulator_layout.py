@@ -66,7 +66,7 @@ def simulator_card():
                 id='ul_gyr',
                 children=html.Div(dbc.Button("G", color="primary", size="lg", className="me-1", outline=True), className="d-grid gap-2 col-8", style={'marginLeft': 'auto'}),
                 multiple=True,
-                style={'marginBottom': '0.7vh'}),
+                style={'marginBottom': '4px'}),
             dcc.Upload(
                 id='ul_acc',
                 children=html.Div(dbc.Button("A", color="primary", size="lg", className="me-1", outline=True), className="d-grid gap-2 col-8", style={'marginLeft': 'auto'}),
@@ -77,7 +77,7 @@ def simulator_card():
                 id='ul_bar',
                 children=html.Div(dbc.Button("B", color="primary", size="lg", className="me-1", outline=True), className="d-grid gap-2 col-8", style={'marginRight': 'auto'}),
                 multiple=True,
-                style={'marginBottom': '0.7vh'}),
+                style={'marginBottom': '4px'}),
             dcc.Upload(
                 id='ul_mag',
                 children=html.Div(dbc.Button("M", color="primary", size="lg", className="me-1", outline=True), className="d-grid gap-2 col-8", style={'marginRight': 'auto'}),
@@ -163,7 +163,7 @@ def simulator_card():
                 html.P("SIMULATOR", className="card-text"),
                 dbc.Row(
                     [
-                        dbc.Col(left_column, width=2),
+                        dbc.Col(left_column, width='auto'),
                         dbc.Col(html.Div(id='map'))
                     ]
                 )
