@@ -9,6 +9,7 @@ from maps import _map
 def simulator_card():
     ### MAP
     # map is initialized in main.py
+    
     ### MODAL
     modal = dbc.Modal(
         [
@@ -122,16 +123,17 @@ def simulator_card():
     # styles
     input_style1 = {
         'color': 'silver',
-        'backgroundColor': '222222',
+        'backgroundColor': '#222222',
         'border': '1px solid #917033'
     }
     input_style2 = {
         'color': 'silver',
-        'backgroundColor': '222222',
+        'backgroundColor': '#222222',
         'border': '1px solid #966200'
     }
     label_style = {
-        'color': 'silver',
+        'textAlign': 'center',
+        'color': 'gray',
         'font-size': '12px',
     }
     ## Entries

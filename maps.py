@@ -1,5 +1,5 @@
-from folium import Map
-from folium.plugins import Fullscreen, MiniMap, MeasureControl, Draw
+from folium import Map, Marker, Icon
+from folium.plugins import Fullscreen, MiniMap, MeasureControl, Draw, LocateControl
 from geopandas import read_file
 from datetime import datetime
 
@@ -41,4 +41,6 @@ def _map():
     )
     # add draw tools to map
     draw.add_to(base_map)
+    # add location finder
+    LocateControl().add_to(base_map)
     return base_map

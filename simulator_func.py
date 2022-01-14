@@ -5,6 +5,7 @@ from folium import GeoJson, LayerControl, GeoJsonTooltip
 from base64 import b64decode
 from maps import _map
 from math import atan2, pi, sqrt
+from json import loads
 
 def get_map() -> 'html.Iframe':
     '''
@@ -19,12 +20,19 @@ def get_map() -> 'html.Iframe':
     base_map = _map() # (re)creating blank base_map
     # adding all converted layers to map
     for geojson_file in listdir('assets/floorplans'):
-        # adding it to base map
+        # tooltips only where further information is available
+        if loads(open(f'assets/floorplans/{geojson_file}').read())['features'][0]['properties'] == {}: tooltips = 'no info'
+        else:  tooltips = GeoJsonTooltip(fields=['usage', 'spaceID'])
+        # adding everything to base map
         name = geojson_file.split('.')[0]
-        geojson = GeoJson(f'assets/floorplans/{geojson_file}', name=name, show=False).add_to(base_map)
-        # adding tooltips if so (for more information when hovering over)
-        GeoJsonTooltip(fields=['usage']).add_to(geojson)
-
+        GeoJson(
+            f'assets/floorplans/{geojson_file}',
+            name=name,
+            tooltip=tooltips,
+            style_function=lambda x: {'weight': 0.5,'color': 'blue'},
+            highlight_function=lambda x: {'weight': 1,'color': 'orange'},
+            show=False
+        ).add_to(base_map)
         
     # saving map as an html file with LayerControl
     LayerControl().add_to(base_map)
@@ -38,10 +46,10 @@ def get_map() -> 'html.Iframe':
             }
     )
 
-def geojson_decoder(content: str) -> str:
+def upload_decoder(content: str) -> str:
     '''
-    - converts base64 file to geojson
-    - returns decoded geojson file
+    - decodes uploaded base64 file to originally uploaded file
+    - returns decoded file
     '''
     # decoding base64 to geojson
     encoded_content = content.split(',')[1]
@@ -50,7 +58,7 @@ def geojson_decoder(content: str) -> str:
 
 def crs32632_converter(filename: str, decoded_content: str) -> None:
     '''
-    - converts decoded every geojson file to WGS84
+    - converts an EPSG: 32632 geojson file to WGS84
     - saves converted file
     '''
     # converting crs (UTM -> EPSG: 32632) of given floorplan to WGS84 (EPSG: 4326)
