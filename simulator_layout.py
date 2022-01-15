@@ -132,7 +132,6 @@ def simulator_card():
         'border': '1px solid #966200'
     }
     label_style = {
-        'textAlign': 'center',
         'color': 'gray',
         'font-size': '12px',
     }
