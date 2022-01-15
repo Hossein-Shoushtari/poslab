@@ -28,9 +28,9 @@ def get_map() -> 'html.Iframe':
         GeoJson(
             f'assets/floorplans/{geojson_file}',
             name=name,
-            tooltip=tooltips,
-            style_function=lambda x: {'weight': 0.5,'color': 'blue'},
-            highlight_function=lambda x: {'weight': 1,'color': 'orange'},
+            #tooltip=tooltips,
+            #style_function=lambda x: {'weight': 0.5,'color': 'blue'},
+            #highlight_function=lambda x: {'weight': 1,'color': 'orange'},
             show=False
         ).add_to(base_map)
         
