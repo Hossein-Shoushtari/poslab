@@ -43,9 +43,16 @@ app.layout = html.Div(
     ### Outputs ###
     Output('sim_modal', 'is_open'),   # modal
     Output('map', 'children'),        # map
+    Output("ul_cv", "is_open"),       # upload - canvas
+    Output("sim_cv", "is_open"),      # simulator - canvas
     ### Inputs ###
     # modal
     State('sim_modal', 'is_open'),
+    # canvas
+    Input("ul_btn", "n_clicks"),   # upload
+    State("ul_cv", "is_open"),     # upload
+    Input("sim_btn", "n_clicks"),  # simulator
+    State("sim_cv", "is_open"),    # simulator
     # maps
     Input('ul_map', 'contents'),
     State('ul_map', 'filename'),
@@ -56,20 +63,40 @@ app.layout = html.Div(
     Input('ul_ant', 'contents'),
     State('ul_ant', 'filename'),
 )
-def callback(is_open, map_contents, map_filenames, way_contents, way_filenames, ant_contents, ant_filenames):
+def callback(
+    # modal
+    modal_state,
+    # offcanvas
+    ul_clicks,  # upload
+    ul_state,   # upload
+    sim_clicks, # simpulation
+    sim_state,  # simpulation
+    # upload
+    map_contents,  # maps
+    map_filenames, # maps
+    way_contents,  # waypoints
+    way_filenames, # waypoints
+    ant_contents,  # antennas
+    ant_filenames  # antennas
+    ): 
     # getting clicked button
     changed_id = [p['prop_id'] for p in callback_context.triggered][0]
+    # =========== CANVAS ============
+    # UPLOAD
+    if 'ul_btn' in changed_id: return modal_state, no_update, not ul_state, sim_state     # activate upload offcanvas
+    # SIMULATOR
+    elif 'sim_btn' in changed_id: return modal_state, no_update, ul_state, not sim_state  # activate simulator offcanvas
     #============= MAP =============
-    if 'ul_map' in changed_id:
+    elif 'ul_map' in changed_id:
         for i in range(len(map_filenames)):
             if map_filenames[i].split('.')[-1] in ['geojson']: # assuming user uploaded right file format
                 decoded_content = upload_decoder(map_contents[i]) # decoding uploaded base64 file
                 crs32632_converter(map_filenames[i], decoded_content) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
             else: # activating modal -> warning
-                return not is_open, no_update
+                return not modal_state, no_update, ul_state, sim_state
         # if everything went fine ...
-        return is_open, get_map() # returning an html.Iframe with refreshed map
-    #========== WAYPOINTS ==========
+        return modal_state, get_map(), ul_state, sim_state # returning an html.Iframe with refreshed map
+    # ========== WAYPOINTS ==========
     elif 'ul_way' in changed_id:
         for i in range(len(way_filenames)):
             if way_filenames[i].split('.')[-1] in ['geojson', 'txt', 'csv']: # assuming user uploaded right file format
@@ -77,10 +104,10 @@ def callback(is_open, map_contents, map_filenames, way_contents, way_filenames, 
                 with open(f'assets/waypoints/{way_filenames[i]}', 'w') as file:
                     file.write(decoded_content)
             else: # activating modal -> warning
-                return not is_open, no_update
+                return not modal_state, no_update, ul_state, sim_state
         # if everything went fine ...
-        return is_open, no_update
-    #========== ANTENNAS ===========
+        return modal_state, no_update, ul_state, sim_state
+    # ========== ANTENNAS ===========
     elif 'ul_ant' in changed_id:
         for i in range(len(ant_filenames)):
             if ant_filenames[i].split('.')[-1] in ['geojson', 'txt', 'csv']: # assuming user uploaded right file format
@@ -88,13 +115,12 @@ def callback(is_open, map_contents, map_filenames, way_contents, way_filenames, 
                 with open(f'assets/antennas/{ant_filenames[i]}', 'w') as file:
                     file.write(decoded_content)
             else: # activating modal -> warning
-                return not is_open, no_update
+                return not modal_state, no_update, ul_state, sim_state
         # if everything went fine ...
-        return is_open, no_update
-    #====== no button clicked ======
-    else:
-        # this else-section is always activated, when the page refreshes
-        return is_open, get_map() # returning the current Iframe/map
+        return modal_state, no_update, ul_state, sim_state
+    # ====== no button clicked ======
+    # this else-section is always activated, when the page refreshes
+    else: return modal_state, get_map(), ul_state, sim_state # returning the current Iframe/map
 
 
 # pushing the page to the web
