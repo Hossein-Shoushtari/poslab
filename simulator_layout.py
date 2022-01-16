@@ -165,7 +165,8 @@ def simulator_card():
                 html.Div([
                     # info text
                     html.P('⚠  Please note:'),
-                    html.P('As Maps only GeoJSON files of type crs:32632 or directly crs:4326 are excepted. Waypoints and Antennas both except either TXT, CSV or GeoJSON.', style={'textAlign': 'left'})],
+                    html.P('Only GeoJSON files of type crs:32632 or directly crs:4326 are accepted as Maps.', style={'textAlign': 'left'}),
+                    html.P(' Both Waypoints and Antennas accept TXT, CSV or GeoJSON.', style={'textAlign': 'left', 'marginTop': '-10px'})],
                 style=div_style1),
                 html.Br(),
                 html.Div([
