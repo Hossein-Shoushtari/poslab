@@ -21,8 +21,10 @@ def get_map() -> 'html.Iframe':
     # adding all converted layers to map
     for geojson_file in listdir('assets/floorplans'):
         # tooltips only where further information is available
-        if loads(open(f'assets/floorplans/{geojson_file}').read())['features'][0]['properties'] == {}: tooltips = 'no info'
-        else:  tooltips = GeoJsonTooltip(fields=['usage', 'spaceID'])
+        props_dict: dict = loads(open(f'assets/floorplans/{geojson_file}').read())['features'][0]['properties']
+        properties: list = [key for key in props_dict.keys()]
+        if properties == []: tooltips = 'no info'
+        else: tooltips = GeoJsonTooltip(fields=properties)
         # adding everything to base map
         name = geojson_file.split('.')[0]
         GeoJson(
