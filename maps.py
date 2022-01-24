@@ -7,8 +7,8 @@ def _map():
     '''
     :return: created base map
     '''
-    # creating a base map and get an hcu-centered view using folium
-    hcu_coordinates = (53.540355074570655, 10.004814073621176)
+    # creating a base map and get an hcu-centered view
+    hcu_coordinates = (53.540252, 10.004814073621176)
     base_map = Map(
         location=hcu_coordinates,
         tiles='stamentoner',
@@ -17,23 +17,17 @@ def _map():
         control_scale=True
     )
     # plugin for mini map
-    minimap = MiniMap(toggle_display=True)
+    # minimap = MiniMap(toggle_display=True)
     # add minimap to map
-    base_map.add_child(minimap)
+    # base_map.add_child(minimap)
     # add full screen button to map
     Fullscreen(position='topleft').add_to(base_map)
     # measure control
-    measure_control = MeasureControl(
-        position='topleft',
-        active_color='red',
-        completed_color='green',
-        primary_length_unit='meters'
-    )
+    # measure_control = MeasureControl(position='topleft', active_color='red', completed_color='green', primary_length_unit='meters')
     # add measure control to map
-    base_map.add_child(measure_control)
+    # base_map.add_child(measure_control)
     # draw tools | 'export=True' exports the drawn shapes as a geojson file
     draw = Draw(
-        export=True,
         filename=f'{datetime.now()}.geojson',
         position='topleft',
         draw_options={'polyline': {'allowIntersection': False}},
@@ -41,6 +35,4 @@ def _map():
     )
     # add draw tools to map
     draw.add_to(base_map)
-    # add location finder
-    LocateControl().add_to(base_map)
     return base_map

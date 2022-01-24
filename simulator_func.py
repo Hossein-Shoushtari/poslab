@@ -44,7 +44,7 @@ def get_map() -> 'html.Iframe':
             style=
             {
                 'width': '100%',
-                'height': '80vh'
+                'height': '60vh'
             }
     )
 

@@ -21,235 +21,190 @@ def simulator_card():
     ### UPLOAD
     # tooltips for more information
     ul_tt = html.Div([
-        dbc.Tooltip("geojson",             target="maps_upload",      placement='right'),
-        dbc.Tooltip("txt, csv or geojson", target="waypoints_upload", placement='right'),
-        dbc.Tooltip("txt, csv or geojson", target="antennas_upload",  placement='right'),
-        dbc.Tooltip("gyroscope",           target="ul_gyr",           placement='top'),
-        dbc.Tooltip("acceleration",        target="ul_acc",           placement='bottom'),
-        dbc.Tooltip("barometer",           target="ul_bar",           placement='top'),
-        dbc.Tooltip("magnetometer",        target="ul_mag",           placement='bottom')
+        dbc.Tooltip("geojson",             target="maps_upload",      placement="right"),
+        dbc.Tooltip("txt, csv or geojson", target="waypoints_upload", placement="right"),
+        dbc.Tooltip("txt, csv or geojson", target="antennas_upload",  placement="right"),
+        dbc.Tooltip("gyroscope, CSV",           target="ul_gyr",           placement="top"),
+        dbc.Tooltip("acceleration, CSV",        target="ul_acc",           placement="bottom"),
+        dbc.Tooltip("barometer, CSV",           target="ul_bar",           placement="top"),
+        dbc.Tooltip("magnetometer, CSV",        target="ul_mag",           placement="bottom")
     ])
     ## Buttons
     # maps and waypoints
     ul_buttons1 = html.Div([
         dcc.Upload(
-            id='ul_map',
-            children=html.Div(dbc.Button("Maps", id='maps_upload', color="info", outline=True), className="d-grid gap-2 col-8 mx-auto"),
-            style={'marginTop': '10px', 'marginBottom': '5px'},
+            id="ul_map",
+            children=html.Div(dbc.Button("Maps", id="maps_upload", color="info", outline=True, style={"width": "148px"})),
+            style={"marginTop": "8px", "marginBottom": "5px"},
             multiple=True),
         dcc.Upload(
-            id='ul_way',
-            children=html.Div(dbc.Button("Waypoints", id='waypoints_upload', color="info", outline=True), className="d-grid gap-2 col-8 mx-auto" ),
-            style={'marginTop': '5px', 'marginBottom': '5px'},
+            id="ul_way",
+            children=html.Div(dbc.Button("Waypoints", id="waypoints_upload", color="info", outline=True, style={"width": "148px"})),
+            style={"marginTop": "5px", "marginBottom": "5px"},
             multiple=True),
         dcc.Upload(
-            id='ul_ant',
-            children=html.Div(dbc.Button("Antennas", id='antennas_upload', color="info", outline=True), className="d-grid gap-2 col-8 mx-auto" ),
-            style={'marginTop': '5px', 'marginBottom': '15px'},
-            multiple=True)
-    ])
+            id="ul_ant",
+            children=html.Div(dbc.Button("Antennas", id="antennas_upload", color="info", outline=True, style={"width": "148px"})),
+            style={"marginTop": "5px", "marginBottom": "8px"},
+            multiple=True)],
+        style={"width": "150px"}
+    )
     # gyroscope, acceleration, barometer and magnetometer
     ul_buttons2 = html.Div(dbc.Row([
         dbc.Col(html.Div([  # left column
             dcc.Upload(
-                id='ul_gyr',
-                children=html.Div(dbc.Button("G", color="primary", size="lg", className="me-1", outline=True), className="d-grid gap-2 col-8", style={'marginLeft': 'auto'}),
+                id="ul_gyr",
+                children=html.Div(dbc.Button("G", color="primary", size="lg", outline=True, style={"width": "86px"})),
                 multiple=True,
-                style={'marginBottom': '4px'}),
+                style={"marginBottom": "6px"}),
             dcc.Upload(
-                id='ul_acc',
-                children=html.Div(dbc.Button("A", color="primary", size="lg", className="me-1", outline=True), className="d-grid gap-2 col-8", style={'marginLeft': 'auto'}),
-                multiple=True)])),
+                id="ul_acc",
+                children=html.Div(dbc.Button("A", color="primary", size="lg", outline=True, style={"width": "86px"})),
+                multiple=True)],
+            style={"textAlign": "left", "marginTop": "18px", "marginBottom": "18px"})),
         dbc.Col(html.Div([  # right column
             dcc.Upload(
-                id='ul_bar',
-                children=html.Div(dbc.Button("B", color="primary", size="lg", className="me-1", outline=True), className="d-grid gap-2 col-8", style={'marginRight': 'auto'}),
+                id="ul_bar",
+                children=html.Div(dbc.Button("B", color="primary", size="lg", outline=True, style={"width": "86px"})),
                 multiple=True,
-                style={'marginBottom': '4px'}),
+                style={"marginBottom": "6px"}),
             dcc.Upload(
-                id='ul_mag',
-                children=html.Div(dbc.Button("M", color="primary", size="lg", className="me-1", outline=True), className="d-grid gap-2 col-8", style={'marginRight': 'auto'}),
-                multiple=True)]))],
-        className="row g-0"),
-        style={'marginBottom': '10px'}
+                id="ul_mag",
+                children=html.Div(dbc.Button("M", color="primary", size="lg", outline=True, style={"width": "86px"})),
+                multiple=True)],
+            style={"textAlign": "right", "marginTop": "18px", "marginBottom": "18px"}))],
+        className="g-0"),
+        style={"width": "180px"}
     )
 
     ### SIMULATION
     # styles
     from_style = {
-        'display': 'flex',
-        'justify-content': 'center',
-        'marginBottom': '5px'
+        "display": "flex",
+        "justify-content": "left",
+        "marginLeft": "12px",
+        "marginBottom": "5px"
     }
     input_style = {
-        'color': 'gray',
-        'width': '320px',
-        'textAlign': 'center',
-        'backgroundColor': 'silver',
-        'border': '1px solid #917033'
+        "color": "gray",
+        "width": "200px",
+        "textAlign": "center",
+        "backgroundColor": "silver",
+        "border": "1px solid #917033"
     }
     label_style = {
-        'marginLeft': '30px',
-        'color': 'gray'
+        "marginLeft": "5px",
+        "color": "gray"
     }
     ## Entries
     text_input = html.Div([
         dbc.FormFloating([    # Distance Quality
-            dbc.Input(id='ti_dis', type='text', placeholder=0, style=input_style),
-            dbc.Label('Distance Quality', style=label_style)],
-        style=from_style),
-        dbc.FormFloating([    # Angle Quality
-            dbc.Input(id='ti_ang', type='text', placeholder=0, style=input_style),
-            dbc.Label('Angle Quality', style=label_style)],
+            dbc.Input(id="fr_dis", type="text", placeholder=0, style=input_style),
+            dbc.Label("Frequency", style=label_style)],
         style=from_style),
         dbc.FormFloating([    # Coordinate Quality
-            dbc.Input(id='ti_coo', type='text', placeholder=0, style=input_style),
-            dbc.Label('Coordinate Quality', style=label_style)],
+            dbc.Input(id="ti_coo", type="text", placeholder=0, style=input_style),
+            dbc.Label("Coordinate Quality", style=label_style)],
         style=from_style),
-        dbc.FormFloating([    # Symantic Error
-            dbc.Input(id='ti_sym', type='text', placeholder=0, style=input_style),
-            dbc.Label('Symantic Error', style=label_style)],
-        style={'display': 'flex', 'justify-content': 'center','marginBottom': '15px'})
+        # dbc.FormFloating([    # Distance Quality
+        #     dbc.Input(id="ti_dis", type="text", placeholder=0, style=input_style),
+        #     dbc.Label("Distance Quality", style=label_style)],
+        # style=from_style),
+        # dbc.FormFloating([    # Angle Quality
+        #     dbc.Input(id="ti_ang", type="text", placeholder=0, style=input_style),
+        #     dbc.Label("Angle Quality", style=label_style)],
+        # style=from_style),
+        # dbc.FormFloating([    # Symantic Error
+        #     dbc.Input(id="ti_sym", type="text", placeholder=0, style=input_style),
+        #     dbc.Label("Symantic Error", style=label_style)],
+        # style={"display": "flex", "justify-content": "center","marginBottom": "15px"})
     ])
     ## Buttons
     sim_buttons = html.Div([
         html.Div(
-            dbc.Button("Calculate ground truth", id='calc', color="warning", outline=True),
-            className="d-grid gap-2 col-8 mx-auto",
-            style={'marginTop': '10px', 'marginBottom': '5px'}),
+            dbc.Button("Calculate ground truth", id="calc", color="light", outline=True, style={"width": "200px"}),
+            style={"marginBottom": "5px"}),
         html.Div(
-            dbc.Button("Simulate measurement", id='sim', color="warning", outline=True),
-            className="d-grid gap-2 col-8 mx-auto",
-            style={'marginTop': '5px', 'marginBottom': '10px'})            
+            dbc.Button("Simulate measurement", id="sim", color="light", outline=True, style={"width": "200px"}),
+            style={"marginTop": "5px"})            
     ])
 
     ## OFFCANVAS
     ## putting everything it its appropriate offcanvas
     #styles
-    hr_style1 = {
-        'width': '80%',
-        'margin': 'auto',
-        'marginBottom': '15px'
-    }
-    hr_style2 = {
-        'width': '30%',
-        'margin': 'auto',
-        'marginBottom': '15px'
-    }
-    div_style1 = {
-        'border':'1px solid orange',
-        'border-radius': 10,
-        'padding': '10px'
-    }
-    div_style2 = {
-        'border':'1px solid',
-        'border-radius': 10,
-        'color': 'silver'
+    hr_style = {
+        'width': '60%',
+        'margin': 'auto'
     }
     H5_style = {
-        'textAlign': 'center',
-        'marginLeft': '40px',
-        'marginRight': '40px',
-        'color': 'grey',
-        'paddingTop': '10px'
+        "textAlign": "center",
+        "color": "grey",
+        "marginTop": "5px"
     }
-    btn_style = {
-        'marginTop': '10px',
-        'marginBottom': '10px'
-    }
-    # UPLOAD
+    # HELP
     # offcanvas
-    ul_canvas = html.Div([
+    help_canvas = html.Div([
         dbc.Offcanvas(
             html.Div([
-                html.Div([
-                    # info text
-                    html.P('⚠  Please note:'),
-                    html.P('Only GeoJSON files of type crs:32632 or directly crs:4326 are accepted as Maps.', style={'textAlign': 'left'}),
-                    html.P(' Both Waypoints and Antennas accept TXT, CSV or GeoJSON.', style={'textAlign': 'left', 'marginTop': '-10px'})],
-                style=div_style1),
-                html.Br(),
-                html.Div([
-                    ul_tt,  # tooltips
-                    html.H5('Upload', style=H5_style), # title
-                    html.Hr(style=hr_style1),           # horizontal line
-                    ul_buttons1,                       # buttons
-                    html.Hr(style=hr_style2),
-                    ul_buttons2],                      # buttons
-                style=div_style2)
-            ]),
-            id="ul_cv",
-            scrollable=True,
-            title="Upload",
-            is_open=False)
+                # info text
+                html.P("⚠  Please note:"),
+                html.P("Only GeoJSON files of type crs:32632 or directly crs:4326 are accepted as Maps.", style={"textAlign": "left"}),
+                html.P(" Both Waypoints and Antennas accept TXT, CSV or GeoJSON.", style={"textAlign": "left", "marginTop": "-10px"})],
+            style={"border":"1px solid orange", "border-radius": 10, "padding": "10px"}),
+        id="help_cv",
+        scrollable=True,
+        title="Help",
+        is_open=False)
     ])
-    # button
-    ul_cv_btn = html.Div(
-        dbc.Button("Data", id='ul_btn', color="info", outline=True),
-        className="d-grid gap-2 col-10 mx-auto",
-        style=btn_style)
-    # SIMULATION
-    # offcanvas
-    sim_canvas = html.Div([
-        dbc.Offcanvas(
-            html.Div([
-                html.H5('Simulation', style=H5_style),
-                html.Hr(style=hr_style1),
-                text_input,
-                html.Hr(style=hr_style2),
-                sim_buttons],
-            style=div_style2
-            ),
-            id="sim_cv",
-            scrollable=True,
-            title="Simulation",
-            is_open=False)
-    ])
-    # button
-    sim_cv_btn = html.Div(
-        dbc.Button("Simulate", id='sim_btn', color="warning", outline=True),
-        className="d-grid gap-2 col-10 mx-auto",
-        style=btn_style)
 
-    ## putting all together | left column
-    left_column = html.Div([
-        # UPLOAD
-        ul_canvas,  # offcanvas
-        html.Div([   # button
-            html.H5('Upload', style=H5_style),
-            html.Hr(style=hr_style1),
-            ul_cv_btn],
-            style=div_style2),
-        html.Br(),
-        # SIMULATION
-        sim_canvas,  # offcanvas
-        html.Div([   # button
-            html.H5('Simulation', style=H5_style),
-            html.Hr(style=hr_style1),
-            sim_cv_btn],
-            style=div_style2),
-        html.Br(),
-        # EXPORT
-        html.Div([
-            html.H5('Export', style=H5_style),
-            html.Hr(style=hr_style1),
-            html.Div(
-                dbc.Button("Get results", id='exp', color="success", outline=True),
-                className="d-grid gap-2 col-10 mx-auto",
-                style=btn_style)],
-            style=div_style2)
+    # card content
+    first_row = html.Div([dbc.Row(
+        [
+            dbc.Col(html.Div([
+                    html.H5("Upload", style=H5_style),
+                    html.Hr(style=hr_style),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.Div(ul_buttons1), style={"paddingLeft": "12px"})),
+                        dbc.Col(html.Div(html.Div(ul_buttons2), style={"paddingRight": "12px"}))],
+                    className="g-0")],
+                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "365px"})),
+
+            dbc.Col(html.Div([
+                    html.H5("Simulation", style=H5_style),
+                    html.Hr(style=hr_style),
+                    dbc.Row([
+                        dbc.Col(html.Div(text_input, style= {"marginTop": "10px"})),
+                        dbc.Col(html.Div(sim_buttons, style= {"marginTop": "30px"}))],
+                    className="g-0")],
+                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px"})),
+
+            dbc.Col(html.Div([
+                html.Div([
+                    html.H5("Export", style=H5_style),
+                    html.Hr(style=hr_style),
+                    html.Div(dbc.Button("Get results", id="exp", color="success", outline=True, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "10px"})],
+                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "100px", "width": "175px"}),
+                html.Div([
+                    html.Div(dbc.Button("Help", id="help_btn", color="warning", outline=False, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "30px"})],
+                style={"height": "90px", "width": "175px"})]))
+        ],
+        justify="evenly")
     ])
+
     ### returning filled Card
     return dbc.Card(dbc.CardBody([
         # modal, giving alert
         modal,
+        # tooltips
+        ul_tt,
+        # canvas
+        help_canvas,
         # card content
-        html.P("SIMULATOR", className="card-text"),
-        dbc.Row([
-            dbc.Col(left_column, width='auto'),
-            dbc.Col(html.Div(id='map'))
+        html.Div([
+            first_row,
+            dbc.Row(html.Div(id="map"))
         ])
     ]),
-    className='mt-3')
+    className="mt-3")
 
 
