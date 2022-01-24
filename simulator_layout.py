@@ -21,13 +21,13 @@ def simulator_card():
     ### UPLOAD
     # tooltips for more information
     ul_tt = html.Div([
-        dbc.Tooltip("geojson",             target="maps_upload",      placement="right"),
-        dbc.Tooltip("txt, csv or geojson", target="waypoints_upload", placement="right"),
-        dbc.Tooltip("txt, csv or geojson", target="antennas_upload",  placement="right"),
-        dbc.Tooltip("gyroscope, CSV",           target="ul_gyr",           placement="top"),
-        dbc.Tooltip("acceleration, CSV",        target="ul_acc",           placement="bottom"),
-        dbc.Tooltip("barometer, CSV",           target="ul_bar",           placement="top"),
-        dbc.Tooltip("magnetometer, CSV",        target="ul_mag",           placement="bottom")
+        dbc.Tooltip("geojson",              target="maps_upload",      placement="right"),
+        dbc.Tooltip("txt, csv or geojson",  target="waypoints_upload", placement="right"),
+        dbc.Tooltip("txt, csv or geojson",  target="antennas_upload",  placement="right"),
+        dbc.Tooltip("gyroscope, CSV",       target="ul_gyr",           placement="top"),
+        dbc.Tooltip("acceleration, CSV",    target="ul_acc",           placement="bottom"),
+        dbc.Tooltip("barometer, CSV",       target="ul_bar",           placement="top"),
+        dbc.Tooltip("magnetometer, CSV",    target="ul_mag",           placement="bottom")
     ])
     ## Buttons
     # maps and waypoints
@@ -164,10 +164,10 @@ def simulator_card():
                     html.H5("Upload", style=H5_style),
                     html.Hr(style=hr_style),
                     dbc.Row([
-                        dbc.Col(html.Div(html.Div(ul_buttons1), style={"paddingLeft": "12px"})),
-                        dbc.Col(html.Div(html.Div(ul_buttons2), style={"paddingRight": "12px"}))],
+                        dbc.Col(html.Div(html.Div(ul_buttons1), style={"marginLeft": "40px"})),
+                        dbc.Col(html.Div(html.Div(ul_buttons2)))],
                     className="g-0")],
-                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "365px"})),
+                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px"})),
 
             dbc.Col(html.Div([
                     html.H5("Simulation", style=H5_style),
@@ -183,12 +183,12 @@ def simulator_card():
                     html.H5("Export", style=H5_style),
                     html.Hr(style=hr_style),
                     html.Div(dbc.Button("Get results", id="exp", color="success", outline=True, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "10px"})],
-                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "100px", "width": "175px"}),
+                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "100px", "width": "435px"}),
                 html.Div([
-                    html.Div(dbc.Button("Help", id="help_btn", color="warning", outline=False, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "30px"})],
-                style={"height": "90px", "width": "175px"})]))
+                    html.Div(dbc.Button("Help", id="help_btn", color="warning", outline=False, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "19px"})],
+                style={"border":"1px solid", "border-radius": 10, "color": "orange", "height": "78px", "width": "435px", "marginTop": "4px"})]))
         ],
-        justify="evenly")
+        className="g-0")
     ])
 
     ### returning filled Card
@@ -202,6 +202,7 @@ def simulator_card():
         # card content
         html.Div([
             first_row,
+            html.Br(),
             dbc.Row(html.Div(id="map"))
         ])
     ]),
