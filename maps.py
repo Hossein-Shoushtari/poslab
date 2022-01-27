@@ -1,5 +1,5 @@
 from folium import Map, Marker, Icon
-from folium.plugins import Fullscreen, MiniMap, MeasureControl, Draw, LocateControl
+from folium.plugins import Fullscreen, MiniMap, MeasureControl, Draw, LocateControl, MousePosition
 from geopandas import read_file
 from datetime import datetime
 
@@ -28,11 +28,24 @@ def _map():
     # base_map.add_child(measure_control)
     # draw tools | 'export=True' exports the drawn shapes as a geojson file
     draw = Draw(
+        export=True,
         filename=f'{datetime.now()}.geojson',
         position='topleft',
         draw_options={'polyline': {'allowIntersection': False}},
         edit_options={'poly': {'allowIntersection': False}}
-    )
-    # add draw tools to map
-    draw.add_to(base_map)
+    ).add_to(base_map)
+    # show mouse position
+    lat_formatter = "function(num) {return L.Util.formatNum(num, 5) + '°N';};"
+    lng_formatter = "function(num) {return L.Util.formatNum(num, 5) + '°E';};"
+    MousePosition(
+        position="topright",
+        separator=" | ",
+        empty_string="NaN",
+        lng_first=True,
+        num_digits=20,
+        prefix="Coordinates:",
+        lat_formatter=lat_formatter,
+        lng_formatter=lng_formatter,
+    ).add_to(base_map)
+
     return base_map

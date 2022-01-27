@@ -10,11 +10,19 @@ def simulator_card():
     ### MAP
     # map is initialized in main.py
     
-    ### MODAL
-    modal = dbc.Modal([
+    ### MODALs
+    # warning
+    warning = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("WARNING")),
         dbc.ModalBody("Wrong file was uploaded!")],
-        id="sim_modal",
+        id="sim_warning",
+        is_open=False
+    )
+    # done
+    done = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalBody("File uploaded successfully!")],
+        id="sim_done",
         is_open=False
     )
 
@@ -90,7 +98,7 @@ def simulator_card():
         "width": "200px",
         "textAlign": "center",
         "backgroundColor": "silver",
-        "border": "1px solid #917033"
+        "border": "1px solid gray"
     }
     label_style = {
         "marginLeft": "5px",
@@ -167,7 +175,7 @@ def simulator_card():
                         dbc.Col(html.Div(html.Div(ul_buttons1), style={"marginLeft": "40px"})),
                         dbc.Col(html.Div(html.Div(ul_buttons2)))],
                     className="g-0")],
-                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px"})),
+                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "marginBottom": "4px"})),
 
             dbc.Col(html.Div([
                     html.H5("Simulation", style=H5_style),
@@ -176,7 +184,7 @@ def simulator_card():
                         dbc.Col(html.Div(text_input, style= {"marginTop": "10px"})),
                         dbc.Col(html.Div(sim_buttons, style= {"marginTop": "30px"}))],
                     className="g-0")],
-                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px"})),
+                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "marginBottom": "4px"})),
 
             dbc.Col(html.Div([
                 html.Div([
@@ -186,15 +194,16 @@ def simulator_card():
                 style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "100px", "width": "435px"}),
                 html.Div([
                     html.Div(dbc.Button("Help", id="help_btn", color="warning", outline=False, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "19px"})],
-                style={"border":"1px solid", "border-radius": 10, "color": "orange", "height": "78px", "width": "435px", "marginTop": "4px"})]))
+                style={"border":"1px solid", "border-radius": 10, "color": "orange", "height": "78px", "width": "435px", "marginTop": "4px", "marginBottom": "4px"})]))
         ],
         className="g-0")
     ])
 
     ### returning filled Card
     return dbc.Card(dbc.CardBody([
-        # modal, giving alert
-        modal,
+        # modals, giving alert
+        warning,
+        done,
         # tooltips
         ul_tt,
         # canvas
