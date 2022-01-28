@@ -1,10 +1,18 @@
 from dash import html, Dash, Output, Input, State, no_update, callback_context
 import dash_bootstrap_components as dbc
 from simulator_layout import simulator_card
-from simulator_func import get_map, upload_decoder, crs32632_converter
+from simulator_func import _map, upload_decoder, crs32632_converter
 from evaluator_layout import evaluator_card
 from coming_soon_layout import coming_soon_card
 from home_layout import home_card
+from dash_extensions.javascript import assign
+
+# ---------------- MAP ----------------- #
+# Geojson rendering logic, must be JavaScript
+geojson_style = assign("""function(feature, context){
+    const {classes, colorscale, style, colorProp} = context.props.hideout;  // get props from hideout
+    return style;
+}""")
 
 # ---------------- HTML ---------------- #
 # designing the webpage using dash
@@ -111,7 +119,7 @@ def callback(
                 crs32632_converter(map_filenames[i], decoded_content) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
             else: return not warning_state, done_state, no_update, help_state # activating modal -> warning    
         # if everything went fine ...
-        return warning_state, not done_state, get_map(), help_state # returning an html.Iframe with refreshed map
+        return warning_state, not done_state, _map(geojson_style), help_state # returning an html.Iframe with refreshed map
     # ========== WAYPOINTS ==========
     elif "ul_way" in button:
         for i in range(len(way_filenames)):
@@ -174,7 +182,7 @@ def callback(
         return warning_state, not done_state, no_update, help_state
     # ====== no button clicked ======
     # this else-section is always activated, when the page refreshes
-    else: return warning_state, done_state, get_map(), help_state # returning the current Iframe/map
+    else: return warning_state, done_state, _map(geojson_style), help_state # returning the current Iframe/map
 
 
 # pushing the page to the web

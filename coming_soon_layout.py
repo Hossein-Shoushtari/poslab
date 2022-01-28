@@ -3,10 +3,12 @@ import dash_bootstrap_components as dbc
 
 def coming_soon_card():
     return dbc.Card(
-        dbc.CardBody(
-            [
-                html.P("Coming Soon", className="card-text")
-            ]
-        ),
-        className="mt-3",
+        [
+            dbc.CardBody(
+                [
+                    html.P("Coming Soon", className="card-text")
+                ]
+            ),
+            dbc.CardFooter("Copyright © 2022 Level 5 Indoor Navigation. All Rights Reserved")
+        ]
     )

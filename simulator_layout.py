@@ -1,10 +1,9 @@
 import os
 from dash import html, dcc, Dash, Output, Input, State, no_update
 import dash_bootstrap_components as dbc
+import dash_leaflet as dl
 from geopandas import GeoDataFrame, read_file
-from folium import GeoJson, LayerControl
 from base64 import b64decode
-from maps import _map
 
 def simulator_card():
     ### MAP
@@ -153,12 +152,19 @@ def simulator_card():
     # offcanvas
     help_canvas = html.Div([
         dbc.Offcanvas(
-            html.Div([
-                # info text
-                html.P("⚠  Please note:"),
-                html.P("Only GeoJSON files of type crs:32632 or directly crs:4326 are accepted as Maps.", style={"textAlign": "left"}),
-                html.P(" Both Waypoints and Antennas accept TXT, CSV or GeoJSON.", style={"textAlign": "left", "marginTop": "-10px"})],
-            style={"border":"1px solid orange", "border-radius": 10, "padding": "10px"}),
+            [   
+                html.Div([
+                    # info bug
+                    html.P("🐞 Something's wrong with the map?"),
+                    html.P("Just scale your browser window smaller and then back to normal.", style={"color": "gray"})],
+                style={"border":"1px solid red", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
+                html.Div([
+                    # info upload
+                    html.P("⚠  Please note:"),
+                    html.P("Only GeoJSON files of type crs:32632 or directly crs:4326 are accepted as Maps.", style={"color": "gray"}),
+                    html.P(" Both Waypoints and Antennas accept TXT, CSV or GeoJSON.", style={"color": "gray", "marginTop": "-10px"})],
+                style={"border":"1px solid orange", "border-radius": 10, "padding": "10px"})
+            ],
         id="help_cv",
         scrollable=True,
         title="Help",
@@ -200,21 +206,29 @@ def simulator_card():
     ])
 
     ### returning filled Card
-    return dbc.Card(dbc.CardBody([
-        # modals, giving alert
-        warning,
-        done,
-        # tooltips
-        ul_tt,
-        # canvas
-        help_canvas,
-        # card content
-        html.Div([
-            first_row,
-            html.Br(),
-            dbc.Row(html.Div(id="map"))
-        ])
-    ]),
-    className="mt-3")
+    return dbc.Card(
+        [
+            dbc.CardBody(
+                [
+                    # modals, giving alert
+                    warning,
+                    done,
+                    # tooltips
+                    ul_tt,
+                    # canvas
+                    help_canvas,
+                    # card content
+                    html.Div(
+                        [
+                            first_row,
+                            html.Br(),
+                            dbc.Row(html.Div(id="map", style={"border": "1px solid #6B8E23", "border-radius": 10}))
+                        ]
+                    )
+                ]
+            ),
+            dbc.CardFooter("Copyright © 2022 Level 5 Indoor Navigation. All Rights Reserved")
+        ]
+    )
 
 
