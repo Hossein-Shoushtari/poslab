@@ -1,5 +1,5 @@
 from os import listdir
-from dash import html
+#from dash import html
 from geopandas import GeoDataFrame, read_file
 from folium import GeoJson, LayerControl, GeoJsonTooltip
 from base64 import b64decode
@@ -94,6 +94,27 @@ def azimuth(ax: float, ay: float, bx: float, by: float) -> float:
     else:
         return atan2((delta_y), (delta_x))
 
+
+def closest_value(input_list, input_value):
+    """
+        return the closest value to a given input value from a list of given values
+
+        Parameters
+        ----------
+        input_list : list of values - list of floats
+        input_value : value for which the closest value is determined - float
+
+        Returns
+        -------
+        arr[i] : closest value from the list to the given value - float
+        """
+    arr = np.asarray(input_list)
+
+    i = (np.abs(arr - input_value)).argmin()
+
+    return arr[i]
+
+
 def simulate_positions(filename, error, freq):
     """
         creating sample data points for 5G measurements with chosen frequency and position error
@@ -108,6 +129,8 @@ def simulate_positions(filename, error, freq):
         -------
         positions : simulated positions from 5G measurements - array of arrays (tuples) of floats
         time_stamps : timestamps of 5G measurements - array of floats
+        error_list : list of the error for each measurement - list of floats
+        qualities_list : list of the quality value for each measurement - list of floats
         """
     with open(filename, newline='') as f:
         reader = csv.reader(f)
@@ -115,6 +138,7 @@ def simulate_positions(filename, error, freq):
         positions = []
         time_stamps = []
         freq = freq / 1000
+        error_list = []
         for row in reader:
             rows.append([float(row[0].split(' ')[0]), float(row[0].split(' ')[1]), float(row[0].split(' ')[2])])
 
@@ -122,6 +146,7 @@ def simulate_positions(filename, error, freq):
             time_stamps.append(rows[r][0])
             x_error = np.random.normal(0, error)
             y_error = np.random.normal(0, error)
+            error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
             positions.append([rows[r][1] + x_error, rows[r][2] + y_error])
 
             dt = 1 / freq
@@ -141,14 +166,22 @@ def simulate_positions(filename, error, freq):
                 time_stamps.append(t2)
                 x_error = np.random.normal(0, error)
                 y_error = np.random.normal(0, error)
-                positions.append([x_temp + dx + np.random.uniform(-error, error, 1)[0],
-                                  y_temp + dy + np.random.uniform(-error, error, 1)[0]])
+                error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
+                positions.append([x_temp + dx + x_error,
+                                  y_temp + dy + y_error])
 
                 t2 = t2 + dt
                 x_temp = x_temp + dx
                 y_temp = y_temp + dy
+        qualities_list = []
+        # assigning the real error to the closest quality value (defined error/5). Might be more useful to
+        # assign the error to the intervall between two qualities or the next hiegher quality value
+        for e in error_list:
+            intervalls = [error / 5, 2 * error / 5, 3 * error / 5, 4 * error / 5, 5 * error / 5]
+            quality = closest_value(intervalls, e)
+            qualities_list.append(quality)
 
-        return positions, time_stamps
+        return positions, time_stamps, error_list, qualities_list
 
 if __name__ == "__main__":
     """
@@ -158,7 +191,9 @@ if __name__ == "__main__":
     filename = 'assets/waypoints/GroundTruthZero2Four.csv'
     error = 2
     freq = 1
-    positions, time_stamps = simulate_positions(filename, error, freq)
+    positions, time_stamps, errors, qualities = simulate_positions(filename, error, freq)
+    print('qualities',qualities)
+    print('errors', errors)
 
     points_positions = []
     for p in positions:
