@@ -11,7 +11,7 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 from shapely.geometry import*
 
-def _map(geojson_style):
+def _map():
     """
     - adds all converted layers to map
     - returns list of all overlays
@@ -29,7 +29,7 @@ def _map(geojson_style):
         name = geojson_file.split(".")[0]  # getting name of geojson file
         geojson = dl.GeoJSON(
             url=f"assets/floorplans/{geojson_file}",  # url to geojson file
-            options=dict(style=geojson_style),  # style each polygon
+            #options=dict(style=geojson_style),  # style each polygon
             hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
             hideout=dict(style={"weight": 0.2, "color": "#DAF7A6"}, classes=[], colorscale=[], colorProp=""))
         layers.append(dl.Overlay(geojson, name=name, checked=False))
