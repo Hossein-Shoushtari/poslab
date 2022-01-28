@@ -222,7 +222,7 @@ def simulator_card():
                         [
                             first_row,
                             html.Br(),
-                            dbc.Row(html.Div(id="map", style={"border": "1px solid #6B8E23", "border-radius": 10}))
+                            dbc.Row(html.Div(id="map"))
                         ]
                     )
                 ]
