@@ -7,21 +7,47 @@ from base64 import b64decode
 
 def simulator_card():
     ### MAP
-    # map is initialized in main.py
+    # HCU coordinates
+    hcu = (53.540252, 10.004814073621176)
+    _map = html.Div(
+        dl.Map(
+            [   
+                html.Div(id="layers"),
+                dl.FeatureGroup(dl.EditControl(id="edit_control"))
+            ],
+            zoom=18,
+            center=hcu,
+            style={'width': '100%', 'height': '70vh', 'margin': "auto", "display": "block"}
+        )
+    )
     
     ### MODALs
-    # warning
-    warning = dbc.Modal([
+    # upload warning
+    ul_warning = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("WARNING")),
         dbc.ModalBody("Wrong file was uploaded!")],
-        id="sim_warning",
+        id="ul_warn",
         is_open=False
     )
-    # done
-    done = dbc.Modal([
+    # upload done
+    ul_done = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("DONE")),
         dbc.ModalBody("File uploaded successfully!")],
-        id="sim_done",
+        id="ul_done",
+        is_open=False
+    )
+    # export warning
+    exp_warning = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
+        dbc.ModalBody("Nothing to export yet!")],
+        id="exp_warn",
+        is_open=False
+    )
+    # export done
+    exp_done = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalBody("Drawn data successfully exported!")],
+        id="exp_done",
         is_open=False
     )
 
@@ -196,7 +222,7 @@ def simulator_card():
                 html.Div([
                     html.H5("Export", style=H5_style),
                     html.Hr(style=hr_style),
-                    html.Div(dbc.Button("Get results", id="exp", color="success", outline=True, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "10px"})],
+                    html.Div(dbc.Button("Get results", id="exp_btn", color="success", outline=True, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "10px"})],
                 style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "100px", "width": "435px"}),
                 html.Div([
                     html.Div(dbc.Button("Help", id="help_btn", color="warning", outline=False, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "19px"})],
@@ -211,8 +237,10 @@ def simulator_card():
             dbc.CardBody(
                 [
                     # modals, giving alert
-                    warning,
-                    done,
+                    ul_warning,
+                    ul_done,
+                    exp_warning,
+                    exp_done,
                     # tooltips
                     ul_tt,
                     # canvas
@@ -222,7 +250,7 @@ def simulator_card():
                         [
                             first_row,
                             html.Br(),
-                            dbc.Row(html.Div(id="map"))
+                            dbc.Row(_map)
                         ]
                     )
                 ]

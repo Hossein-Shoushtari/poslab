@@ -1,4 +1,5 @@
 from os import listdir
+from datetime import datetime
 from dash import html
 import dash_leaflet as dl
 from dash_extensions.javascript import arrow_function
@@ -11,7 +12,7 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 from shapely.geometry import*
 
-def _map(geojson_style):
+def _layers(geojson_style):
     """
     - adds all converted layers to map
     - returns list of all overlays
@@ -20,8 +21,6 @@ def _map(geojson_style):
     url = "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
     # Map info
     attribution = "&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a> "
-    # HCU coordinates
-    hcu = (53.540252, 10.004814073621176)
     # initializing list of all layers. first item is BaseLayer
     layers = [dl.BaseLayer(dl.TileLayer(url=url, attribution=attribution), name="base", checked=True)]
     # parsing through all converted layers and adding them to <<layers>>
@@ -33,14 +32,7 @@ def _map(geojson_style):
             hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
             hideout=dict(style={"weight": 0.2, "color": "#DAF7A6"}, classes=[], colorscale=[], colorProp=""))
         layers.append(dl.Overlay(geojson, name=name, checked=False))
-    return html.Div([dl.Map(
-            [
-                dl.LayersControl(layers)
-            ],
-            zoom=18,
-            center=hcu,
-            style={'width': '100%', 'height': '70vh', 'margin': "auto", "display": "block"})
-        ])
+    return html.Div(dl.LayersControl(layers))
 
 def upload_decoder(content: str) -> str:
     """
@@ -61,6 +53,23 @@ def crs32632_converter(filename: str, decoded_content: str) -> None:
     layer = GeoDataFrame(read_file(decoded_content), crs=32632).to_crs(4326)
     # saving converted layer
     layer.to_file(f"assets/floorplans/{filename}", driver="GeoJSON")
+
+def export_data(data: dict) -> None:
+    """
+    - formats geojson like dict from layercontrol
+    - saves formatted file as geojson file (>assets/export<)
+    """
+    # original export data must be formatted to proper geojson like string
+    old = "'"
+    new = """ " """
+    # getting the current date and time for unique filename
+    name = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
+    # storing data as geojson file
+    with open(f"assets/export/exportdata_{name}.geojson", "w") as file:
+        # formatting data-string
+        data_str = str(data).replace(old, new[1])
+        # ...saving
+        file.write(data_str)
 
 
 
