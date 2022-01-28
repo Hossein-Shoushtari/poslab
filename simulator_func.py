@@ -22,7 +22,7 @@ def _layers(geojson_style):
     # Map info
     attribution = "&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a> "
     # initializing list of all layers. first item is BaseLayer
-    layers = [dl.BaseLayer(dl.TileLayer(url=url, attribution=attribution), name="base", checked=True)]
+    layers = [dl.BaseLayer(dl.TileLayer(url=url, maxZoom=20, attribution=attribution), name="base", checked=True)]
     # parsing through all converted layers and adding them to <<layers>>
     for geojson_file in listdir("assets/floorplans"):
         name = geojson_file.split(".")[0]  # getting name of geojson file
@@ -30,7 +30,7 @@ def _layers(geojson_style):
             url=f"assets/floorplans/{geojson_file}",  # url to geojson file
             options=dict(style=geojson_style),  # style each polygon
             hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
-            hideout=dict(style={"weight": 0.2, "color": "#DAF7A6"}, classes=[], colorscale=[], colorProp=""))
+            hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""))
         layers.append(dl.Overlay(geojson, name=name, checked=False))
     return html.Div(dl.LayersControl(layers))
 

@@ -8,14 +8,14 @@ from base64 import b64decode
 def simulator_card():
     ### MAP
     # HCU coordinates
-    hcu = (53.540252, 10.004814073621176)
+    hcu = (53.5403169239316, 10.004875659942629)
     _map = html.Div(
         dl.Map(
             [   
                 html.Div(id="layers"),
                 dl.FeatureGroup(dl.EditControl(id="edit_control"))
             ],
-            zoom=18,
+            zoom=19,
             center=hcu,
             style={'width': '100%', 'height': '70vh', 'margin': "auto", "display": "block"}
         )
