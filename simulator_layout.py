@@ -2,18 +2,71 @@ import os
 from dash import html, dcc, Dash, Output, Input, State, no_update
 import dash_bootstrap_components as dbc
 import dash_leaflet as dl
+from dash_extensions.javascript import assign, arrow_function
 from geopandas import GeoDataFrame, read_file
 from base64 import b64decode
+from simulator_func import hover_info
 
 def simulator_card():
     ### MAP
     # HCU coordinates
     hcu = (53.5403169239316, 10.004875659942629)
+    # Tile Layer
+    url = "https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
+    # Map info
+    attribution = "&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a>, &copy; <a href='https://openmaptiles.org/'>OpenMapTiles</a> &copy; <a href='http://openstreetmap.org'>OpenStreetMap</a> contributors"
+    
+    # Geojson rendering logic, must be JavaScript
+    geojson_style = assign("""function(feature, context){
+        const {classes, colorscale, style, colorProp} = context.props.hideout;  // get props from hideout
+        return style;
+    }""")
+    # making layers out of default floorplans
+    ly_EG = dl.Overlay(
+        dl.GeoJSON(url=f"assets/floorplans/EG.geojson",  # url to geojson file
+                   options=dict(style=geojson_style),  # style each polygon
+                   hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
+                   hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""),
+                   id="eg"),
+        name="EG",
+        checked=False)
+    ly_1OG = dl.Overlay(
+        dl.GeoJSON(url=f"assets/floorplans/1OG.geojson",  # url to geojson file
+                   options=dict(style=geojson_style),  # style each polygon
+                   hoverStyle=arrow_function(dict(weight=1, color="orange")),  # style applied on hover
+                   hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""),
+                   id="1og"),
+        name="1OG",
+        checked=False)
+    ly_4OG = dl.Overlay(
+        dl.GeoJSON(url=f"assets/floorplans/4OG.geojson",  # url to geojson file
+                   options=dict(style=geojson_style),  # style each polygon
+                   hoverStyle=arrow_function(dict(weight=1, color="orange")),  # style applied on hover
+                   hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""),
+                   id="4og"),
+        name="4OG",
+        checked=False)
+    # info panel for geojson layer segments (tooltips while hovering)
+    info = html.Div(children=hover_info(), id="hover_info",
+                style={
+                    "position": "absolute",
+                    "top": "10px",
+                    "right": "120px",
+                    "z-index": "1000",
+                    "color": "black",
+                    "backgroundColor": "silver",
+                    "border": "1px solid gray",
+                    "border-radius": 5,
+                    "padding": "10px",
+                    "width": "240px"})
+    # putting all together to map
     _map = html.Div(
         dl.Map(
             [   
-                html.Div(id="layers"),
-                dl.FeatureGroup(dl.EditControl(id="edit_control"))
+                info,
+                dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
+                html.Div(id="layers", children=dl.LayersControl([ly_EG, ly_1OG, ly_4OG])), # default layers + later all uploaded new layers
+                dl.FeatureGroup(dl.EditControl(id="edit_control")) # possibility to draw/edit data
             ],
             zoom=19,
             center=hcu,
@@ -232,7 +285,7 @@ def simulator_card():
     ])
 
     ### returning filled Card
-    return dbc.Card(
+    return geojson_style, dbc.Card(
         [
             dbc.CardBody(
                 [

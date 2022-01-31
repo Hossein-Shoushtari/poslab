@@ -1,18 +1,10 @@
 from dash import html, Dash, Output, Input, State, no_update, callback_context
 import dash_bootstrap_components as dbc
 from simulator_layout import simulator_card
-from simulator_func import _layers, upload_decoder, crs32632_converter, export_data
+from simulator_func import _layers, upload_decoder, crs32632_converter, export_data, hover_info
 from evaluator_layout import evaluator_card
 from coming_soon_layout import coming_soon_card
 from home_layout import home_card
-from dash_extensions.javascript import assign
-
-# ---------------- MAP ----------------- #
-# Geojson rendering logic, must be JavaScript
-geojson_style = assign("""function(feature, context){
-    const {classes, colorscale, style, colorProp} = context.props.hideout;  // get props from hideout
-    return style;
-}""")
 
 # ---------------- HTML ---------------- #
 # designing the webpage using dash
@@ -26,7 +18,7 @@ app.title = "L5IN"
 ## Home page ##
 home_tab_content = home_card()  # getting the card content from home.py
 ## Simulator ##
-sim_tab_content = simulator_card()  # from simulator.py
+geojson_style, sim_tab_content = simulator_card()  # from simulator.py
 ## Evaluator ##
 ev_tab_content = evaluator_card()  # from evaluator.py
 ## Comming Soon ##
@@ -102,7 +94,7 @@ def upload(
     # getting clicked button
     button = [p["prop_id"] for p in callback_context.triggered][0]
     # UPLOAD
-    #============= MAP =============
+    #============= MAP =====================================================================================================================
     if "ul_map" in button:
         for i in range(len(map_filenames)):
             if map_filenames[i].split(".")[-1] in ["geojson"]: # assuming user uploaded right file format
@@ -111,7 +103,7 @@ def upload(
             else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
         # if everything went fine ...
         return ul_warning_state, not ul_done_state, _layers(geojson_style) # returning an html.Iframe with refreshed map
-    # ========== WAYPOINTS ==========
+    # ========== WAYPOINTS =================================================================================================================
     elif "ul_way" in button:
         for i in range(len(way_filenames)):
             if way_filenames[i].split(".")[-1] in ["geojson", "txt", "csv"]: # assuming user uploaded right file format
@@ -121,7 +113,7 @@ def upload(
             else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
         # if everything went fine ...
         return ul_warning_state, not ul_done_state, no_update
-    # ========== ANTENNAS ===========
+    # ========== ANTENNAS ==================================================================================================================
     elif "ul_ant" in button:
         for i in range(len(ant_filenames)):
             if ant_filenames[i].split(".")[-1] in ["geojson", "txt", "csv"]: # assuming user uploaded right file format
@@ -131,7 +123,7 @@ def upload(
             else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
         # if everything went fine ...
         return ul_warning_state, not ul_done_state, no_update
-    # ========== GYROSCOPE ==========
+    # ========== GYROSCOPE =================================================================================================================
     elif "ul_gyr" in button:
         for i in range(len(gyr_filenames)):
             if gyr_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
@@ -141,7 +133,7 @@ def upload(
             else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
         # if everything went fine ...
         return ul_warning_state, not ul_done_state, no_update
-    # ========= ACCELERATION  =======
+    # ========= ACCELERATION  ==============================================================================================================
     elif "ul_acc" in button:
         for i in range(len(acc_filenames)):
             if acc_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
@@ -151,7 +143,7 @@ def upload(
             else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
         # if everything went fine ...
         return ul_warning_state, not ul_done_state, no_update
-    # ========= BAROMETER  ==========
+    # ========= BAROMETER  =================================================================================================================
     elif "ul_bar" in button:
         for i in range(len(bar_filenames)):
             if bar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
@@ -161,7 +153,7 @@ def upload(
             else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
         # if everything went fine ...
         return ul_warning_state, not ul_done_state, no_update
-    # ======== MAGNETOMETER  ========
+    # ======== MAGNETOMETER  ===============================================================================================================
     elif "ul_mar" in button:
         for i in range(len(mar_filenames)):
             if mar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
@@ -171,9 +163,9 @@ def upload(
             else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
         # if everything went fine ...
         return ul_warning_state, not ul_done_state, no_update
-    # ====== no button clicked ======
+    # ====== no button clicked =============================================================================================================
     # this else-section is always activated, when the page refreshes
-    else: return ul_warning_state, ul_done_state, _layers(geojson_style) # returning the current Iframe/map
+    else: return ul_warning_state, ul_done_state, no_update
 
 # handling export
 @app.callback(
@@ -226,6 +218,23 @@ def help(
     if "help_btn" in button: return not help_cv_state     # activate help offcanvas
     else: help_cv_state
 
+# handling hovering tooltips in layers
+@app.callback(
+    ### Outputs ###
+    Output("hover_info", "children"),  # info panel
+    ### Inputs ###
+    Input("eg", "hover_feature"),      # EG
+    Input("1og", "hover_feature"),     # 1OG
+    Input("4og", "hover_feature"),     # 4OG
+)
+def hovering(
+    # geojson info of all three layers
+    feature_eg, feature_1og, feature_4og
+    ):
+    if feature_eg: return hover_info(feature_eg)       # if EG is clicked
+    elif feature_1og: return hover_info(feature_1og)   # if 1OG is clicked
+    elif feature_4og: return hover_info(feature_4og)   # if 4OGG is clicked
+    else: return hover_info()                          # if nothing is clicked
 
 
 # pushing the page to the web

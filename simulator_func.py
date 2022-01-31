@@ -12,27 +12,55 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 from shapely.geometry import*
 
+
+
 def _layers(geojson_style):
     """
     - adds all converted layers to map
     - returns list of all overlays
     """
-    # Tile Layer
-    url = "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
-    # Map info
-    attribution = "&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a> "
-    # initializing list of all layers. first item is BaseLayer
-    layers = [dl.BaseLayer(dl.TileLayer(url=url, maxZoom=20, attribution=attribution), name="base", checked=True)]
+    # again making layers out of default floorplans
+    ly_EG = dl.Overlay(
+        dl.GeoJSON(
+            url=f"assets/floorplans/EG.geojson",  # url to geojson file
+            options=dict(style=geojson_style),  # style each polygon
+            hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
+            hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp="",
+            id="eg")),
+        name="EG",
+        checked=False)
+    ly_1OG = dl.Overlay(
+        dl.GeoJSON(
+            url=f"assets/floorplans/1OG.geojson",  # url to geojson file
+            options=dict(style=geojson_style),  # style each polygon
+            hoverStyle=arrow_function(dict(weight=1, color="orange")),  # style applied on hover
+            hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp="",
+            id="1og")),
+        name="1OG",
+        checked=False)
+    ly_4OG = dl.Overlay(
+        dl.GeoJSON(
+            url=f"assets/floorplans/4OG.geojson",  # url to geojson file
+            options=dict(style=geojson_style),  # style each polygon
+            hoverStyle=arrow_function(dict(weight=1, color="orange")),  # style applied on hover
+            hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp="",
+            id="4og")),
+        name="4OG",
+        checked=False)
+    # initializing list of all layers
+    layers = [ly_EG, ly_1OG, ly_4OG]
     # parsing through all converted layers and adding them to <<layers>>
     for geojson_file in listdir("assets/floorplans"):
         name = geojson_file.split(".")[0]  # getting name of geojson file
-        geojson = dl.GeoJSON(
-            url=f"assets/floorplans/{geojson_file}",  # url to geojson file
-            options=dict(style=geojson_style),  # style each polygon
-            hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
-            hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""))
-        layers.append(dl.Overlay(geojson, name=name, checked=False))
+        if name not in ["EG", "1OG", "4OG"]:
+            geojson = dl.GeoJSON(
+                url=f"assets/floorplans/{geojson_file}",  # url to geojson file
+                options=dict(style=geojson_style),  # style each polygon
+                hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
+                hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""))
+            layers.append(dl.Overlay(geojson, name=name, checked=False))
     return html.Div(dl.LayersControl(layers))
+
 
 def upload_decoder(content: str) -> str:
     """
@@ -44,6 +72,7 @@ def upload_decoder(content: str) -> str:
     decoded_content = b64decode(encoded_content).decode("latin-1")  # should be a geojson like string
     return decoded_content
 
+
 def crs32632_converter(filename: str, decoded_content: str) -> None:
     """
     - converts an EPSG: 32632 geojson file to WGS84
@@ -53,6 +82,7 @@ def crs32632_converter(filename: str, decoded_content: str) -> None:
     layer = GeoDataFrame(read_file(decoded_content), crs=32632).to_crs(4326)
     # saving converted layer
     layer.to_file(f"assets/floorplans/{filename}", driver="GeoJSON")
+
 
 def export_data(data: dict) -> None:
     """
@@ -71,6 +101,12 @@ def export_data(data: dict) -> None:
         # ...saving
         file.write(data_str)
 
+
+def hover_info(feature=None):
+    header = [html.H4("Space Information")]
+    if not feature:
+        return header + [html.P("Choose a layer. Hover over a segment.")]
+    return header + [html.Div([html.P(f"{prop}: {feature['properties'][prop]}", style={"marginBottom": "-3px"})]) for prop in feature["properties"]]
 
 
 def closest_value(input_list, input_value):
