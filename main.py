@@ -1,11 +1,18 @@
 from dash import html, Dash, Output, Input, State, no_update, callback_context
 import dash_bootstrap_components as dbc
+from dash_extensions.javascript import assign
 from simulator_layout import simulator_card
-from simulator_func import _layers, upload_decoder, crs32632_converter, export_data, hover_info
+from simulator_func import uploaded_layers, upload_decoder, crs32632_converter, export_data, hover_info
 from evaluator_layout import evaluator_card
 from coming_soon_layout import coming_soon_card
 from home_layout import home_card
 
+
+# Geojson rendering logic, must be JavaScript
+geojson_style = assign("""function(feature, context){
+    const {classes, colorscale, style, colorProp} = context.props.hideout;  // get props from hideout
+    return style;
+}""")
 # ---------------- HTML ---------------- #
 # designing the webpage using dash
 ex_ss = [dbc.themes.DARKLY]
@@ -18,7 +25,7 @@ app.title = "L5IN"
 ## Home page ##
 home_tab_content = home_card()  # getting the card content from home.py
 ## Simulator ##
-geojson_style, sim_tab_content = simulator_card()  # from simulator.py
+sim_tab_content = simulator_card(geojson_style)  # from simulator.py
 ## Evaluator ##
 ev_tab_content = evaluator_card()  # from evaluator.py
 ## Comming Soon ##
@@ -102,7 +109,7 @@ def upload(
                 crs32632_converter(map_filenames[i], decoded_content) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
             else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
         # if everything went fine ...
-        return ul_warning_state, not ul_done_state, _layers(geojson_style) # returning an html.Iframe with refreshed map
+        return ul_warning_state, not ul_done_state, uploaded_layers(geojson_style) # returning an html.Iframe with refreshed map
     # ========== WAYPOINTS =================================================================================================================
     elif "ul_way" in button:
         for i in range(len(way_filenames)):
@@ -165,7 +172,7 @@ def upload(
         return ul_warning_state, not ul_done_state, no_update
     # ====== no button clicked =============================================================================================================
     # this else-section is always activated, when the page refreshes
-    else: return ul_warning_state, ul_done_state, no_update
+    else: return ul_warning_state, ul_done_state, uploaded_layers(geojson_style)
 
 # handling export
 @app.callback(
@@ -223,9 +230,9 @@ def help(
     ### Outputs ###
     Output("hover_info", "children"),  # info panel
     ### Inputs ###
-    Input("eg", "hover_feature"),      # EG
-    Input("1og", "hover_feature"),     # 1OG
-    Input("4og", "hover_feature"),     # 4OG
+    Input("EG", "hover_feature"),      # EG
+    Input("1OG", "hover_feature"),     # 1OG
+    Input("4OG", "hover_feature"),     # 4OG
 )
 def hovering(
     # geojson info of all three layers

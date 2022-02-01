@@ -1,6 +1,7 @@
 from os import listdir
 from datetime import datetime
 from dash import html
+import dash_bootstrap_components as dbc
 import dash_leaflet as dl
 from dash_extensions.javascript import arrow_function
 from geopandas import GeoDataFrame, read_file
@@ -12,43 +13,48 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 from shapely.geometry import*
 
+def default_layers(geojson_style) -> list:
+    """
+    return list of default layers (EG, 1OG, 4OG) with id to get hover info
+
+    Parameters
+    ----------
+    geojson_style : geojson rendering logic in java script (assign)
+
+    Returns
+    -------
+    layers : list of default layers
+    """
+    # initializing list to fill it with default layers
+    layers = []
+    # list of all default floorplan names
+    floorplans = ["EG", "1OG", "4OG"]
+    for fp in floorplans:
+        geojson = dl.GeoJSON(
+            url=f"assets/floorplans/{fp}.geojson",  # url to geojson file
+            options=dict(style=geojson_style),  # style each polygon
+            hoverStyle=arrow_function(dict(weight=1, color="orange")),  # style applied on hover
+            hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""),
+            id=fp)
+        layers.append(dl.Overlay(geojson, name=fp, checked=False))
+    return layers
 
 
-def _layers(geojson_style):
+def uploaded_layers(geojson_style):
     """
     - adds all converted layers to map
     - returns list of all overlays
+
+    Parameters
+    ----------
+    geojson_style : geojson rendering logic in java script (assign)
+
+    Returns
+    -------
+    html.Div : list of default layers + new uploaded layers
     """
-    # again making layers out of default floorplans
-    ly_EG = dl.Overlay(
-        dl.GeoJSON(
-            url=f"assets/floorplans/EG.geojson",  # url to geojson file
-            options=dict(style=geojson_style),  # style each polygon
-            hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
-            hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp="",
-            id="eg")),
-        name="EG",
-        checked=False)
-    ly_1OG = dl.Overlay(
-        dl.GeoJSON(
-            url=f"assets/floorplans/1OG.geojson",  # url to geojson file
-            options=dict(style=geojson_style),  # style each polygon
-            hoverStyle=arrow_function(dict(weight=1, color="orange")),  # style applied on hover
-            hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp="",
-            id="1og")),
-        name="1OG",
-        checked=False)
-    ly_4OG = dl.Overlay(
-        dl.GeoJSON(
-            url=f"assets/floorplans/4OG.geojson",  # url to geojson file
-            options=dict(style=geojson_style),  # style each polygon
-            hoverStyle=arrow_function(dict(weight=1, color="orange")),  # style applied on hover
-            hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp="",
-            id="4og")),
-        name="4OG",
-        checked=False)
-    # initializing list of all layers
-    layers = [ly_EG, ly_1OG, ly_4OG]
+    # getting list of layers (already filled with default layers)
+    layers = default_layers(geojson_style)
     # parsing through all converted layers and adding them to <<layers>>
     for geojson_file in listdir("assets/floorplans"):
         name = geojson_file.split(".")[0]  # getting name of geojson file
@@ -103,25 +109,59 @@ def export_data(data: dict) -> None:
 
 
 def hover_info(feature=None):
-    header = [html.H4("Space Information")]
+    header = [html.H4("Space Information", style={"textAlign": "center"}), html.Hr(style={"width": "60%", "margin": "auto", "marginBottom": "10px"})]
     if not feature:
-        return header + [html.P("Choose a layer. Hover over a segment.")]
-    return header + [html.Div([html.P(f"{prop}: {feature['properties'][prop]}", style={"marginBottom": "-3px"})]) for prop in feature["properties"]]
+        return header + [html.P("Choose a layer. Hover over a segment.", style={"textAlign": "center"})]
+    # creating table for properties
+    table_header = [html.Thead(html.Tr([html.Th("Usage", style={"width": "80px", "color": "white"}), html.Th("Value", style={"color": "white"})]))]
+    table_body_content = []
+    # filling table_body with content
+    for prop in feature["properties"]:
+        table_body_content.append(html.Tr(
+            [
+                html.Td(
+                    prop,
+                    style={
+                        "font-size": "15px",
+                        "width": "80px",
+                        "color": "white"
+                    }
+                ),
+                html.Td(
+                    feature["properties"][prop],
+                    style={
+                        "font-size": "15px",
+                        "color": "white"
+                    }
+                )
+            ]
+        ))
+    table_body = [html.Tbody(table_body_content[:-1])]
+    # completing table
+    table = dbc.Table(
+        table_header + table_body,
+        style={"marginBottom": "-3px"},
+        size="sm",
+        bordered=True,
+        striped=True,
+        dark=True
+    )
+    return html.Div([html.Div(header), table])
 
 
 def closest_value(input_list, input_value):
     """
-        return the closest value to a given input value from a list of given values
+    return the closest value to a given input value from a list of given values
 
-        Parameters
-        ----------
-        input_list : list of values - list of floats
-        input_value : value for which the closest value is determined - float
+    Parameters
+    ----------
+    input_list : list of values - list of floats
+    input_value : value for which the closest value is determined - float
 
-        Returns
-        -------
-        arr[i] : closest value from the list to the given value - float
-        """
+    Returns
+    -------
+    arr[i] : closest value from the list to the given value - float
+    """
     arr = np.asarray(input_list)
 
     i = (np.abs(arr - input_value)).argmin()
@@ -131,21 +171,21 @@ def closest_value(input_list, input_value):
 
 def simulate_positions(filename, error, freq):
     """
-        creating sample data points for 5G measurements with chosen frequency and position error
+    creating sample data points for 5G measurements with chosen frequency and position error
 
-        Parameters
-        ----------
-        filename : name of csv file containing groundtrouth data points - string
-        error : desired error for 5G positions (as std) - float
-        freq : frequency of 5G measurements in (number of measurements/second)  - float
+    Parameters
+    ----------
+    filename : name of csv file containing groundtrouth data points - string
+    error : desired error for 5G positions (as std) - float
+    freq : frequency of 5G measurements in (number of measurements/second)  - float
 
-        Returns
-        -------
-        positions : simulated positions from 5G measurements - array of arrays (tuples) of floats
-        time_stamps : timestamps of 5G measurements - array of floats
-        error_list : list of the error for each measurement - list of floats
-        qualities_list : list of the quality value for each measurement - list of floats
-        """
+    Returns
+    -------
+    positions : simulated positions from 5G measurements - array of arrays (tuples) of floats
+    time_stamps : timestamps of 5G measurements - array of floats
+    error_list : list of the error for each measurement - list of floats
+    qualities_list : list of the quality value for each measurement - list of floats
+    """
     with open(filename, newline='') as f:
         reader = csv.reader(f)
         rows = []
@@ -199,8 +239,8 @@ def simulate_positions(filename, error, freq):
 
 if __name__ == "__main__":
     """
-            check if the simulate_positions function is working
-            """
+    check if the simulate_positions function is working
+    """
 
     filename = 'assets/waypoints/GroundTruthZero2Four.csv'
     error = 2

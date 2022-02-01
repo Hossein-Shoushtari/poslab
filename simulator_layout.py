@@ -2,50 +2,14 @@ import os
 from dash import html, dcc, Dash, Output, Input, State, no_update
 import dash_bootstrap_components as dbc
 import dash_leaflet as dl
-from dash_extensions.javascript import assign, arrow_function
+from simulator_func import default_layers
+from dash_extensions.javascript import arrow_function
 from geopandas import GeoDataFrame, read_file
 from base64 import b64decode
 from simulator_func import hover_info
 
-def simulator_card():
+def simulator_card(geojson_style):
     ### MAP
-    # HCU coordinates
-    hcu = (53.5403169239316, 10.004875659942629)
-    # Tile Layer
-    url = "https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
-    # Map info
-    attribution = "&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a>, &copy; <a href='https://openmaptiles.org/'>OpenMapTiles</a> &copy; <a href='http://openstreetmap.org'>OpenStreetMap</a> contributors"
-    
-    # Geojson rendering logic, must be JavaScript
-    geojson_style = assign("""function(feature, context){
-        const {classes, colorscale, style, colorProp} = context.props.hideout;  // get props from hideout
-        return style;
-    }""")
-    # making layers out of default floorplans
-    ly_EG = dl.Overlay(
-        dl.GeoJSON(url=f"assets/floorplans/EG.geojson",  # url to geojson file
-                   options=dict(style=geojson_style),  # style each polygon
-                   hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
-                   hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""),
-                   id="eg"),
-        name="EG",
-        checked=False)
-    ly_1OG = dl.Overlay(
-        dl.GeoJSON(url=f"assets/floorplans/1OG.geojson",  # url to geojson file
-                   options=dict(style=geojson_style),  # style each polygon
-                   hoverStyle=arrow_function(dict(weight=1, color="orange")),  # style applied on hover
-                   hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""),
-                   id="1og"),
-        name="1OG",
-        checked=False)
-    ly_4OG = dl.Overlay(
-        dl.GeoJSON(url=f"assets/floorplans/4OG.geojson",  # url to geojson file
-                   options=dict(style=geojson_style),  # style each polygon
-                   hoverStyle=arrow_function(dict(weight=1, color="orange")),  # style applied on hover
-                   hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""),
-                   id="4og"),
-        name="4OG",
-        checked=False)
     # info panel for geojson layer segments (tooltips while hovering)
     info = html.Div(children=hover_info(), id="hover_info",
                 style={
@@ -54,19 +18,28 @@ def simulator_card():
                     "right": "120px",
                     "z-index": "1000",
                     "color": "black",
-                    "backgroundColor": "silver",
-                    "border": "1px solid gray",
+                    "backgroundColor": "white",
+                    "opacity": "0.6",
+                    "border": "2px solid #B2AFAC",
                     "border-radius": 5,
                     "padding": "10px",
                     "width": "240px"})
+    # HCU coordinates
+    hcu = (53.5403169239316, 10.004875659942629)
+    # Tile Layer
+    url = "https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
+    # Map info
+    attribution = "&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a>, &copy; <a href='https://openmaptiles.org/'>OpenMapTiles</a> &copy; <a href='http://openstreetmap.org'>OpenStreetMap</a> contributors"
     # putting all together to map
     _map = html.Div(
         dl.Map(
             [   
                 info,
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
-                html.Div(id="layers", children=dl.LayersControl([ly_EG, ly_1OG, ly_4OG])), # default layers + later all uploaded new layers
-                dl.FeatureGroup(dl.EditControl(id="edit_control")) # possibility to draw/edit data
+                html.Div(id="layers", children=dl.LayersControl(default_layers(geojson_style))), # default layers + later all uploaded new layers
+                dl.FullscreenControl(), # possibility to get map fullscreen
+                dl.FeatureGroup(dl.EditControl(id="edit_control")), # possibility to draw/edit data
+                
             ],
             zoom=19,
             center=hcu,
@@ -219,8 +192,8 @@ def simulator_card():
     ## putting everything it its appropriate offcanvas
     #styles
     hr_style = {
-        'width': '60%',
-        'margin': 'auto'
+        "width": "60%",
+        "margin": "auto"
     }
     H5_style = {
         "textAlign": "center",
@@ -235,13 +208,13 @@ def simulator_card():
                 html.Div([
                     # info bug
                     html.P("🐞 Something's wrong with the map?"),
-                    html.P("Just scale your browser window smaller and then back to normal.", style={"color": "gray"})],
+                    html.P("Just scale your browser window smaller and then back to normal or simply click the FullScreen Button right under the zoom section.", style={"color": "gray"})],
                 style={"border":"1px solid red", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
                 html.Div([
                     # info upload
                     html.P("⚠  Please note:"),
                     html.P("Only GeoJSON files of type crs:32632 or directly crs:4326 are accepted as Maps.", style={"color": "gray"}),
-                    html.P(" Both Waypoints and Antennas accept TXT, CSV or GeoJSON.", style={"color": "gray", "marginTop": "-10px"})],
+                    html.P("Both Waypoints and Antennas accept TXT, CSV or GeoJSON.", style={"color": "gray", "marginTop": "-10px"})],
                 style={"border":"1px solid orange", "border-radius": 10, "padding": "10px"})
             ],
         id="help_cv",
@@ -279,13 +252,13 @@ def simulator_card():
                 style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "100px", "width": "435px"}),
                 html.Div([
                     html.Div(dbc.Button("Help", id="help_btn", color="warning", outline=False, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "19px"})],
-                style={"border":"1px solid", "border-radius": 10, "color": "orange", "height": "78px", "width": "435px", "marginTop": "4px", "marginBottom": "4px"})]))
+                style={"border":"1px solid", "border-radius": 10, "color": "orange", "height": "76px", "width": "435px", "marginTop": "4px", "marginBottom": "4px"})]))
         ],
         className="g-0")
     ])
 
     ### returning filled Card
-    return geojson_style, dbc.Card(
+    return dbc.Card(
         [
             dbc.CardBody(
                 [
