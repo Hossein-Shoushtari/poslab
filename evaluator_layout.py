@@ -10,6 +10,6 @@ def evaluator_card():
                     dbc.Button("Don't click here", color="danger"),
                 ]
             ),
-            dbc.CardFooter("Copyright © 2022 Level 5 Indoor Navigation. All Rights Reserved")
+            dbc.CardFooter("Copyright © 2022 Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})
         ]
     )

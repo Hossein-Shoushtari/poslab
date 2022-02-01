@@ -9,6 +9,6 @@ def coming_soon_card():
                     html.P("Coming Soon", className="card-text")
                 ]
             ),
-            dbc.CardFooter("Copyright © 2022 Level 5 Indoor Navigation. All Rights Reserved")
+            dbc.CardFooter("Copyright © 2022 Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})
         ]
     )

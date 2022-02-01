@@ -113,7 +113,7 @@ def hover_info(feature=None):
     if not feature:
         return header + [html.P("Choose a layer. Hover over a segment.", style={"textAlign": "center"})]
     # creating table for properties
-    table_header = [html.Thead(html.Tr([html.Th("Usage", style={"width": "80px", "color": "white"}), html.Th("Value", style={"color": "white"})]))]
+    table_header = [html.Thead(html.Tr([html.Th("Properties", style={"width": "80px", "color": "white"}), html.Th("Value", style={"color": "white"})]))]
     table_body_content = []
     # filling table_body with content
     for prop in feature["properties"]:

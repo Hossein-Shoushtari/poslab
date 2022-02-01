@@ -281,7 +281,7 @@ def simulator_card(geojson_style):
                     )
                 ]
             ),
-            dbc.CardFooter("Copyright © 2022 Level 5 Indoor Navigation. All Rights Reserved")
+            dbc.CardFooter("Copyright © 2022 Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})
         ]
     )
 
