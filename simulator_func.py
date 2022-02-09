@@ -30,7 +30,7 @@ from geojson import Feature
 import pandas as pd
 import scipy.signal as signal
 from scipy.interpolate import interp1d
-import quaternion
+# import quaternion
 
 
 def default_layers(geojson_style) -> list:
@@ -312,7 +312,7 @@ def get_rotation_matrix_from_vector(rotation_vector):
     q3 = rotation_vector[2] # rotation vector in 3, part of unit quaternion>>q1*q1 + q2*q2 + q3*q3 is less than 1
 
     if rotation_vector.size >= 4:
-        q0 = rotation_vector[3]   #rotation vector input as unit quaternion should be like that(q1,q2,q3,q0)
+        q0 = rotation_vector[3]   # rotation vector input as unit quaternion should be like that(q1,q2,q3,q0)
     else:
         q0 = 1 - q1*q1 - q2*q2 - q3*q3
         if q0 > 0:

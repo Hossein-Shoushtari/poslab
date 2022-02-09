@@ -115,8 +115,7 @@ def upload(
         for i in range(len(way_filenames)):
             if way_filenames[i].split(".")[-1] in ["geojson", "txt", "csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(way_contents[i]) # decoding uploaded base64 file
-                with open(f"assets/waypoints/{way_filenames[i]}", "w") as file:
-                    file.write(decoded_content)
+                with open(f"assets/waypoints/{way_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
             else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
         # if everything went fine ...
         return ul_warning_state, not ul_done_state, no_update
@@ -125,8 +124,7 @@ def upload(
         for i in range(len(ant_filenames)):
             if ant_filenames[i].split(".")[-1] in ["geojson", "txt", "csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(ant_contents[i]) # decoding uploaded base64 file
-                with open(f"assets/antennas/{ant_filenames[i]}", "w") as file:
-                    file.write(decoded_content)
+                with open(f"assets/antennas/{ant_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
             else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
         # if everything went fine ...
         return ul_warning_state, not ul_done_state, no_update
@@ -135,8 +133,7 @@ def upload(
         for i in range(len(gyr_filenames)):
             if gyr_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(gyr_contents[i]) # decoding uploaded base64 file
-                with open(f"assets/sensors/{gyr_filenames[i]}", "w") as file:
-                    file.write(decoded_content)
+                with open(f"assets/sensors/gyr.csv", "w") as file: file.write(decoded_content) # saving file
             else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
         # if everything went fine ...
         return ul_warning_state, not ul_done_state, no_update
@@ -145,8 +142,7 @@ def upload(
         for i in range(len(acc_filenames)):
             if acc_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(acc_contents[i]) # decoding uploaded base64 file
-                with open(f"assets/sensors/{acc_filenames[i]}", "w") as file:
-                    file.write(decoded_content)
+                with open(f"assets/sensors/acc.csv", "w") as file: file.write(decoded_content) # saving file
             else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
         # if everything went fine ...
         return ul_warning_state, not ul_done_state, no_update
@@ -155,18 +151,16 @@ def upload(
         for i in range(len(bar_filenames)):
             if bar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(bar_contents[i]) # decoding uploaded base64 file
-                with open(f"assets/sensors/{bar_filenames[i]}", "w") as file:
-                    file.write(decoded_content)
+                with open(f"assets/sensors/bar.csv", "w") as file: file.write(decoded_content) # saving file
             else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
         # if everything went fine ...
         return ul_warning_state, not ul_done_state, no_update
     # ======== MAGNETOMETER  ===============================================================================================================
-    elif "ul_mar" in button:
+    elif "ul_mag" in button:
         for i in range(len(mar_filenames)):
             if mar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(mar_contents[i]) # decoding uploaded base64 file
-                with open(f"assets/sensors/{mar_filenames[i]}", "w") as file:
-                    file.write(decoded_content)
+                with open(f"assets/sensors/mag.csv", "w") as file: file.write(decoded_content) # saving file
             else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
         # if everything went fine ...
         return ul_warning_state, not ul_done_state, no_update
