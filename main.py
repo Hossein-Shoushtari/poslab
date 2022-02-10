@@ -2,7 +2,7 @@ from dash import html, Dash, Output, Input, State, no_update, callback_context
 import dash_bootstrap_components as dbc
 from dash_extensions.javascript import assign
 from simulator_layout import simulator_card
-from simulator_func import uploaded_layers, upload_decoder, crs32632_converter, export_data, hover_info
+from simulator_func import uploaded_layers, upload_decoder, crs32632_converter, export_data, hover_info, ground_truth_generation
 from evaluator_layout import evaluator_card
 from coming_soon_layout import coming_soon_card
 from home_layout import home_card
@@ -178,7 +178,6 @@ def upload(
     # modal
     State("exp_done", "is_open"),     # done
     State("exp_warn", "is_open"),     # warning
-
     # export
     Input("edit_control", "geojson"), # drawn data in geojson format
     Input("exp_btn", "n_clicks")      # export button click status 
@@ -190,10 +189,8 @@ def export(
     # export
     data,
     exp_clicks
-    ): 
-    # getting clicked button
-    button = [p["prop_id"] for p in callback_context.triggered][0]
-    if "exp_btn" in button:
+    ):
+    if exp_clicks:
         if data["features"]:
             export_data(data)
             return not exp_done_state, exp_warn_state # data successfully exported
@@ -213,10 +210,8 @@ def help(
     help_cv_state,
     # button
     help_clicks
-    ): 
-    # getting clicked button
-    button = [p["prop_id"] for p in callback_context.triggered][0]
-    if "help_btn" in button: return not help_cv_state     # activate help offcanvas
+    ):
+    if help_clicks: return not help_cv_state     # activate help offcanvas
     else: help_cv_state
 
 # handling hovering tooltips in layers
@@ -236,6 +231,34 @@ def hovering(
     elif feature_1og: return hover_info(feature_1og)   # if 1OG is clicked
     elif feature_4og: return hover_info(feature_4og)   # if 4OGG is clicked
     else: return hover_info()                          # if nothing is clicked
+
+# handling calculation
+@app.callback(
+    ### Outputs ###
+    # modal
+    Output("calc_done", "is_open"),    # calculation done status
+    Output("calc_warn", "is_open"),    # calculation warning status
+    Output("spinner1", "children"),     # loading status
+    ### Inputs ###
+    # modal
+    State("calc_done", "is_open"),     # done
+    State("calc_warn", "is_open"),     # warning
+    # calculation
+    Input("calc_btn", "n_clicks")      # calculation button click status 
+)
+def calculation(
+    ## modal
+    calc_done_state,
+    calc_warn_state,
+    # calculation
+    calc_clicks
+    ):
+    if calc_clicks:
+        if ground_truth_generation():
+            return not calc_done_state, calc_warn_state, no_update # successful calculation
+        return calc_done_state, not calc_warn_state, no_update # calculation failed
+    return calc_done_state, calc_warn_state, no_update # nothing is clicked. nothing happens
+
 
 
 # pushing the page to the web

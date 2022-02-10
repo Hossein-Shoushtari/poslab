@@ -4,18 +4,15 @@ from dash import html
 import dash_bootstrap_components as dbc
 import dash_leaflet as dl
 from dash_extensions.javascript import arrow_function
-from geopandas import GeoDataFrame, read_file
+from geopandas import GeoDataFrame, read_file, GeoSeries
 from base64 import b64decode
 from json import loads
 import numpy as np
 import csv
-import geopandas as gpd
 import matplotlib.pyplot as plt
-from shapely.geometry import*
 
 
 import re
-import geopandas as gpd
 import shapely
 from shapely.geometry import LineString,MultiPoint,MultiPolygon,MultiLineString
 from shapely.geometry import *
@@ -449,14 +446,13 @@ def correct_positions(rel_positions, reference_positions):
         # print(f'Rel positions list size: {len(rel_positions_list)}, ref positions size: {reference_positions.shape[0]}')
         del rel_positions_list[-1]
     assert len(rel_positions_list) == reference_positions.shape[0] - 1
-
     corrected_positions = np.zeros((0, 3))
     for i, rel_ps in enumerate(rel_positions_list):
         start_position = reference_positions[i]
         end_position = reference_positions[i + 1]
         abs_ps = np.zeros(rel_ps.shape)
         abs_ps[:, 0] = rel_ps[:, 0]
-#         abs_ps[:, 1:3] = rel_ps[:, 1:3] + start_position[1:3]
+        # abs_ps[:, 1:3] = rel_ps[:, 1:3] + start_position[1:3]
         abs_ps[0, 1:3] = rel_ps[0, 1:3] + start_position[1:3]
         for j in range(1, rel_ps.shape[0]):
             abs_ps[j, 1:3] = abs_ps[j-1, 1:3] + rel_ps[j, 1:3]
@@ -583,6 +579,25 @@ def heading_thomas(acc, gyr, freq):
         
     return headings
 
+def ground_truth_generation():
+    try:
+        # getting all data needed
+        acc = np.loadtxt("assets/sensors/acc.csv")
+        gyr = np.loadtxt("assets/sensors/gyr.csv")
+        ref = np.loadtxt("assets/waypoints/ref.csv")
+        # calculating ground truth
+        step_timestamps, step_indexs, step_acce_max_mins = compute_steps(acc)
+        headings = heading_thomas(acc, gyr, 100)
+        stride_lengths = compute_stride_length(step_acce_max_mins)
+        step_headings = compute_step_heading(step_timestamps, headings)
+        rel_positions = compute_rel_positions(stride_lengths, step_headings)
+        GroundTruth = correct_positions(rel_positions, ref[:,:3])
+        # saving ground truth
+        pd.DataFrame(GroundTruth).to_csv("assets/waypoints/GroundTruthTest.csv")
+        # everything went fine
+        return True
+    except Exception as e:
+        return None  # something went wrong
 
 
 #### Coordinate Simulation class!!!
@@ -769,5 +784,5 @@ if __name__ == "__main__":
         points_positions.append(Point(p))
 
     print(points_positions)
-    gpd.GeoSeries(points_positions).plot(figsize=(10, 10), color='red', markersize=100, label='5G positions')
+    GeoSeries(points_positions).plot(figsize=(10, 10), color='red', markersize=100, label='5G positions')
     plt.pause(60)

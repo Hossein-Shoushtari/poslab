@@ -9,6 +9,70 @@ from base64 import b64decode
 from simulator_func import hover_info
 
 def simulator_card(geojson_style):
+    ### SPINNERs
+    spinner1 = dbc.Spinner(
+        children=[
+            html.Div(id="spinner1", style={"display": "none"})
+        ],
+        type=None,
+        fullscreen=True,
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "black"},
+        spinnerClassName="spinner"
+    )
+    spinner2 = dbc.Spinner(
+        children=[
+            html.Div(id="spinner2", style={"display": "none"})
+        ],
+        type=None,
+        fullscreen=True,
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "black"},
+        spinnerClassName="spinner"
+    )
+
+    ### MODALs
+    # upload warning
+    ul_warning = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("WARNING")),
+        dbc.ModalBody("Wrong file was uploaded!")],
+        id="ul_warn",
+        is_open=False
+    )
+    # upload done
+    ul_done = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalBody("File uploaded successfully!")],
+        id="ul_done",
+        is_open=False
+    )
+    # calculation warning
+    calc_warning = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
+        dbc.ModalBody("Nothing to calculate yet!")],
+        id="calc_warn",
+        is_open=False
+    )
+    # calculation done
+    calc_done = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalBody("Calculation successful!")],
+        id="calc_done",
+        is_open=False
+    )
+    # export warning
+    exp_warning = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
+        dbc.ModalBody("Nothing to export yet!")],
+        id="exp_warn",
+        is_open=False
+    )
+    # export done
+    exp_done = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalBody("Drawn data successfully exported!")],
+        id="exp_done",
+        is_open=False
+    )
+
     ### MAP
     # info panel for geojson layer segments (tooltips while hovering)
     info = html.Div(children=hover_info(), id="hover_info",
@@ -16,7 +80,7 @@ def simulator_card(geojson_style):
                     "position": "absolute",
                     "top": "10px",
                     "right": "120px",
-                    "z-index": "1000",
+                    "z-index": "500",
                     "color": "black",
                     "backgroundColor": "white",
                     "opacity": "0.6",
@@ -47,36 +111,6 @@ def simulator_card(geojson_style):
         )
     )
     
-    ### MODALs
-    # upload warning
-    ul_warning = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("WARNING")),
-        dbc.ModalBody("Wrong file was uploaded!")],
-        id="ul_warn",
-        is_open=False
-    )
-    # upload done
-    ul_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("DONE")),
-        dbc.ModalBody("File uploaded successfully!")],
-        id="ul_done",
-        is_open=False
-    )
-    # export warning
-    exp_warning = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
-        dbc.ModalBody("Nothing to export yet!")],
-        id="exp_warn",
-        is_open=False
-    )
-    # export done
-    exp_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("DONE")),
-        dbc.ModalBody("Drawn data successfully exported!")],
-        id="exp_done",
-        is_open=False
-    )
-
     ### UPLOAD
     # tooltips for more information
     ul_tt = html.Div([
@@ -181,10 +215,10 @@ def simulator_card(geojson_style):
     ## Buttons
     sim_buttons = html.Div([
         html.Div(
-            dbc.Button("Calculate ground truth", id="calc", color="light", outline=True, style={"width": "200px"}),
+            dbc.Button("Calculate ground truth", id="calc_btn", color="light", outline=True, style={"width": "200px"}),
             style={"marginBottom": "5px"}),
         html.Div(
-            dbc.Button("Simulate measurement", id="sim", color="light", outline=True, style={"width": "200px"}),
+            dbc.Button("Simulate measurement", id="sim_btn", color="light", outline=True, style={"width": "200px"}),
             style={"marginTop": "5px"})            
     ])
 
@@ -265,12 +299,17 @@ def simulator_card(geojson_style):
                     # modals, giving alert
                     ul_warning,
                     ul_done,
+                    calc_warning,
+                    calc_done,
                     exp_warning,
                     exp_done,
                     # tooltips
                     ul_tt,
                     # canvas
                     help_canvas,
+                    # spinner, showing loading status
+                    spinner1,
+                    spinner2,
                     # card content
                     html.Div(
                         [
@@ -278,7 +317,7 @@ def simulator_card(geojson_style):
                             html.Br(),
                             dbc.Row(_map)
                         ]
-                    )
+                    ),
                 ]
             ),
             dbc.CardFooter("Copyright © 2022 Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})
