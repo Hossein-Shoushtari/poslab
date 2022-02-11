@@ -4,7 +4,6 @@ import dash_bootstrap_components as dbc
 import dash_leaflet as dl
 from simulator_func import default_layers
 from dash_extensions.javascript import arrow_function
-from geopandas import GeoDataFrame, read_file
 from base64 import b64decode
 from simulator_func import hover_info
 

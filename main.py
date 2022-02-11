@@ -190,7 +190,8 @@ def export(
     data,
     exp_clicks
     ):
-    if exp_clicks:
+    button = [p["prop_id"] for p in callback_context.triggered][0]
+    if "exp_btn" in button:
         if data["features"]:
             export_data(data)
             return not exp_done_state, exp_warn_state # data successfully exported
