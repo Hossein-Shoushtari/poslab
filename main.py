@@ -51,6 +51,7 @@ app.layout = html.Div(
     Output("ul_warn", "is_open"),    # warning
     Output("ul_done", "is_open"),    # done
     Output("layers", "children"),    # layers
+    Output("spin_ul", "children"),   # loading status
     ### Inputs ###
     # modals
     State("ul_warn", "is_open"),
@@ -107,66 +108,66 @@ def upload(
             if map_filenames[i].split(".")[-1] in ["geojson"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(map_contents[i]) # decoding uploaded base64 file
                 crs32632_converter(map_filenames[i], decoded_content) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
-            else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
+            else: return not ul_warning_state, ul_done_state, no_update, no_update # activating modal -> warning    
         # if everything went fine ...
-        return ul_warning_state, not ul_done_state, uploaded_layers(geojson_style) # returning an html.Iframe with refreshed map
+        return ul_warning_state, not ul_done_state, uploaded_layers(geojson_style), no_update # returning an html.Iframe with refreshed map
     # ========== WAYPOINTS =================================================================================================================
     elif "ul_way" in button:
         for i in range(len(way_filenames)):
             if way_filenames[i].split(".")[-1] in ["geojson", "txt", "csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(way_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/waypoints/{way_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
+            else: return not ul_warning_state, ul_done_state, no_update, no_update # activating modal -> warning    
         # if everything went fine ...
-        return ul_warning_state, not ul_done_state, no_update
+        return ul_warning_state, not ul_done_state, no_update, no_update
     # ========== ANTENNAS ==================================================================================================================
     elif "ul_ant" in button:
         for i in range(len(ant_filenames)):
             if ant_filenames[i].split(".")[-1] in ["geojson", "txt", "csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(ant_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/antennas/{ant_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
+            else: return not ul_warning_state, ul_done_state, no_update, no_update # activating modal -> warning    
         # if everything went fine ...
-        return ul_warning_state, not ul_done_state, no_update
+        return ul_warning_state, not ul_done_state, no_update, no_update
     # ========== GYROSCOPE =================================================================================================================
     elif "ul_gyr" in button:
         for i in range(len(gyr_filenames)):
             if gyr_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(gyr_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/gyr.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
+            else: return not ul_warning_state, ul_done_state, no_update, no_update # activating modal -> warning    
         # if everything went fine ...
-        return ul_warning_state, not ul_done_state, no_update
+        return ul_warning_state, not ul_done_state, no_update, no_update
     # ========= ACCELERATION  ==============================================================================================================
     elif "ul_acc" in button:
         for i in range(len(acc_filenames)):
             if acc_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(acc_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/acc.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
+            else: return not ul_warning_state, ul_done_state, no_update, no_update # activating modal -> warning    
         # if everything went fine ...
-        return ul_warning_state, not ul_done_state, no_update
+        return ul_warning_state, not ul_done_state, no_update, no_update
     # ========= BAROMETER  =================================================================================================================
     elif "ul_bar" in button:
         for i in range(len(bar_filenames)):
             if bar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(bar_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/bar.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
+            else: return not ul_warning_state, ul_done_state, no_update, no_update # activating modal -> warning    
         # if everything went fine ...
-        return ul_warning_state, not ul_done_state, no_update
+        return ul_warning_state, not ul_done_state, no_update, no_update
     # ======== MAGNETOMETER  ===============================================================================================================
     elif "ul_mag" in button:
         for i in range(len(mar_filenames)):
             if mar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(mar_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/mag.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warning_state, ul_done_state, no_update # activating modal -> warning    
+            else: return not ul_warning_state, ul_done_state, no_update, no_update # activating modal -> warning    
         # if everything went fine ...
-        return ul_warning_state, not ul_done_state, no_update
+        return ul_warning_state, not ul_done_state, no_update, no_update
     # ====== no button clicked =============================================================================================================
     # this else-section is always activated, when the page refreshes
-    else: return ul_warning_state, ul_done_state, uploaded_layers(geojson_style)
+    else: return ul_warning_state, ul_done_state, uploaded_layers(geojson_style), no_update
 
 # handling export
 @app.callback(
@@ -239,7 +240,7 @@ def hovering(
     # modal
     Output("calc_done", "is_open"),    # calculation done status
     Output("calc_warn", "is_open"),    # calculation warning status
-    Output("spinner1", "children"),     # loading status
+    Output("spin_calc", "children"),   # loading status
     ### Inputs ###
     # modal
     State("calc_done", "is_open"),     # done
