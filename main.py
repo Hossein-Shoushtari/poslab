@@ -2,7 +2,7 @@ from dash import html, Dash, Output, Input, State, no_update, callback_context
 import dash_bootstrap_components as dbc
 from dash_extensions.javascript import assign
 from simulator_layout import simulator_card
-from simulator_func import uploaded_layers, upload_decoder, crs32632_converter, export_data, hover_info, ground_truth_generation
+from simulator_func import add_new_layers, upload_decoder, crs32632_converter, export_data, hover_info, ground_truth_generation
 from evaluator_layout import evaluator_card
 from coming_soon_layout import coming_soon_card
 from home_layout import home_card
@@ -13,6 +13,7 @@ geojson_style = assign("""function(feature, context){
     const {classes, colorscale, style, colorProp} = context.props.hideout;  // get props from hideout
     return style;
 }""")
+
 # ---------------- HTML ---------------- #
 # designing the webpage using dash
 ex_ss = [dbc.themes.DARKLY]
@@ -44,18 +45,25 @@ app.layout = html.Div(
         )
     ]
 )
-# ==============================================================================
-# handling upload
+
+# ========= handling upload and calculation ================================================================================================
 @app.callback(
     ### Outputs ###
-    Output("ul_warn", "is_open"),    # warning
-    Output("ul_done", "is_open"),    # done
+    # modals
+    Output("ul_warn", "is_open"),    # upload warn
+    Output("ul_done", "is_open"),    # upload done
+    Output("calc_done", "is_open"),  # calculation done
+    Output("calc_warn", "is_open"),  # calculation warn
+    # layers
     Output("layers", "children"),    # layers
-    Output("spin_ul", "children"),   # loading status
+    # loading (invisible div)
+    Output("spin", "children"),      # loading status
     ### Inputs ###
     # modals
     State("ul_warn", "is_open"),
     State("ul_done", "is_open"),
+    State("calc_done", "is_open"),
+    State("calc_warn", "is_open"),
     # maps
     Input("ul_map", "contents"),
     State("ul_map", "filename"),
@@ -77,11 +85,15 @@ app.layout = html.Div(
     # magnetometer
     Input("ul_mag", "contents"),
     State("ul_mag", "filename"),
+    # calculation
+    Input("calc_btn", "n_clicks")
 )
 def upload(
     ## modals
-    ul_warning_state,
-    ul_done_state,
+    ul_warn,
+    ul_done,
+    calc_warn,
+    calc_done,
     ## upload
     map_contents,  # maps
     map_filenames,
@@ -97,7 +109,9 @@ def upload(
     bar_contents,  # barometer
     bar_filenames,
     mag_contents,  # magnetometer
-    mag_filenames
+    mag_filenames,
+    # calculation
+    calc_btn
     ): 
     # getting clicked button
     button = [p["prop_id"] for p in callback_context.triggered][0]
@@ -108,85 +122,92 @@ def upload(
             if map_filenames[i].split(".")[-1] in ["geojson"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(map_contents[i]) # decoding uploaded base64 file
                 crs32632_converter(map_filenames[i], decoded_content) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
-            else: return not ul_warning_state, ul_done_state, no_update, no_update # activating modal -> warning    
+            else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
-        return ul_warning_state, not ul_done_state, uploaded_layers(geojson_style), no_update # returning an html.Iframe with refreshed map
+        return ul_warn, not ul_done, calc_warn, calc_done, add_new_layers(geojson_style), no_update # returning an html.Iframe with refreshed map
     # ========== WAYPOINTS =================================================================================================================
     elif "ul_way" in button:
         for i in range(len(way_filenames)):
             if way_filenames[i].split(".")[-1] in ["geojson", "txt", "csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(way_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/waypoints/{way_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warning_state, ul_done_state, no_update, no_update # activating modal -> warning    
+            else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
-        return ul_warning_state, not ul_done_state, no_update, no_update
+        return ul_warn, not ul_done, calc_warn, calc_done, no_update, no_update
     # ========== ANTENNAS ==================================================================================================================
     elif "ul_ant" in button:
         for i in range(len(ant_filenames)):
             if ant_filenames[i].split(".")[-1] in ["geojson", "txt", "csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(ant_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/antennas/{ant_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warning_state, ul_done_state, no_update, no_update # activating modal -> warning    
+            else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
-        return ul_warning_state, not ul_done_state, no_update, no_update
+        return ul_warn, not ul_done, calc_warn, calc_done, no_update, no_update
     # ========== GYROSCOPE =================================================================================================================
     elif "ul_gyr" in button:
         for i in range(len(gyr_filenames)):
             if gyr_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(gyr_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/gyr.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warning_state, ul_done_state, no_update, no_update # activating modal -> warning    
+            else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
-        return ul_warning_state, not ul_done_state, no_update, no_update
+        return ul_warn, not ul_done, calc_warn, calc_done, no_update, no_update
     # ========= ACCELERATION  ==============================================================================================================
     elif "ul_acc" in button:
         for i in range(len(acc_filenames)):
             if acc_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(acc_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/acc.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warning_state, ul_done_state, no_update, no_update # activating modal -> warning    
+            else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
-        return ul_warning_state, not ul_done_state, no_update, no_update
+        return ul_warn, not ul_done, calc_warn, calc_done, no_update, no_update
     # ========= BAROMETER  =================================================================================================================
     elif "ul_bar" in button:
         for i in range(len(bar_filenames)):
             if bar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_decoder(bar_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/bar.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warning_state, ul_done_state, no_update, no_update # activating modal -> warning    
+            else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
-        return ul_warning_state, not ul_done_state, no_update, no_update
+        return ul_warn, not ul_done, calc_warn, calc_done, no_update, no_update
     # ======== MAGNETOMETER  ===============================================================================================================
     elif "ul_mag" in button:
-        for i in range(len(mar_filenames)):
-            if mar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                decoded_content = upload_decoder(mar_contents[i]) # decoding uploaded base64 file
+        for i in range(len(mag_filenames)):
+            if mag_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
+                decoded_content = upload_decoder(mag_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/mag.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warning_state, ul_done_state, no_update, no_update # activating modal -> warning    
+            else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
-        return ul_warning_state, not ul_done_state, no_update, no_update
+        return ul_warn, not ul_done, calc_warn, calc_done, no_update, no_update
+    # ======== CALCULATION  ================================================================================================================
+    elif "calc_btn" in button:
+        ground_truth = ground_truth_generation(geojson_style)
+        if ground_truth:
+            return ul_warn, ul_done, not calc_done, calc_warn, ground_truth, no_update # successful calculation
+        # calculation failed
+        return ul_warn, ul_done, calc_done, not calc_warn, no_update, no_update   
     # ====== no button clicked =============================================================================================================
     # this else-section is always activated, when the page refreshes
-    else: return ul_warning_state, ul_done_state, uploaded_layers(geojson_style), no_update
+    else: return ul_warn, ul_done, ul_done, calc_done, add_new_layers(geojson_style), no_update
 
-# handling export
+# ================ handling export =========================================================================================================
 @app.callback(
     ### Outputs ###
     # modal
     Output("exp_done", "is_open"),    # export done status
-    Output("exp_warn", "is_open"),    # export warning status
+    Output("exp_warn", "is_open"),    # export warn status
     ### Inputs ###
     # modal
     State("exp_done", "is_open"),     # done
-    State("exp_warn", "is_open"),     # warning
+    State("exp_warn", "is_open"),     # warn
     # export
     Input("edit_control", "geojson"), # drawn data in geojson format
     Input("exp_btn", "n_clicks")      # export button click status 
 )
 def export(
     ## modal
-    exp_done_state,
-    exp_warn_state,
+    exp_done,
+    exp_warn,
     # export
     data,
     exp_clicks
@@ -195,11 +216,11 @@ def export(
     if "exp_btn" in button:
         if data["features"]:
             export_data(data)
-            return not exp_done_state, exp_warn_state # data successfully exported
-        return exp_done_state, not exp_warn_state # nothing is drawn -> no data exported
-    return exp_done_state, exp_warn_state # nothing is clicked. nothing happens
+            return not exp_done, exp_warn # data successfully exported
+        return exp_done, not exp_warn # nothing is drawn -> no data exported
+    return exp_done, exp_warn # nothing is clicked. nothing happens
 
-# handling help
+# ================= handling help ==========================================================================================================
 @app.callback(
     ### Outputs ###
     Output("help_cv", "is_open"),    # canvas
@@ -209,14 +230,14 @@ def export(
 )
 def help(
     # canvas status
-    help_cv_state,
+    help_cv,
     # button
     help_clicks
     ):
-    if help_clicks: return not help_cv_state     # activate help offcanvas
-    else: help_cv_state
+    if help_clicks: return not help_cv     # activate help offcanvas
+    else: help_cv
 
-# handling hovering tooltips in layers
+# ====== handling hovering tooltips in layers ==============================================================================================
 @app.callback(
     ### Outputs ###
     Output("hover_info", "children"),  # info panel
@@ -234,32 +255,6 @@ def hovering(
     elif feature_4og: return hover_info(feature_4og)   # if 4OGG is clicked
     else: return hover_info()                          # if nothing is clicked
 
-# handling calculation
-@app.callback(
-    ### Outputs ###
-    # modal
-    Output("calc_done", "is_open"),    # calculation done status
-    Output("calc_warn", "is_open"),    # calculation warning status
-    Output("spin_calc", "children"),   # loading status
-    ### Inputs ###
-    # modal
-    State("calc_done", "is_open"),     # done
-    State("calc_warn", "is_open"),     # warning
-    # calculation
-    Input("calc_btn", "n_clicks")      # calculation button click status 
-)
-def calculation(
-    ## modal
-    calc_done_state,
-    calc_warn_state,
-    # calculation
-    calc_clicks
-    ):
-    if calc_clicks:
-        if ground_truth_generation():
-            return not calc_done_state, calc_warn_state, no_update # successful calculation
-        return calc_done_state, not calc_warn_state, no_update # calculation failed
-    return calc_done_state, calc_warn_state, no_update # nothing is clicked. nothing happens
 
 
 

@@ -9,18 +9,9 @@ from simulator_func import hover_info
 
 def simulator_card(geojson_style):
     ### SPINNERs
-    spin_calc = dbc.Spinner(
+    spin = dbc.Spinner(
         children=[
-            html.Div(id="spin_calc", style={"display": "none"})
-        ],
-        type=None,
-        fullscreen=True,
-        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "black"},
-        spinnerClassName="spinner"
-    )
-    spin_ul = dbc.Spinner(
-        children=[
-            html.Div(id="spin_ul", style={"display": "none"})
+            html.Div(id="spin", style={"display": "none"})
         ],
         type=None,
         fullscreen=True,
@@ -306,9 +297,8 @@ def simulator_card(geojson_style):
                     ul_tt,
                     # canvas
                     help_canvas,
-                    # spinner, showing loading status
-                    spin_calc,
-                    spin_ul,
+                    # spinner
+                    spin,
                     # card content
                     html.Div(
                         [

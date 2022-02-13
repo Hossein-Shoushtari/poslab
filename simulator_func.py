@@ -3,30 +3,23 @@ from datetime import datetime
 from dash import html
 import dash_bootstrap_components as dbc
 import dash_leaflet as dl
+import dash_leaflet.express as dlx
 from dash_extensions.javascript import arrow_function
 from geopandas import GeoDataFrame, read_file, GeoSeries
 from base64 import b64decode
-from json import loads
 import numpy as np
 import csv
 import matplotlib.pyplot as plt
-
-
 import re
 import shapely
-from shapely.geometry import LineString,MultiPoint,MultiPolygon,MultiLineString
+from shapely.geometry import LineString, MultiPoint, MultiPolygon, MultiLineString, Point, Polygon
 from shapely.geometry import *
-from shapely.ops import unary_union
-from shapely.ops import cascaded_union
-from shapely.ops import triangulate
-from shapely.geometry import Point,Polygon
-from shapely.ops import nearest_points
+import shapely.geometry as sg
+from shapely.ops import unary_union, cascaded_union, triangulate, nearest_points
 import math
 from turfpy import measurement
-from geojson import Feature
-import pandas as pd
+from geojson import Feature, FeatureCollection, Point
 import scipy.signal as signal
-from scipy.interpolate import interp1d
 # import quaternion
 
 
@@ -54,10 +47,11 @@ def default_layers(geojson_style) -> list:
             hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""),
             id=fp)
         layers.append(dl.Overlay(geojson, name=fp, checked=False))
+
     return layers
 
 
-def uploaded_layers(geojson_style):
+def add_new_layers(geojson_style, ground_truth = None):
     """
     - adds all converted layers to map
     - returns list of all overlays
@@ -65,10 +59,11 @@ def uploaded_layers(geojson_style):
     Parameters
     ----------
     geojson_style : geojson rendering logic in java script (assign)
+    ground_truth: if available, calculated ground truth data
 
     Returns
     -------
-    html.Div : list of default layers + new uploaded layers
+    html.Div : list of default layers + new uploaded layers + calculated ground truth
     """
     # getting list of layers (already filled with default layers)
     layers = default_layers(geojson_style)
@@ -82,8 +77,40 @@ def uploaded_layers(geojson_style):
                 hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
                 hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""))
             layers.append(dl.Overlay(geojson, name=name, checked=False))
+    # if ground truth (gt) wasn't calculated -> adding gt also to map
+    if ground_truth is not None:
+        markers = gt_markers(ground_truth)
+        layers.append(dl.Overlay(dl.LayerGroup(markers), name="GroundTruth", checked=True))
+        
     return html.Div(dl.LayersControl(layers))
 
+
+def gt_markers(ground_truth):
+    """
+    - converts lat and lon from groundtruth to crs:4326
+    - returns list of all created markers with converted lat and lon
+
+    Parameters
+    ----------
+    ground_truth: calculated ground truth data
+
+    Returns
+    -------
+    list of all created markers with converted lat and lon
+    """
+    # designing icon (from https://icons8.de/icons/set/marker)
+    icon = {
+        "iconUrl": "https://img.icons8.com/emoji/344/red-circle-emoji.png",
+        "iconSize": [5, 5],  # size of the icon
+        "iconAnchor": [0, 0],  # point of the icon which will correspond to marker"s location
+    }
+    # making points out of ground truth data for converting it (crs:32632 to crs:4326)
+    points = {"waypoint": [i for i in range(1, ground_truth.shape[0]+1)], "geometry": [sg.Point(lat, lon) for lat, lon in ground_truth]}
+    converted_points = GeoDataFrame(points, crs=32632).to_crs(4326)
+    # making geojson format for creating markers
+    geojson = dlx.dicts_to_geojson([dict(lat=row[1].y, lon=row[1].x) for _, row in converted_points.iterrows()])
+    markers = [dl.Marker(position=[row[1].y, row[1].x], icon=icon) for _, row in converted_points.iterrows()]
+    return markers
 
 def upload_decoder(content: str) -> str:
     """
@@ -93,19 +120,18 @@ def upload_decoder(content: str) -> str:
     # decoding base64 to geojson
     encoded_content = content.split(",")[1]
     decoded_content = b64decode(encoded_content).decode("latin-1")  # should be a geojson like string
-    return decoded_content
 
+    return decoded_content
 
 def crs32632_converter(filename: str, decoded_content: str) -> None:
     """
-    - converts an EPSG: 32632 geojson file to WGS84
+    - converts an EPSG: 32632 geojson file to WGS84 (4326)
     - saves converted file
     """
     # converting crs (UTM -> EPSG: 32632) of given floorplan to WGS84 (EPSG: 4326)
     layer = GeoDataFrame(read_file(decoded_content), crs=32632).to_crs(4326)
     # saving converted layer
     layer.to_file(f"assets/floorplans/{filename}", driver="GeoJSON")
-
 
 def export_data(data: dict) -> None:
     """
@@ -123,7 +149,6 @@ def export_data(data: dict) -> None:
         data_str = str(data).replace(old, new[1])
         # ...saving
         file.write(data_str)
-
 
 def hover_info(feature=None):
     header = [html.H4("Space Information", style={"textAlign": "center"}), html.Hr(style={"width": "60%", "margin": "auto", "marginBottom": "10px"})]
@@ -163,6 +188,7 @@ def hover_info(feature=None):
         striped=True,
         dark=True
     )
+
     return html.Div([html.Div(header), table])
 
 
@@ -242,9 +268,9 @@ def compute_steps(acce_datas):
         if step_criterion == 2:
             if (acce_binarys[-1] == -1) and ((acce_binarys[-2] == 1) or (acce_binarys[-2] == 0)):
                 step_flag = True
-#         elif step_criterion == 3:
-#             if (acce_binarys[-1] == -1) and (acce_binarys[-2] == 0) and (np.sum(acce_binarys[:-2]) > 1):
-#                 step_flag = True
+        # elif step_criterion == 3:
+        #     if (acce_binarys[-1] == -1) and (acce_binarys[-2] == 0) and (np.sum(acce_binarys[:-2]) > 1):
+        #         step_flag = True
         else:
             if (acce_binarys[-1] == 0) and acce_binarys[-2] == -1:
                 if (state_flag == 1) and ((acce_data[0] - acce_min[0]) > interval_threshold):
@@ -265,7 +291,6 @@ def compute_steps(acce_datas):
 
 def step_counter():
     print('The number of stesps is:' ,  len(step_timestamps))
-
 
 def compute_stride_length(step_acce_max_mins):
     K = 0.4
@@ -365,7 +390,6 @@ def get_rotation_matrix_from_vector(rotation_vector):
 
     return R
 
-
 def get_orientation(R):
     if np.linalg.det(R) < 0:
         print(np.linalg.det(R))
@@ -373,14 +397,14 @@ def get_orientation(R):
     values = np.zeros((3,))
     if np.size(flat_R) == 9:
         values[0] = np.arctan2(flat_R[1], flat_R[4])
-#         if flat_R[1] < 0:
-#             values[0] = -2*np.pi + np.arctan2(flat_R[1], flat_R[4])
-#         else:
-#             values[0] =  np.arctan2(flat_R[1], flat_R[4])
-#         if flat_R[1]<0 and flat_R[4] < 0:
-#             values[0] =  np.arctan2(flat_R[1], flat_R[4])
-#         else:
-#             values[0] =  np.arctan2(flat_R[1], flat_R[4])
+    #  if flat_R[1] < 0:
+        # values[0] = -2*np.pi + np.arctan2(flat_R[1], flat_R[4])
+    # else:
+        # values[0] =  np.arctan2(flat_R[1], flat_R[4])
+    # if flat_R[1]<0 and flat_R[4] < 0:
+        # values[0] =  np.arctan2(flat_R[1], flat_R[4])
+    # else:
+        # values[0] =  np.arctan2(flat_R[1], flat_R[4])
         values[1] = np.arcsin(-flat_R[7])
         values[2] = np.arctan2(-flat_R[6], flat_R[8])
     else:
@@ -422,7 +446,6 @@ def compute_rel_positions(stride_lengths, step_headings):
         rel_positions[i, 2] = stride_lengths[i, 1] * np.cos(step_headings[i, 1])
 
     return rel_positions
-
 
 def compute_step_positions(acce_datas, ahrs_datas, posi_datas):
     step_timestamps, step_indexs, step_acce_max_mins = compute_steps(acce_datas)
@@ -467,7 +490,6 @@ def correct_positions(rel_positions, reference_positions):
     corrected_positions = np.array(corrected_positions)
 
     return corrected_positions
-
 
 def split_ts_seq(ts_seq, sep_ts):
     """
@@ -579,24 +601,24 @@ def heading_thomas(acc, gyr, freq):
         
     return headings
 
-def ground_truth_generation():
+def ground_truth_generation(geojson_style):
     try:
-        # getting all data needed
+        # Loading Data
         acc = np.loadtxt("assets/sensors/acc.csv")
         gyr = np.loadtxt("assets/sensors/gyr.csv")
         ref = np.loadtxt("assets/waypoints/ref.csv")
-        # calculating ground truth
+        # Calculation
         step_timestamps, step_indexs, step_acce_max_mins = compute_steps(acc)
         headings = heading_thomas(acc, gyr, 100)
         stride_lengths = compute_stride_length(step_acce_max_mins)
         step_headings = compute_step_heading(step_timestamps, headings)
         rel_positions = compute_rel_positions(stride_lengths, step_headings)
         GroundTruth = correct_positions(rel_positions, ref[:,:3])
-        # saving ground truth
-        pd.DataFrame(GroundTruth).to_csv("assets/waypoints/GroundTruthTest.csv")
+        # Pushing to map
+        markers_added = add_new_layers(geojson_style, GroundTruth[:, 1:3])
         # everything went fine
-        return True
-    except Exception as e:
+        return markers_added
+    except:
         return None  # something went wrong
 
 
@@ -620,7 +642,6 @@ def closest_value(input_list, input_value):
     i = (np.abs(arr - input_value)).argmin()
 
     return arr[i]
-
 
 def semantic_error(number_range, error_range, intervall_range, time_stamps):
     """
@@ -652,7 +673,6 @@ def semantic_error(number_range, error_range, intervall_range, time_stamps):
         errors.append(np.random.uniform(error_range[0], error_range[-1]))
 
     return intervall_lengths, errors, intervall_starts
-
 
 def simulate_positions(filename, error, freq, number_range, error_range, intervall_range, semantic):
     """
