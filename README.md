@@ -1,21 +1,35 @@
-# CellularPositioningSimulator
+# Simulation ⟷  Evaluation
 
-official website:
-https://simulation2evaluation.herokuapp.com/
+### official website: https://simulation2evaluation.herokuapp.com/
 
+---
+## File Navigation -- Overview
+### DIRECTORIES
+#### assets
+> **antennas** : uploaded antenna data can be found here
+> **export** : after clicking on 'Get results', drawn geometry types are saved in one geojson file here 
+> **floorplans** : already converted floorplans (EG, 1OG, 4OG) and uploaded new map data can be found here
+> **groundtruth** : Dorians groung truth data can be found here
+> **images** : images for the website can be found here
+> **sensors** : all uploaded sensor data (acc, bar, gyr, mag) can be found here
+> **waypoints** : uploaded waypoint data can be found here
 
-## short intro
-### Python files
-main.py = website is build | server is established | functions are called  
-**_layout.py = layout of tabs | no funcionality  
-**_func.py = functions of tabs  -> this would be the space to add new functions; I will do the correct connecting to the buttons  
-### assets
-Floorplans = the original floorplans | no further need; already converted  
-floorplans_converted = all converted and usable flooplans/maps | these will be displayed on the map  
-### HTML file
-map.html = automatically created with folium to get the map as an Iframe with dash  
-### for heroku deploy
-- .gitignore
-- Procfile
-- requirements.txt
+### FILES
+> **main.py** : self-explanatory :)
+
+> **dashExtensions_default.js** : GeoJSON rendering logic. Must be Java Script. Used for dash-leaflet. Only initialized once in the beginning.
+
+> **spinner_styling.css** : CSS styling of blue spinner/loading sign
+
+> **coordinate_simulation.py** : Dorian's part
+
+> **ground_truth_generation.py** : Hossein's part
+
+> **measurement_simulation.py** : Georg's part (?)
+
+> **ly_...** : Design and layout of 4 tabs on web (Home, Simulator, Evaluator, Coming Soon)
+
+> **util.py** : Needed functions to run all buttons (converting, encoding, etc.)
+
+> **.gitignore**, **Procfile**, **requirements.txt** : for heroku deploy
 

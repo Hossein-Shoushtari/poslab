@@ -2,17 +2,14 @@ import os
 from dash import html, dcc, Dash, Output, Input, State, no_update
 import dash_bootstrap_components as dbc
 import dash_leaflet as dl
-from simulator_func import default_layers
+from util import floorplan2layer, hover_info
 from dash_extensions.javascript import arrow_function
 from base64 import b64decode
-from simulator_func import hover_info
 
 def simulator_card(geojson_style):
     ### SPINNERs
     spin = dbc.Spinner(
-        children=[
-            html.Div(id="spin", style={"display": "none"})
-        ],
+        children=[html.Div(id="spin", style={"display": "none"})],
         type=None,
         fullscreen=True,
         fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "black"},
@@ -21,7 +18,7 @@ def simulator_card(geojson_style):
 
     ### MODALs
     # upload warning
-    ul_warning = dbc.Modal([
+    ul_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("WARNING")),
         dbc.ModalBody("Wrong file was uploaded!")],
         id="ul_warn",
@@ -35,21 +32,21 @@ def simulator_card(geojson_style):
         is_open=False
     )
     # calculation warning
-    calc_warning = dbc.Modal([
+    gen_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
         dbc.ModalBody("Nothing to calculate yet!")],
-        id="calc_warn",
+        id="gen_warn",
         is_open=False
     )
     # calculation done
-    calc_done = dbc.Modal([
+    gen_done = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("DONE")),
         dbc.ModalBody("Calculation successful!")],
-        id="calc_done",
+        id="gen_done",
         is_open=False
     )
     # export warning
-    exp_warning = dbc.Modal([
+    exp_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
         dbc.ModalBody("Nothing to export yet!")],
         id="exp_warn",
@@ -65,19 +62,23 @@ def simulator_card(geojson_style):
 
     ### MAP
     # info panel for geojson layer segments (tooltips while hovering)
-    info = html.Div(children=hover_info(), id="hover_info",
-                style={
-                    "position": "absolute",
-                    "top": "10px",
-                    "right": "120px",
-                    "z-index": "500",
-                    "color": "black",
-                    "backgroundColor": "white",
-                    "opacity": "0.6",
-                    "border": "2px solid #B2AFAC",
-                    "border-radius": 5,
-                    "padding": "10px",
-                    "width": "240px"})
+    info = html.Div(
+        children=hover_info(),
+        id="hover_info",
+        style={
+            "position": "absolute",
+            "top": "10px",
+            "right": "120px",
+            "z-index": "500",
+            "color": "black",
+            "backgroundColor": "white",
+            "opacity": "0.6",
+            "border": "2px solid #B2AFAC",
+            "border-radius": 5,
+            "padding": "10px",
+            "width": "240px"
+        }
+    )
     # HCU coordinates
     hcu = (53.5403169239316, 10.004875659942629)
     # Tile Layer
@@ -90,9 +91,12 @@ def simulator_card(geojson_style):
             [   
                 info,
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
-                html.Div(id="layers", children=dl.LayersControl(default_layers(geojson_style))), # default layers + later all uploaded new layers
+                html.Div(id="layers", children=dl.LayersControl(floorplan2layer(geojson_style))), # default layers + later all uploaded new layers
                 dl.FullscreenControl(), # possibility to get map fullscreen
-                dl.FeatureGroup(dl.EditControl(id="edit_control")), # possibility to draw/edit data
+                dl.FeatureGroup(dl.EditControl(
+                                    id="edit_control",
+                                    draw=dict(rectangle=False, circle=False),
+                                    position="topleft")), # possibility to draw/edit data
                 
             ],
             zoom=19,
@@ -205,7 +209,7 @@ def simulator_card(geojson_style):
     ## Buttons
     sim_buttons = html.Div([
         html.Div(
-            dbc.Button("Calculate ground truth", id="calc_btn", color="light", outline=True, style={"width": "200px"}),
+            dbc.Button("Generate ground truth", id="gen_btn", color="light", outline=True, style={"width": "200px"}),
             style={"marginBottom": "5px"}),
         html.Div(
             dbc.Button("Simulate measurement", id="sim_btn", color="light", outline=True, style={"width": "200px"}),
@@ -287,11 +291,11 @@ def simulator_card(geojson_style):
             dbc.CardBody(
                 [
                     # modals, giving alert
-                    ul_warning,
+                    ul_warn,
                     ul_done,
-                    calc_warning,
-                    calc_done,
-                    exp_warning,
+                    gen_warn,
+                    gen_done,
+                    exp_warn,
                     exp_done,
                     # tooltips
                     ul_tt,

@@ -1,14 +1,23 @@
+#### IMPORTS
+# dash
 from dash import html, Dash, Output, Input, State, no_update, callback_context
 import dash_bootstrap_components as dbc
+import dash_leaflet as dl
 from dash_extensions.javascript import assign
-from simulator_layout import simulator_card
-from simulator_func import add_new_layers, upload_decoder, crs32632_converter, export_data, hover_info, ground_truth_generation
-from evaluator_layout import evaluator_card
-from coming_soon_layout import coming_soon_card
-from home_layout import home_card
+# layouts (ly)
+from ly_home import home_card
+from ly_simulator import simulator_card
+from ly_evaluator import evaluator_card
+from ly_coming_soon import coming_soon_card
+# utils
+from util import upload_encoder, geojson_converter
+from util import export_data, hover_info, floorplan2layer
+from util import upload2layer, csv2marker, marker2layer
+# generations/simulations/calculations
+from ground_truth_generation import generate_gt
 
 
-# Geojson rendering logic, must be JavaScript
+# Geojson rendering logic, must be JavaScript and only initialized once!
 geojson_style = assign("""function(feature, context){
     const {classes, colorscale, style, colorProp} = context.props.hideout;  // get props from hideout
     return style;
@@ -46,14 +55,14 @@ app.layout = html.Div(
     ]
 )
 
-# ========= handling upload and calculation ================================================================================================
+# ========= handling upload and generation ================================================================================================
 @app.callback(
     ### Outputs ###
     # modals
     Output("ul_warn", "is_open"),    # upload warn
     Output("ul_done", "is_open"),    # upload done
-    Output("calc_done", "is_open"),  # calculation done
-    Output("calc_warn", "is_open"),  # calculation warn
+    Output("gen_done", "is_open"),   # generation done
+    Output("gen_warn", "is_open"),   # generation warn
     # layers
     Output("layers", "children"),    # layers
     # loading (invisible div)
@@ -62,8 +71,8 @@ app.layout = html.Div(
     # modals
     State("ul_warn", "is_open"),
     State("ul_done", "is_open"),
-    State("calc_done", "is_open"),
-    State("calc_warn", "is_open"),
+    State("gen_done", "is_open"),
+    State("gen_warn", "is_open"),
     # maps
     Input("ul_map", "contents"),
     State("ul_map", "filename"),
@@ -85,8 +94,8 @@ app.layout = html.Div(
     # magnetometer
     Input("ul_mag", "contents"),
     State("ul_mag", "filename"),
-    # calculation
-    Input("calc_btn", "n_clicks")
+    # generation
+    Input("gen_btn", "n_clicks")
 )
 def upload(
     ## modals
@@ -110,8 +119,8 @@ def upload(
     bar_filenames,
     mag_contents,  # magnetometer
     mag_filenames,
-    # calculation
-    calc_btn
+    # generation
+    gen_btn
     ): 
     # getting clicked button
     button = [p["prop_id"] for p in callback_context.triggered][0]
@@ -120,16 +129,17 @@ def upload(
     if "ul_map" in button:
         for i in range(len(map_filenames)):
             if map_filenames[i].split(".")[-1] in ["geojson"]: # assuming user uploaded right file format
-                decoded_content = upload_decoder(map_contents[i]) # decoding uploaded base64 file
-                crs32632_converter(map_filenames[i], decoded_content) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
+                decoded_content = upload_encoder(map_contents[i]) # decoding uploaded base64 file
+                geojson_converter(map_filenames[i], decoded_content) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
             else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
-        return ul_warn, not ul_done, calc_warn, calc_done, add_new_layers(geojson_style), no_update # returning an html.Iframe with refreshed map
+        layers = floorplan2layer(geojson_style) + upload2layer(geojson_style) # floorplans + uploaded layers
+        return ul_warn, not ul_done, calc_warn, calc_done, html.Div(dl.LayersControl(layers)), no_update # returning an html.Iframe with refreshed map
     # ========== WAYPOINTS =================================================================================================================
     elif "ul_way" in button:
         for i in range(len(way_filenames)):
             if way_filenames[i].split(".")[-1] in ["geojson", "txt", "csv"]: # assuming user uploaded right file format
-                decoded_content = upload_decoder(way_contents[i]) # decoding uploaded base64 file
+                decoded_content = upload_encoder(way_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/waypoints/{way_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
             else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
@@ -138,7 +148,7 @@ def upload(
     elif "ul_ant" in button:
         for i in range(len(ant_filenames)):
             if ant_filenames[i].split(".")[-1] in ["geojson", "txt", "csv"]: # assuming user uploaded right file format
-                decoded_content = upload_decoder(ant_contents[i]) # decoding uploaded base64 file
+                decoded_content = upload_encoder(ant_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/antennas/{ant_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
             else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
@@ -147,7 +157,7 @@ def upload(
     elif "ul_gyr" in button:
         for i in range(len(gyr_filenames)):
             if gyr_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                decoded_content = upload_decoder(gyr_contents[i]) # decoding uploaded base64 file
+                decoded_content = upload_encoder(gyr_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/gyr.csv", "w") as file: file.write(decoded_content) # saving file
             else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
@@ -156,7 +166,7 @@ def upload(
     elif "ul_acc" in button:
         for i in range(len(acc_filenames)):
             if acc_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                decoded_content = upload_decoder(acc_contents[i]) # decoding uploaded base64 file
+                decoded_content = upload_encoder(acc_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/acc.csv", "w") as file: file.write(decoded_content) # saving file
             else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
@@ -165,7 +175,7 @@ def upload(
     elif "ul_bar" in button:
         for i in range(len(bar_filenames)):
             if bar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                decoded_content = upload_decoder(bar_contents[i]) # decoding uploaded base64 file
+                decoded_content = upload_encoder(bar_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/bar.csv", "w") as file: file.write(decoded_content) # saving file
             else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
@@ -174,21 +184,25 @@ def upload(
     elif "ul_mag" in button:
         for i in range(len(mag_filenames)):
             if mag_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                decoded_content = upload_decoder(mag_contents[i]) # decoding uploaded base64 file
+                decoded_content = upload_encoder(mag_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/mag.csv", "w") as file: file.write(decoded_content) # saving file
             else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
         return ul_warn, not ul_done, calc_warn, calc_done, no_update, no_update
-    # ======== CALCULATION  ================================================================================================================
-    elif "calc_btn" in button:
-        ground_truth = ground_truth_generation(geojson_style)
-        if ground_truth:
-            return ul_warn, ul_done, not calc_done, calc_warn, ground_truth, no_update # successful calculation
-        # calculation failed
-        return ul_warn, ul_done, calc_done, not calc_warn, no_update, no_update   
+    # ======== GENERATION  ================================================================================================================
+    elif "gen_btn" in button:
+        #try:
+        gt = generate_gt(geojson_style) # generating ground truth data
+        markers = csv2marker(gt[:, 1:3]) # converting crs and making markers
+        layers = floorplan2layer(geojson_style) + upload2layer(geojson_style) + [marker2layer(markers)] # floorplans + uploaded layers + markers
+        return ul_warn, ul_done, not calc_done, calc_warn, html.Div(dl.LayersControl(layers)), no_update # successful generation
+        #except: # generation  failed
+            #return ul_warn, ul_done, calc_done, not calc_warn, no_update, no_update   
     # ====== no button clicked =============================================================================================================
     # this else-section is always activated, when the page refreshes
-    else: return ul_warn, ul_done, ul_done, calc_done, add_new_layers(geojson_style), no_update
+    else:
+        layers = floorplan2layer(geojson_style) # floorplans
+        return ul_warn, ul_done, ul_done, calc_done, html.Div(dl.LayersControl(layers)), no_update
 
 # ================ handling export =========================================================================================================
 @app.callback(
