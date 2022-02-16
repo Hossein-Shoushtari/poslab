@@ -6,13 +6,13 @@
 ## File Navigation -- Overview
 ### DIRECTORIES
 #### assets
-> **antennas** : uploaded antenna data can be found here
-> **export** : after clicking on 'Get results', drawn geometry types are saved in one geojson file here 
-> **floorplans** : already converted floorplans (EG, 1OG, 4OG) and uploaded new map data can be found here
-> **groundtruth** : Dorians groung truth data can be found here
-> **images** : images for the website can be found here
-> **sensors** : all uploaded sensor data (acc, bar, gyr, mag) can be found here
-> **waypoints** : uploaded waypoint data can be found here
+> **antennas** : uploaded antenna data can be found here  
+> **export** : after clicking on 'Get results', drawn geometry types are saved in one geojson file here  
+> **floorplans** : already converted floorplans (EG, 1OG, 4OG) and uploaded new map data can be found here  
+> **groundtruth** : Dorians groung truth data can be found here  
+> **images** : images for the website can be found here  
+> **sensors** : all uploaded sensor data (acc, bar, gyr, mag) can be found here  
+> **waypoints** : uploaded waypoint data can be found here  
 
 ### FILES
 > **main.py** : self-explanatory :)
