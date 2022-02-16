@@ -91,7 +91,7 @@ def simulator_card(geojson_style):
             [   
                 info,
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
-                html.Div(id="layers", children=dl.LayersControl(floorplan2layer(geojson_style))), # default layers + later all uploaded new layers
+                html.Div(dl.LayersControl(floorplan2layer(geojson_style)), id="layers"), # default layers previously set
                 dl.FullscreenControl(), # possibility to get map fullscreen
                 dl.FeatureGroup(dl.EditControl(
                                     id="edit_control",

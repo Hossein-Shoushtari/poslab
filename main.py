@@ -20,8 +20,8 @@ from ground_truth_generation import generate_gt
 # Geojson rendering logic, must be JavaScript and only initialized once!
 geojson_style = assign("""function(feature, context){
     const {classes, colorscale, style, colorProp} = context.props.hideout;  // get props from hideout
-    return style;
-}""")
+    return style;}"""
+)
 
 # ---------------- HTML ---------------- #
 # designing the webpage using dash
@@ -133,7 +133,7 @@ def upload(
                 geojson_converter(map_filenames[i], decoded_content) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
             else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
-        layers = floorplan2layer(geojson_style) + upload2layer(geojson_style) # floorplans + uploaded layers
+        layers = upload2layer(geojson_style) # uploaded layers
         return ul_warn, not ul_done, calc_warn, calc_done, html.Div(dl.LayersControl(layers)), no_update # returning an html.Iframe with refreshed map
     # ========== WAYPOINTS =================================================================================================================
     elif "ul_way" in button:
@@ -191,18 +191,17 @@ def upload(
         return ul_warn, not ul_done, calc_warn, calc_done, no_update, no_update
     # ======== GENERATION  ================================================================================================================
     elif "gen_btn" in button:
-        #try:
-        gt = generate_gt(geojson_style) # generating ground truth data
-        markers = csv2marker(gt[:, 1:3]) # converting crs and making markers
-        layers = floorplan2layer(geojson_style) + upload2layer(geojson_style) + [marker2layer(markers)] # floorplans + uploaded layers + markers
-        return ul_warn, ul_done, not calc_done, calc_warn, html.Div(dl.LayersControl(layers)), no_update # successful generation
-        #except: # generation  failed
-            #return ul_warn, ul_done, calc_done, not calc_warn, no_update, no_update   
+        try:
+            gt = generate_gt(geojson_style) # generating ground truth data
+            markers = csv2marker(gt[:, 1:3]) # converting crs and making markers
+            layers = upload2layer(geojson_style) + [marker2layer(markers)] # uploaded layers + markers
+            return ul_warn, ul_done, not calc_done, calc_warn, html.Div(dl.LayersControl(layers)), no_update # successful generation
+        except: # generation  failed
+            return ul_warn, ul_done, calc_done, not calc_warn, no_update, no_update   
     # ====== no button clicked =============================================================================================================
     # this else-section is always activated, when the page refreshes
     else:
-        layers = floorplan2layer(geojson_style) # floorplans
-        return ul_warn, ul_done, ul_done, calc_done, html.Div(dl.LayersControl(layers)), no_update
+        return ul_warn, ul_done, ul_done, calc_done, html.Div(dl.LayersControl(upload2layer(geojson_style))), no_update
 
 # ================ handling export =========================================================================================================
 @app.callback(
