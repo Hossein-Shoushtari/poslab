@@ -20,28 +20,28 @@ def simulator_card(geojson_style):
     # upload warning
     ul_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("WARNING")),
-        dbc.ModalBody("Wrong file was uploaded!")],
+        dbc.ModalBody("At least one wrong file was uploaded!")],
         id="ul_warn",
         is_open=False
     )
     # upload done
     ul_done = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("DONE")),
-        dbc.ModalBody("File uploaded successfully!")],
+        dbc.ModalBody("File(s) uploaded successfully!")],
         id="ul_done",
         is_open=False
     )
     # calculation warning
     gen_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
-        dbc.ModalBody("Nothing to calculate yet!")],
+        dbc.ModalBody("Nothing to generate yet!")],
         id="gen_warn",
         is_open=False
     )
     # calculation done
     gen_done = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("DONE")),
-        dbc.ModalBody("Calculation successful!")],
+        dbc.ModalBody("Generation successful!")],
         id="gen_done",
         is_open=False
     )
@@ -91,12 +91,12 @@ def simulator_card(geojson_style):
             [   
                 info,
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
-                html.Div(dl.LayersControl(floorplan2layer(geojson_style)), id="layers"), # default layers previously set
+                html.Div(id="layers", children=dl.LayersControl(floorplan2layer(geojson_style))), # is previously filled with floorplans
                 dl.FullscreenControl(), # possibility to get map fullscreen
                 dl.FeatureGroup(dl.EditControl(
                                     id="edit_control",
-                                    draw=dict(rectangle=False, circle=False),
-                                    position="topleft")), # possibility to draw/edit data
+                                    draw=dict(rectangle=False, circle=False), # possibility to draw/edit data
+                                    position="topleft")),
                 
             ],
             zoom=19,

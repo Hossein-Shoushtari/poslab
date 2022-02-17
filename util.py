@@ -149,18 +149,19 @@ def upload2layer(geojson_style) -> list:
     RETURN
     layers : list of uploaded layers
     """
-    # getting list of layers (already filled with default layers)
-    layers = floorplan2layer(geojson_style)
-    # parsing through all converted layers and adding them to <<layers>>
-    for geojson_file in listdir("assets/floorplans"):
+    # initializing list to fill it with newly uploaded layers
+    layers = []
+    for geojson_file in listdir("assets/maps"):
         name = geojson_file.split(".")[0]  # getting name of geojson file
-        if name not in ["EG", "1OG", "4OG"]:
-            geojson = dl.GeoJSON(
-                url=f"assets/floorplans/{geojson_file}",  # url to geojson file
-                options=dict(style=geojson_style),  # style each polygon
-                hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
-                hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""))
-            layers.append(dl.Overlay(geojson, name=name, checked=False))
+        geojson = dl.GeoJSON(
+            url=f"assets/maps/{geojson_file}",  # url to geojson file
+            options=dict(style=geojson_style),  # style each polygon
+            hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
+            hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""))
+        layers.append(dl.Overlay(geojson, name=name, checked=False))
+    # assuring, that only existing map data is returned (not empty one)
+    if len(layers) > 1: layers = layers[1:]
+    else: layers = []
 
     return layers
 

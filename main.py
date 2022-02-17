@@ -159,15 +159,15 @@ def upload(
     # UPLOAD
     #============= MAP =====================================================================================================================
     if "ul_map" in button:
-        for i in range(len(map_filenames)):
-            if map_filenames[i].split(".")[-1] in ["geojson"]: # assuming user uploaded right file format
-                decoded_content = upload_encoder(map_contents[i]) # decoding uploaded base64 file
-                converted = GeoDataFrame(read_file(decoded_content), crs=32632).to_crs(4326) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
-                converted.to_file(f"assets/floorplans/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
-            else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
-        # if everything went fine ...
-        layers = upload2layer(geojson_style) # uploaded layers
-        return ul_warn, not ul_done, calc_warn, calc_done, html.Div(dl.LayersControl(layers)), no_update # returning an html.Iframe with refreshed map
+        check = [name.split(".")[-1] for name in map_filenames if name.split(".")[-1] not in ["geojson"]] # getting all wrong file formats
+        if len(check) > 0: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn
+        for i in range(len(map_filenames)): # only right files were uploaded
+            decoded_content = upload_encoder(map_contents[i]) # decoding uploaded base64 file
+            converted = GeoDataFrame(read_file(decoded_content), crs=32632).to_crs(4326) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
+            converted.to_file(f"assets/maps/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
+        # floorplans + uploaded maps
+        layers = floorplan2layer(geojson_style) + upload2layer(geojson_style)
+        return ul_warn, not ul_done, calc_warn, calc_done, html.Div(dl.LayersControl(layers)), no_update # returning uploaded layers
     # ========== WAYPOINTS =================================================================================================================
     elif "ul_way" in button:
         for i in range(len(way_filenames)):
@@ -227,14 +227,16 @@ def upload(
         try:
             gt = generate_gt(geojson_style) # generating ground truth data
             markers = csv2marker(gt[:, 1:3]) # converting crs and making markers
-            layers = upload2layer(geojson_style) + [dl.Overlay(dl.LayerGroup(markers), name="GroundTruth", checked=True)] # uploaded layers + markers
-            return ul_warn, ul_done, not calc_done, calc_warn, html.Div(dl.LayersControl(layers)), no_update # successful generation
+            # floorplans + uploaded maps + markers
+            layers = floorplan2layer(geojson_style) + upload2layer(geojson_style) + [dl.Overlay(dl.LayerGroup(markers), name="GroundTruth", checked=True)]
+            return ul_warn, ul_done, not calc_done, calc_warn, dl.LayersControl(layers), no_update # successful generation
         except: # generation  failed
             return ul_warn, ul_done, calc_done, not calc_warn, no_update, no_update   
     # ====== no button clicked =============================================================================================================
     # this else-section is always activated, when the page refreshes
     else:
-        return ul_warn, ul_done, ul_done, calc_done, html.Div(dl.LayersControl(upload2layer(geojson_style))), no_update
+        layers = floorplan2layer(geojson_style) + upload2layer(geojson_style)
+        return ul_warn, ul_done, ul_done, calc_done, html.Div(dl.LayersControl(layers)), no_update
 
 # ================ handling export =========================================================================================================
 @app.callback(
