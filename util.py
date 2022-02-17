@@ -11,26 +11,9 @@ from datetime import datetime
 from base64 import b64decode
 from os import listdir
 # installed
-from geopandas import GeoDataFrame, read_file
+from geopandas import GeoDataFrame
 from shapely.geometry import Point
 
-def geojson_converter(filename: str, decoded_content: str) -> None:
-    """
-    FUNCTION
-    - converts geojson from crs:32632 to crs:4326
-    - saves converted file
-    -------
-    PARAMETERS
-    filename : filename of file
-    decoded_content : decoded content of file
-    -------
-    RETURN
-    None
-    """
-    # converting crs (UTM -> EPSG: 32632) of given floorplan to WGS84 (EPSG: 4326)
-    layer = GeoDataFrame(read_file(decoded_content), crs=32632).to_crs(4326)
-    # saving converted layer
-    layer.to_file(f"assets/floorplans/{filename}", driver="GeoJSON")
 
 def upload_encoder(content: str) -> str:
     """
@@ -180,21 +163,6 @@ def upload2layer(geojson_style) -> list:
             layers.append(dl.Overlay(geojson, name=name, checked=False))
 
     return layers
-
-def marker2layer(markers: list) -> 'dl.Overlay':
-    """
-    FUNCTION
-    - makes layers out of markers
-    -------
-    PARAMETER
-    markers : markers with lat and lon
-    -------
-    RETURN
-    layer : layer with all markers
-    """
-    layer = dl.Overlay(dl.LayerGroup(markers), name="GroundTruth", checked=True)
-    
-    return layer
 
 def csv2marker(ground_truth: list) -> list:
     """

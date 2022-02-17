@@ -1,18 +1,20 @@
 #### IMPORTS
 # dash
-from dash import html, Dash, Output, Input, State, no_update, callback_context
+from dash import Dash, dcc, html, Output, Input, State, no_update, callback_context
 import dash_bootstrap_components as dbc
 import dash_leaflet as dl
 from dash_extensions.javascript import assign
+# installed packages
+from geopandas import GeoDataFrame, read_file
 # layouts (ly)
 from ly_home import home_card
 from ly_simulator import simulator_card
 from ly_evaluator import evaluator_card
 from ly_coming_soon import coming_soon_card
 # utils
-from util import upload_encoder, geojson_converter
-from util import export_data, hover_info, floorplan2layer
-from util import upload2layer, csv2marker, marker2layer
+from util import upload_encoder, floorplan2layer
+from util import export_data, hover_info
+from util import upload2layer, csv2marker
 # generations/simulations/calculations
 from ground_truth_generation import generate_gt
 
@@ -33,24 +35,54 @@ app.title = "L5IN"
 
 ### LAYOUT ###
 ## Home page ##
-home_tab_content = home_card()  # getting the card content from home.py
+home_tab = home_card()  # getting the card content from home.py
 ## Simulator ##
-sim_tab_content = simulator_card(geojson_style)  # from simulator.py
+sim_tab = simulator_card(geojson_style)  # from simulator.py
 ## Evaluator ##
-ev_tab_content = evaluator_card()  # from evaluator.py
+ev_tab = evaluator_card()  # from evaluator.py
 ## Comming Soon ##
-cs_tab_content = coming_soon_card()  # from comming_soon.py    
+cs_tab = coming_soon_card()  # from comming_soon.py    
 
 # putting all together
 app.layout = html.Div(
     [
-        dbc.Tabs(
+        dcc.Tabs(
+            value="tab1",
+            children=
             [
-                dbc.Tab(home_tab_content, label="Home", active_label_style={"color": "#DC7633"}),
-                dbc.Tab(sim_tab_content, label="Simulator", active_label_style={"color": "#DC7633"}),
-                dbc.Tab(ev_tab_content, label="Evaluator", active_label_style={"color": "#DC7633"}),
-                dbc.Tab(cs_tab_content, label="Coming Soon", disabled=True)
-            ]
+                dcc.Tab(
+                    value="tab1",
+                    label="Home",
+                    className='custom-tab',
+                    selected_className='custom-tab--selected',
+                    selected_style={"color": "#DC6000", "background": "#303030"},
+                    children=home_tab),
+                dcc.Tab(
+                    value="tab2",
+                    label="Simulator",
+                    className='custom-tab',
+                    selected_className='custom-tab--selected',
+                    selected_style={"color": "#DC6000", "background": "#303030"},
+                    children=sim_tab),
+                dcc.Tab(
+                    value="tab3",
+                    label="Evaluator",
+                    className='custom-tab',
+                    selected_className='custom-tab--selected',
+                    selected_style={"color": "#DC6000", "background": "#303030"},
+                    children=ev_tab),
+                dcc.Tab(
+                    value="tab4",
+                    label="Coming Soon",
+                    className='custom-tab',
+                    selected_className='custom-tab--selected',
+                    selected_style={"color": "#AEB5BD", "background": "#303030"},
+                    children=cs_tab,
+                    disabled=True)
+            ],
+            colors={
+                "background": "#222222"
+            }
         )
     ]
 )
@@ -130,7 +162,8 @@ def upload(
         for i in range(len(map_filenames)):
             if map_filenames[i].split(".")[-1] in ["geojson"]: # assuming user uploaded right file format
                 decoded_content = upload_encoder(map_contents[i]) # decoding uploaded base64 file
-                geojson_converter(map_filenames[i], decoded_content) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
+                converted = GeoDataFrame(read_file(decoded_content), crs=32632).to_crs(4326) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
+                converted.to_file(f"assets/floorplans/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
             else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
         layers = upload2layer(geojson_style) # uploaded layers
@@ -194,7 +227,7 @@ def upload(
         try:
             gt = generate_gt(geojson_style) # generating ground truth data
             markers = csv2marker(gt[:, 1:3]) # converting crs and making markers
-            layers = upload2layer(geojson_style) + [marker2layer(markers)] # uploaded layers + markers
+            layers = upload2layer(geojson_style) + [dl.Overlay(dl.LayerGroup(markers), name="GroundTruth", checked=True)] # uploaded layers + markers
             return ul_warn, ul_done, not calc_done, calc_warn, html.Div(dl.LayersControl(layers)), no_update # successful generation
         except: # generation  failed
             return ul_warn, ul_done, calc_done, not calc_warn, no_update, no_update   

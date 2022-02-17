@@ -1,0 +1,35 @@
+.custom-tabs-container {
+    width: 85%;
+    background-color: #222222;
+    z-index: 0;
+}
+.custom-tabs {
+    border-top-left-radius: 3px;
+    background-color: #222222;
+    padding: 0px 24px;
+    z-index: 0;
+}
+
+.custom-tab {
+    color:#FFFFFF;
+    z-index: 10000;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-top: 3px solid transparent !important;
+    border-left: 0px !important;
+    border-right: 0px !important;
+    border-bottom: 0px !important;
+    background-color: #303030;
+    padding: 12px !important;
+    font-family: "system-ui";
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    z-index: 0;
+}
+.custom-tab--selected {
+    border-left: 1px solid #444444 !important;
+    border-right: 1px solid #444444 !important;
+    border-top: 3px solid #e36209 !important;
+    z-index: 0;
+}

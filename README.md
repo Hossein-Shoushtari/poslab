@@ -17,9 +17,11 @@
 ### FILES
 > **main.py** : self-explanatory :)
 
-> **dashExtensions_default.js** : GeoJSON rendering logic. Must be Java Script. Used for dash-leaflet. Only initialized once in the beginning.
+> **dashExtensions_default.js** : GeoJSON rendering logic. Must be in Java Script. It's used for dash-leaflet. It's only initialized once in the beginning.
 
-> **spinner_styling.css** : CSS styling of blue spinner/loading sign
+> **spinner_styling.css** : CSS styling of the blue spinner/loading sign
+
+> **tabs.css** : CSS styling of the four tabs
 
 > **coordinate_simulation.py** : Dorian's part
 
