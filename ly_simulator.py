@@ -97,7 +97,6 @@ def simulator_card(geojson_style):
                                     id="edit_control",
                                     draw=dict(rectangle=False, circle=False), # possibility to draw/edit data
                                     position="topleft")),
-                
             ],
             zoom=19,
             center=hcu,
@@ -231,24 +230,33 @@ def simulator_card(geojson_style):
     # HELP
     # offcanvas
     help_canvas = html.Div([
-        dbc.Offcanvas(
-            [   
-                html.Div([
-                    # info bug
-                    html.P("🐞 Something's wrong with the map?"),
-                    html.P("Just scale your browser window smaller and then back to normal or simply click the FullScreen Button right under the zoom section.", style={"color": "gray"})],
-                style={"border":"1px solid red", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
-                html.Div([
-                    # info upload
-                    html.P("⚠  Please note:"),
-                    html.P("Only GeoJSON files of type crs:32632 or directly crs:4326 are accepted as Maps.", style={"color": "gray"}),
-                    html.P("Both Waypoints and Antennas accept TXT, CSV or GeoJSON.", style={"color": "gray", "marginTop": "-10px"})],
-                style={"border":"1px solid orange", "border-radius": 10, "padding": "10px"})
-            ],
+        dbc.Offcanvas([   
+            html.Div([
+                # info upload
+                html.H5("UPLOAD", style={"text-align": "center", "color": "#3B5A7F"}),
+                html.Hr(style={"margin": "auto", "width": "80%", "color": "#3B5A7F"}),
+                html.P("All 7 buttons are for uploading the data required for the simulation.", style={"color": "gray"}),
+                dbc.Row([
+                    dbc.Col(html.Div(html.P("Maps:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                    dbc.Col(html.P("Only GeoJSON files of type crs:32632 or directly crs:4326 are accepted.", style={"color": "gray"}))
+                ], className="g-0"),
+                dbc.Row([
+                    dbc.Col(html.Div(html.P("Waypoints:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                    dbc.Col(html.P("Only TXT, CSV or GeoJSON files are accepted.", style={"color": "gray"}))
+                ], className="g-0"),
+                dbc.Row([
+                    dbc.Col(html.Div(html.P("Antennas:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                    dbc.Col(html.P("Only TXT, CSV or GeoJSON files are accepted.", style={"color": "gray"}))
+                ], className="g-0"),
+                dbc.Row([
+                    dbc.Col(html.Div(html.P("Sensors:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                    dbc.Col(html.P("Only CSV files are accepted.", style={"color": "gray"}))
+                ], className="g-0")],
+            style={"border":"1px solid #3B5A7F", "border-radius": 10, "padding": "10px", "marginBottom": "10px"})],
         id="help_cv",
         scrollable=True,
         title="Help",
-        is_open=False)
+        is_open=True)
     ])
 
     # card content

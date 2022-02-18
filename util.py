@@ -184,10 +184,38 @@ def csv2marker(ground_truth: list) -> list:
         "iconAnchor": [0, 0],  # point of the icon which will correspond to marker"s location
     }
     # making points out of ground truth data for converting it (crs:32632 to crs:4326)
-    points = {"waypoint": [i for i in range(1, ground_truth.shape[0]+1)], "geometry": [Point(lat, lon) for lat, lon in ground_truth]}
+    points = {"GroundTruth": [i for i in range(1, ground_truth.shape[0]+1)], "geometry": [Point(lat, lon) for lat, lon in ground_truth]}
     converted_points = GeoDataFrame(points, crs=32632).to_crs(4326)
     # making geojson format for creating markers
     geojson = dlx.dicts_to_geojson([dict(lat=row[1].y, lon=row[1].x) for _, row in converted_points.iterrows()])
-    markers = [dl.Marker(position=[row[1].y, row[1].x], icon=icon) for _, row in converted_points.iterrows()]
-    
+    # making and designing markers (adding tooltip and popup)
+    markers = []
+    for nr, row in converted_points.iterrows():
+        marker = dl.Marker(
+            position=[row[1].y, row[1].x],
+            icon=icon,
+            children=[
+                dl.Tooltip(str(nr)),
+                dl.Popup([
+                    html.H5(nr, style={"text-align": "center", "color": "gray", "marginTop": "-5px"}),
+                    dbc.Table(html.Tbody([
+                        html.Tr([
+                            html.Td("Latitude", style={"font-size": "15px", "color": "white"}),
+                            html.Td(f"{row[1].y:.5f}", style={"font-size": "15px", "color": "white"})
+                        ]),
+                        html.Tr([
+                            html.Td("Longitude", style={"font-size": "15px", "color": "white"}),
+                            html.Td(f"{row[1].x:.5f}",style={"font-size": "15px", "color": "white"})
+                        ])
+                    ]),
+                    style={"marginTop": "-8px", "opacity": "0.5"},
+                    size="sm",
+                    bordered=True,
+                    color="secondary",
+                    )
+                ])
+            ]
+        )
+        markers.append(marker)
+        
     return markers

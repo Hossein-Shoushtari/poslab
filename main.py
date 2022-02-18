@@ -133,8 +133,8 @@ def upload(
     ## modals
     ul_warn,
     ul_done,
-    calc_warn,
-    calc_done,
+    gern_warn,
+    gern_done,
     ## upload
     map_contents,  # maps
     map_filenames,
@@ -160,68 +160,68 @@ def upload(
     #============= MAP =====================================================================================================================
     if "ul_map" in button:
         check = [name.split(".")[-1] for name in map_filenames if name.split(".")[-1] not in ["geojson"]] # getting all wrong file formats
-        if len(check) > 0: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn
+        if len(check) > 0: return not ul_warn, ul_done, gern_warn, gern_done, no_update, no_update # activating modal -> warn
         for i in range(len(map_filenames)): # only right files were uploaded
             decoded_content = upload_encoder(map_contents[i]) # decoding uploaded base64 file
             converted = GeoDataFrame(read_file(decoded_content), crs=32632).to_crs(4326) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
             converted.to_file(f"assets/maps/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
         # floorplans + uploaded maps
         layers = floorplan2layer(geojson_style) + upload2layer(geojson_style)
-        return ul_warn, not ul_done, calc_warn, calc_done, html.Div(dl.LayersControl(layers)), no_update # returning uploaded layers
+        return ul_warn, not ul_done, gern_warn, gern_done, html.Div(dl.LayersControl(layers)), no_update # returning uploaded layers
     # ========== WAYPOINTS =================================================================================================================
     elif "ul_way" in button:
         for i in range(len(way_filenames)):
             if way_filenames[i].split(".")[-1] in ["geojson", "txt", "csv"]: # assuming user uploaded right file format
                 decoded_content = upload_encoder(way_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/waypoints/{way_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
+            else: return not ul_warn, ul_done, gern_warn, gern_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
-        return ul_warn, not ul_done, calc_warn, calc_done, no_update, no_update
+        return ul_warn, not ul_done, gern_warn, gern_done, no_update, no_update
     # ========== ANTENNAS ==================================================================================================================
     elif "ul_ant" in button:
         for i in range(len(ant_filenames)):
             if ant_filenames[i].split(".")[-1] in ["geojson", "txt", "csv"]: # assuming user uploaded right file format
                 decoded_content = upload_encoder(ant_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/antennas/{ant_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
+            else: return not ul_warn, ul_done, gern_warn, gern_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
-        return ul_warn, not ul_done, calc_warn, calc_done, no_update, no_update
+        return ul_warn, not ul_done, gern_warn, gern_done, no_update, no_update
     # ========== GYROSCOPE =================================================================================================================
     elif "ul_gyr" in button:
         for i in range(len(gyr_filenames)):
             if gyr_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_encoder(gyr_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/gyr.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
+            else: return not ul_warn, ul_done, gern_warn, gern_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
-        return ul_warn, not ul_done, calc_warn, calc_done, no_update, no_update
+        return ul_warn, not ul_done, gern_warn, gern_done, no_update, no_update
     # ========= ACCELERATION  ==============================================================================================================
     elif "ul_acc" in button:
         for i in range(len(acc_filenames)):
             if acc_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_encoder(acc_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/acc.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
+            else: return not ul_warn, ul_done, gern_warn, gern_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
-        return ul_warn, not ul_done, calc_warn, calc_done, no_update, no_update
+        return ul_warn, not ul_done, gern_warn, gern_done, no_update, no_update
     # ========= BAROMETER  =================================================================================================================
     elif "ul_bar" in button:
         for i in range(len(bar_filenames)):
             if bar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_encoder(bar_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/bar.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
+            else: return not ul_warn, ul_done, gern_warn, gern_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
-        return ul_warn, not ul_done, calc_warn, calc_done, no_update, no_update
+        return ul_warn, not ul_done, gern_warn, gern_done, no_update, no_update
     # ======== MAGNETOMETER  ===============================================================================================================
     elif "ul_mag" in button:
         for i in range(len(mag_filenames)):
             if mag_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_encoder(mag_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/sensors/mag.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warn, ul_done, calc_warn, calc_done, no_update, no_update # activating modal -> warn    
+            else: return not ul_warn, ul_done, gern_warn, gern_done, no_update, no_update # activating modal -> warn    
         # if everything went fine ...
-        return ul_warn, not ul_done, calc_warn, calc_done, no_update, no_update
+        return ul_warn, not ul_done, gern_warn, gern_done, no_update, no_update
     # ======== GENERATION  ================================================================================================================
     elif "gen_btn" in button:
         try:
@@ -229,14 +229,14 @@ def upload(
             markers = csv2marker(gt[:, 1:3]) # converting crs and making markers
             # floorplans + uploaded maps + markers
             layers = floorplan2layer(geojson_style) + upload2layer(geojson_style) + [dl.Overlay(dl.LayerGroup(markers), name="GroundTruth", checked=True)]
-            return ul_warn, ul_done, not calc_done, calc_warn, dl.LayersControl(layers), no_update # successful generation
+            return ul_warn, ul_done, not gern_done, gern_warn, html.Div(dl.LayersControl(layers)), no_update # successful generation
         except: # generation  failed
-            return ul_warn, ul_done, calc_done, not calc_warn, no_update, no_update   
+            return ul_warn, ul_done, gern_done, not gern_warn, no_update, no_update   
     # ====== no button clicked =============================================================================================================
     # this else-section is always activated, when the page refreshes
     else:
         layers = floorplan2layer(geojson_style) + upload2layer(geojson_style)
-        return ul_warn, ul_done, ul_done, calc_done, html.Div(dl.LayersControl(layers)), no_update
+        return ul_warn, ul_done, ul_done, gern_done, html.Div(dl.LayersControl(layers)), no_update
 
 # ================ handling export =========================================================================================================
 @app.callback(
