@@ -25,8 +25,8 @@ from ground_truth_generator import generate_gt
 from coordinate_simulation import simulate_positions
 
 # first deleting the "empty"-files -> due to github, that does not commit empty folders
-#try: deleter()
-#except: pass
+try: deleter()
+except: pass
 
 # Geojson rendering logic, must be JavaScript and only initialized once!
 geojson_style = assign("""function(feature, context){
