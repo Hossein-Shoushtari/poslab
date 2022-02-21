@@ -7,6 +7,7 @@ import dash_leaflet as dl
 import dash_leaflet.express as dlx
 from dash_extensions.javascript import arrow_function
 # built in
+import numpy as np
 from datetime import datetime
 from base64 import b64decode
 from os import listdir
@@ -165,11 +166,11 @@ def upload2layer(geojson_style) -> list:
 
     return layers
 
-def csv2marker(ground_truth: list) -> list:
+def gt2marker(ground_truth: list) -> list:
     """
     FUNCTION
     - converts lat and lon from crs32632 (groundtruth) to crs4326
-    - returns list of all created markers with converted lat and lon
+    - makes leaflet markers out of coordinates
     -------
     PARAMETER
     ground_truth : calculated ground truth data
@@ -195,7 +196,7 @@ def csv2marker(ground_truth: list) -> list:
             position=[row[1].y, row[1].x],
             icon=icon,
             children=[
-                dl.Tooltip(str(nr)),
+                dl.Tooltip(nr+1),
                 dl.Popup([
                     html.H5(nr, style={"text-align": "center", "color": "gray", "marginTop": "-5px"}),
                     dbc.Table(html.Tbody([
@@ -219,3 +220,116 @@ def csv2marker(ground_truth: list) -> list:
         markers.append(marker)
         
     return markers
+
+def ref_tab(name: str) -> list:
+    """
+    FUNCTION
+    - transforms reference data into table-rows and adds checkboxes
+    -------
+    PARAMETER
+    name : filename of reference data
+    -------
+    RETURN
+    tr_list : list of table rows with number, latitude, longitude and checkbox
+    """
+    # loading data
+    data = np.loadtxt(f"assets/waypoints/{name}.csv")[:, 1:3]
+    # filling list with table-rows
+    tr_list = []
+    for i in range(1, data.shape[0]-1):
+        nr  = html.Td(i+1, style={"width": "60px", "color": "gray", "text-align": "center"})
+        lat = html.Td(data[i,0], style={"width": "112px", "color": "gray", "text-align": "center"})
+        lon = html.Td(data[i,1], style={"width": "112px", "color": "gray", "text-align": "center"})
+        select = html.Td(dbc.Checklist(options=[{"value": 1}], value=[1], style={"marginLeft": "17px"}, id=f"check{i}"), style={"width": "60px"})
+        tr_list.append(html.Tr([nr, lat, lon, select]))
+    
+    # first and last point always selected
+    td1 = html.Tr(
+        [
+            html.Td(1, style={"width": "60px", "color": "gray", "text-align": "center"}),
+            html.Td(data[0,0], style={"width": "112px", "color": "gray", "text-align": "center"}),
+            html.Td(data[0,1], style={"width": "112px", "color": "gray", "text-align": "center"}),
+            html.Td(dbc.Checklist(options=[{"value": 1, "disabled": True}], value=[1], style={"marginLeft": "17px"}, id="check0"), style={"width": "60px"})
+        ]
+    )
+    td2 = html.Tr(
+        [
+            html.Td(data.shape[0], style={"width": "60px", "color": "gray", "text-align": "center"}),
+            html.Td(data[data.shape[0]-1,0], style={"width": "112px", "color": "gray", "text-align": "center"}),
+            html.Td(data[data.shape[0]-1,1], style={"width": "112px", "color": "gray", "text-align": "center"}),
+            html.Td(dbc.Checklist(options=[{"value": 1, "disabled": True}], value=[1], style={"marginLeft": "17px"}, id=f"check{data.shape[0]-1}"), style={"width": "60px"})
+        ]
+    )
+    tr_list.insert(0, td1)
+    tr_list.append(td2)
+    return tr_list
+
+def ref_checked(name: str, check: tuple) -> list:
+    """
+    FUNCTION
+    - parses over reference data and just keeps checked data 
+    -------
+    PARAMETER
+    name : filename of reference data
+    check : info about which checkbox is checked/unchecked
+    -------
+    RETURN
+    data : ndarray with checked coordinates
+    """
+    # loading data
+    data = np.loadtxt(f"assets/waypoints/{name}.csv")
+    # creating ndarray to decide whether it is checked or not
+    keep = np.ones(data.shape[0], dtype=bool)
+    # looping over data and check tuple
+    for i in range(data.shape[0]):
+        if len(check[i]) == 0: # unchecked
+            keep[i] = False
+    # keeping checked data
+    data = data[keep]
+    
+    return data
+
+def ref2marker(name: str, check: tuple) -> list:
+    """
+    FUNCTION
+    - converts lat and lon from crs32632 (reference points) to crs4326
+    - makes leaflet markers out of coordinates
+    -------
+    PARAMETER
+    ref : reference points data
+    -------
+    RETURN
+    markers : list of all created markers with converted lat and lon
+    """
+    # loading data
+    data = np.loadtxt(f"assets/waypoints/{name}.csv")[:, 1:3]
+    # determing whether checked or unchecked
+    keep = np.ones(data.shape[0], dtype=bool)
+    for i in range(data.shape[0]):
+        if len(check[i]) == 0:
+            keep[i] = False
+    print(keep)
+    # designing icon (from https://icons8.de/icons/set/marker)
+    icon = {
+        "iconUrl": "https://img.icons8.com/emoji/344/blue-circle-emoji.png",
+        "iconSize": [10, 10],  # size of the icon
+        "iconAnchor": [0, 0],  # point of the icon which will correspond to marker"s location
+    }
+    # making points out of ground truth data for converting it (crs:32632 to crs:4326)
+    points = {"waypoint": [i for i in range(1, data.shape[0]+1)], "geometry": [Point(lat, lon) for lat, lon in data]}
+    converted_points = GeoDataFrame(points, crs=32632).to_crs(4326)
+    # making markers only of checked points
+    markers = []
+    for nr, row in converted_points.iterrows():
+        if keep[nr]:
+            marker = dl.Marker(
+                position=[row[1].y, row[1].x],
+                icon=icon,
+                children=[
+                    dl.Tooltip(nr+1, permanent=True)
+                ]
+            )
+            markers.append(marker)
+
+    return markers
+

@@ -51,14 +51,13 @@ def semantic_error(number_range, error_range, intervall_range, time_stamps):
     errors = []
 
     for i in range(number_of_intervalls):
-        intervall_lengths.append(np.random.uniform(intervall_range[0], intervall_range[
-            -1]))  # choose random intervalls (according to number of intervalls) from the timeline
+        intervall_lengths.append(np.random.uniform(intervall_range[0], intervall_range[-1]))  # choose random intervalls (according to number of intervalls) from the timeline
         intervall_starts.append(np.random.choice(time_stamps[:-1]))
         errors.append(np.random.uniform(error_range[0], error_range[-1]))
 
     return intervall_lengths, errors, intervall_starts
 
-def simulate_positions(filename, error, freq, number_range, error_range, intervall_range, semantic):
+def simulate_positions(filename, error, freq, number_range=[1, 10], error_range=[1, 15], intervall_range=[1 * 1000, 20 * 1000], semantic=False):
     """
         creating sample data points for 5G measurements with defined frequency and measurement error range. Semantic errors are
         generated in rondomly with chosen ranges for the duration, standard deviation and number of accurances
@@ -150,31 +149,22 @@ def simulate_positions(filename, error, freq, number_range, error_range, interva
             quality = closest_value([error / 5, 2 * error / 5, 3 * error / 5, 4 * error / 5, 5 * error / 5], e)
             qualities_list.append(quality)
 
-        return positions, time_stamps, error_list, qualities_list
+        return time_stamps, positions, error_list, qualities_list
 
-if __name__ == "__main__":
-    ###Ground Truth Generation
-    #tips
-    #step_timestamps, step_indexs, step_acce_max_mins = compute_steps(acc)
-    #headings = heading_thomas(acc,gyr,100)
-    #stride_lengths = compute_stride_length(step_acce_max_mins)
-    #step_headings = compute_step_heading(step_timestamps, headings)
-    #rel_positions = compute_rel_positions(stride_lengths, step_headings)
-    #GroundTruth = correct_positions(rel_positions, ref[:,:3])
-    
+if __name__ == "__main__":    
     ####Coordinate Simulation
     """
     check if the simulate_positions function is working
     """
 
-    filename = 'assets/groundtruth/GroundTruthZero2Four.csv'
+    filename = 'assets/groundtruth/GroundTruthEight.csv'
     error = 2
     freq = 1
     number_range = [1, 10] # range of number of occurencies for segments with semantic error
     error_range = [1, 15] # range of possible values for the semantic errors
     intervall_range = [1 * 1000, 20 * 1000] # range of intervall lengths where semantic errors are generated
     semantic_is_used = False # set this to True if semantic errors are used
-    positions,time_stamps, errors, qualities = simulate_positions(filename,2,1,number_range, error_range, intervall_range,semantic_is_used)
+    time_stamps, positions, errors, qualities = simulate_positions(filename,2,1)
     print('qualities',qualities)
     print('errors', errors)
 

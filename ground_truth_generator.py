@@ -292,7 +292,7 @@ def correct_positions(rel_positions, reference_positions):
     if len(rel_positions_list) != reference_positions.shape[0] - 1:
         # print(f'Rel positions list size: {len(rel_positions_list)}, ref positions size: {reference_positions.shape[0]}')
         del rel_positions_list[-1]
-    assert len(rel_positions_list) == reference_positions.shape[0] - 1
+    # assert len(rel_positions_list) == reference_positions.shape[0] - 1
     corrected_positions = np.zeros((0, 3))
     for i, rel_ps in enumerate(rel_positions_list):
         start_position = reference_positions[i]
@@ -425,12 +425,12 @@ def heading_thomas(acc, gyr, freq):
         
     return headings
 
-def generate_gt(geojson_style):
+def generate_gt(ref: list):
     try:
         # Loading Data
         acc = np.loadtxt("assets/sensors/acc.csv")
         gyr = np.loadtxt("assets/sensors/gyr.csv")
-        ref = np.loadtxt("assets/waypoints/ref.csv")
+
         # Calculation
         step_timestamps, step_indexs, step_acce_max_mins = compute_steps(acc)
         headings = heading_thomas(acc, gyr, 100)

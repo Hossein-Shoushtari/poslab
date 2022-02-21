@@ -1,20 +1,38 @@
-import os
+##### Simulator Tab -- Layout
+###IMPORTS
+# dash
 from dash import html, dcc, Dash, Output, Input, State, no_update
 import dash_bootstrap_components as dbc
 import dash_leaflet as dl
-from util import floorplan2layer, hover_info
 from dash_extensions.javascript import arrow_function
+# built in
 from base64 import b64decode
+# utils
+from util import floorplan2layer, hover_info
 
 def simulator_card(geojson_style):
     ### SPINNERs
-    spin = dbc.Spinner(
-        children=[html.Div(id="spin", style={"display": "none"})],
+    spin1 = dbc.Spinner(
+        children=[html.Div(id="spin1", style={"display": "none"})],
         type=None,
         fullscreen=True,
         fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "black"},
         spinnerClassName="spinner"
     )
+    spin2 = dbc.Spinner(
+        children=[html.Div(id="spin2", style={"display": "none"})],
+        type=None,
+        fullscreen=True,
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "black"},
+        spinnerClassName="spinner"
+    )
+
+    ### STORAGE
+    # dcc.Store to store and share data between callbacks
+    storage = html.Div([
+        # filename from dropdown
+        dcc.Store(id='dd_filename', data=[], storage_type='memory')
+    ])
 
     ### MODALs
     # upload warning
@@ -29,6 +47,20 @@ def simulator_card(geojson_style):
         dbc.ModalHeader(dbc.ModalTitle("DONE")),
         dbc.ModalBody("File(s) uploaded successfully!")],
         id="ul_done",
+        is_open=False
+    )
+    # map warning
+    map_warn = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("WARNING")),
+        dbc.ModalBody("At least one wrong file was uploaded!")],
+        id="map_warn",
+        is_open=False
+    )
+    # map done
+    map_done = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalBody("File(s) uploaded and layered successfully!")],
+        id="map_done",
         is_open=False
     )
     # calculation warning
@@ -59,6 +91,17 @@ def simulator_card(geojson_style):
         id="exp_done",
         is_open=False
     )
+    # ref show warning
+    show_warn = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
+        dbc.ModalBody(children=[
+            html.P("Nothing to show yet!"),
+            html.P("Please select data first.")
+        ])],
+        id="show_warn",
+        is_open=False
+    )
+
 
     ### MAP
     # info panel for geojson layer segments (tooltips while hovering)
@@ -208,7 +251,7 @@ def simulator_card(geojson_style):
     ## Buttons
     sim_buttons = html.Div([
         html.Div(
-            dbc.Button("Generate ground truth", id="gen_btn", color="light", outline=True, style={"width": "200px"}),
+            dbc.Button("Ground Truth", id="gt_btn", color="light", outline=True, style={"width": "200px"}),
             style={"marginBottom": "5px"}),
         html.Div(
             dbc.Button("Simulate measurement", id="sim_btn", color="light", outline=True, style={"width": "200px"}),
@@ -216,7 +259,6 @@ def simulator_card(geojson_style):
     ])
 
     ## OFFCANVAS
-    ## putting everything it its appropriate offcanvas
     #styles
     hr_style = {
         "width": "60%",
@@ -228,7 +270,6 @@ def simulator_card(geojson_style):
         "marginTop": "5px"
     }
     # HELP
-    # offcanvas
     help_canvas = html.Div([
         dbc.Offcanvas([   
             html.Div([
@@ -238,7 +279,7 @@ def simulator_card(geojson_style):
                 html.P("All 7 buttons are for uploading the data required for the simulation.", style={"color": "gray"}),
                 dbc.Row([
                     dbc.Col(html.Div(html.P("Maps:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                    dbc.Col(html.P("Only GeoJSON files of type crs:32632 or directly crs:4326 are accepted.", style={"color": "gray"}))
+                    dbc.Col(html.P("Only GeoJSON files of type crs:32632 are accepted.", style={"color": "gray"}))
                 ], className="g-0"),
                 dbc.Row([
                     dbc.Col(html.Div(html.P("Waypoints:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
@@ -256,9 +297,69 @@ def simulator_card(geojson_style):
         id="help_cv",
         scrollable=True,
         title="Help",
-        is_open=True)
+        is_open=False)
     ])
+    # GROUND TRUTH
+    gt_canvas = html.Div([
+        dbc.Offcanvas([
+            # steps
+            html.Div([
+                html.H5("Procedure", style={"color": "silver", "text-indent": "15px"}),
+                html.P("🢖 Select the data", style={"color": "gray", "marginBottom": "-5px", "text-indent": "10px"}),
+                html.P("🢖 Show Waypoints on the map", style={"color": "gray", "marginBottom": "-5px", "text-indent": "10px"}),
+                html.P("🢖 Select Waypoints you want", style={"color": "gray", "marginBottom": "-5px", "text-indent": "10px"}),
+                html.P("🢖 Generate Ground Truth Trajectory", style={"color": "gray", "text-indent": "10px"})
+            ],
+            style={"border": "1px solid #E45E07", "border-radius": 10, "padding": "10px", "marginBottom": "15px", "height": "140px"}),
 
+            html.Div([
+                # buttons
+                html.Div(dbc.Row([
+                    dbc.Col(dbc.Button("Show", id="show_btn", color="light", outline=True, style={"width": "160px"})),
+                    dbc.Col(dbc.Button("Generate", id="gen_btn", color="light", outline=True, style={"width": "160px"}))
+                ], className="g-0"),
+                style={"text-align": "center", "marginBottom": "15px"}),
+                # dropdown
+                dcc.Dropdown(
+                    id="ref_select",
+                    options=[],
+                    placeholder="Select Data",
+                    clearable=True,
+                    optionHeight=35,
+                    multi=False,
+                    searchable=True,
+                    style={"marginBottom": "15px", "color": "black"},
+                ),
+                # headline
+                html.Div(html.H5("Waypoints", style={"color": "#ADB5BD", "text-align": "center"}),
+                    style={"background": "#375A7F", "border": "1px solid #4B6B8C", "borderBottom": "0px", "paddingBottom": "4px"}),
+                # table header
+                dbc.Table(html.Thead(
+                    html.Tr(
+                        [
+                            html.Th("№", style={"width": "60px", "color": "gray", "text-align": "center"}),
+                            html.Th("Latitude", style={"width": "112px", "color": "gray", "text-align": "center"}),
+                            html.Th("Longitude", style={"width": "112px", "color": "gray", "text-align": "center"}),
+                            html.Th("Select", style={"width": "60px", "color": "gray", "text-align": "center"})
+                        ])),
+                    style={"marginTop": "-7px", "marginBottom": "7px"},
+                    size="sm",
+                    bordered=True,
+                    color="primary"),
+                # table body -> reference points
+                html.Div(id="ref_tab"),
+
+                # creating an invisible div with enough checkboxes (100) for later ref points displayment
+                html.Div(id="invisible",
+                    children=[dbc.Checklist(options=[{"value": 1}], value=[1], id=f"check{i}") for i in range(100)],
+                    style={"display": "none"})
+            ],
+            style={"border":"1px solid silver", "border-radius": 10, "padding": "10px"})],
+        id="gt_cv",
+        scrollable=True,
+        title="Ground Truth Generation",
+        is_open=False)
+    ])
     # card content
     first_row = html.Div([dbc.Row(
         [
@@ -288,7 +389,7 @@ def simulator_card(geojson_style):
                 style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "100px", "width": "435px"}),
                 html.Div([
                     html.Div(dbc.Button("Help", id="help_btn", color="warning", outline=False, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "19px"})],
-                style={"border":"1px solid", "border-radius": 10, "color": "orange", "height": "76px", "width": "435px", "marginTop": "4px", "marginBottom": "4px"})]))
+                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "76px", "width": "435px", "marginTop": "4px", "marginBottom": "4px"})]))
         ],
         className="g-0")
     ])
@@ -301,16 +402,23 @@ def simulator_card(geojson_style):
                     # modals, giving alert
                     ul_warn,
                     ul_done,
+                    map_warn,
+                    map_done,
                     gen_warn,
                     gen_done,
                     exp_warn,
                     exp_done,
+                    show_warn,
+                    # storage
+                    storage,
                     # tooltips
                     ul_tt,
                     # canvas
                     help_canvas,
-                    # spinner
-                    spin,
+                    gt_canvas,
+                    # spinners
+                    spin1,
+                    spin2,
                     # card content
                     html.Div(
                         [
