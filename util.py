@@ -308,7 +308,6 @@ def ref2marker(name: str, check: tuple) -> list:
     for i in range(data.shape[0]):
         if len(check[i]) == 0:
             keep[i] = False
-    print(keep)
     # designing icon (from https://icons8.de/icons/set/marker)
     icon = {
         "iconUrl": "https://img.icons8.com/emoji/344/blue-circle-emoji.png",

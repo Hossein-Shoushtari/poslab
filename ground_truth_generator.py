@@ -1,13 +1,5 @@
 ##### Ground Truth Generation class!!!
 
-### TIPS
-# step_timestamps, step_indexs, step_acce_max_mins = compute_steps(acc)
-# headings = heading_thomas(acc,gyr,100)
-# stride_lengths = compute_stride_length(step_acce_max_mins)
-# step_headings = compute_step_heading(step_timestamps, headings)
-# rel_positions = compute_rel_positions(stride_lengths, step_headings)
-# GroundTruth = correct_positions(rel_positions, ref[:,:3])
-
 ### IMPORTS
 # built in
 import numpy as np

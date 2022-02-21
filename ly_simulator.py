@@ -31,8 +31,13 @@ def simulator_card(geojson_style):
     # dcc.Store to store and share data between callbacks
     storage = html.Div([
         # filename from dropdown
-        dcc.Store(id='dd_filename', data=[], storage_type='memory')
+        dcc.Store(id='dd_filename', data=[], storage_type='memory'),
+        # generated ground truth
+        dcc.Store(id='gt', data=[], storage_type='memory')
     ])
+
+    ### DOWNLOAD
+    download = dcc.Download(id="sim_download")
 
     ### MODALs
     # upload warning
@@ -66,7 +71,7 @@ def simulator_card(geojson_style):
     # calculation warning
     gen_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
-        dbc.ModalBody("Nothing to generate yet!")],
+        dbc.ModalBody("Please select data first!")],
         id="gen_warn",
         is_open=False
     )
@@ -99,6 +104,20 @@ def simulator_card(geojson_style):
             html.P("Please select data first.")
         ])],
         id="show_warn",
+        is_open=False
+    )
+    # simulation warning
+    sim_warn = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
+        dbc.ModalBody("Please generate GroundTruth first, as well as enter integer values for frequency and error!")],
+        id="sim_warn",
+        is_open=False
+    )
+    # simulation done
+    sim_done = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalBody("Simulation successful!")],
+        id="sim_done",
         is_open=False
     )
 
@@ -151,7 +170,7 @@ def simulator_card(geojson_style):
     # tooltips for more information
     ul_tt = html.Div([
         dbc.Tooltip("geojson",              target="maps_upload",      placement="right"),
-        dbc.Tooltip("txt, csv or geojson",  target="waypoints_upload", placement="right"),
+        dbc.Tooltip("csv",  target="waypoints_upload", placement="right"),
         dbc.Tooltip("txt, csv or geojson",  target="antennas_upload",  placement="right"),
         dbc.Tooltip("gyroscope, CSV",       target="ul_gyr",           placement="top"),
         dbc.Tooltip("acceleration, CSV",    target="ul_acc",           placement="bottom"),
@@ -399,6 +418,10 @@ def simulator_card(geojson_style):
         [
             dbc.CardBody(
                 [
+                    # storage
+                    storage,
+                    # download
+                    download,
                     # modals, giving alert
                     ul_warn,
                     ul_done,
@@ -409,8 +432,8 @@ def simulator_card(geojson_style):
                     exp_warn,
                     exp_done,
                     show_warn,
-                    # storage
-                    storage,
+                    sim_done,
+                    sim_warn,
                     # tooltips
                     ul_tt,
                     # canvas

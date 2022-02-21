@@ -6,6 +6,7 @@ import dash_leaflet as dl
 from dash_extensions.javascript import assign
 # built in
 from os import listdir
+import numpy as np
 # installed
 from geopandas import GeoDataFrame, read_file
 # layouts (ly)
@@ -19,13 +20,13 @@ from util import export_data, hover_info
 from util import upload2layer, gt2marker
 from util import ref_tab, ref_checked
 from util import ref2marker, deleter
-
 # generators/simulations/calculations
 from ground_truth_generator import generate_gt
+from coordinate_simulation import simulate_positions
 
 # first deleting the "empty"-files -> due to github, that does not commit empty folders
-try: deleter()
-except: pass
+#try: deleter()
+#except: pass
 
 # Geojson rendering logic, must be JavaScript and only initialized once!
 geojson_style = assign("""function(feature, context){
@@ -151,7 +152,7 @@ def upload(
     # ========== WAYPOINTS =================================================================================================================
     if "ul_way" in button:
         for i in range(len(way_filenames)):
-            if way_filenames[i].split(".")[-1] in ["geojson", "txt", "csv"]: # assuming user uploaded right file format
+            if way_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 decoded_content = upload_encoder(way_contents[i]) # decoding uploaded base64 file
                 with open(f"assets/waypoints/{way_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
             else: return not ul_warn, ul_done, no_update # activating modal -> warn    
@@ -219,6 +220,8 @@ def upload(
     Output("layers", "children"),    # layers
     # loading (invisible div)
     Output("spin2", "children"),      # loading status
+    # store generated ground truth
+    Output("gt", "data"),
     ### Inputs ###
     # modals
     State("map_warn", "is_open"),
@@ -257,14 +260,14 @@ def display(
     #============= MAP =====================================================================================================================
     if "ul_map" in button:
         file_check = [name.split(".")[-1] for name in map_filenames if name.split(".")[-1] not in ["geojson"]] # getting all wrong file formats
-        if len(file_check) > 0: return not map_warn, map_done, gen_warn, gen_done, show_warn, no_update, no_update # activating modal -> warn
+        if len(file_check) > 0: return not map_warn, map_done, gen_warn, gen_done, show_warn, no_update, no_update, no_update # activating modal -> warn
         for i in range(len(map_filenames)): # only right files were uploaded
             decoded_content = upload_encoder(map_contents[i]) # decoding uploaded base64 file
             converted = GeoDataFrame(read_file(decoded_content), crs=32632).to_crs(4326) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
             converted.to_file(f"assets/maps/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
         # floorplans + uploaded maps
         layers = floorplan2layer(geojson_style) + upload2layer(geojson_style)
-        return map_warn, not map_done, gen_warn, gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update # returning uploaded layers
+        return map_warn, not map_done, gen_warn, gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update, no_update # returning uploaded layers
     # ========= GT GENERATOR  =================================================================================================================
     elif "gen_btn" in button:
         if name:
@@ -273,20 +276,21 @@ def display(
             markers = gt2marker(gt[:, 1:3]) # converting crs and making markers
             # floorplans + uploaded maps + markers
             layers = floorplan2layer(geojson_style) + upload2layer(geojson_style) + [dl.Overlay(dl.LayerGroup(markers), name="GroundTruth", checked=True)]
-            return map_warn, map_done, gen_warn, not gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update # successful generator
+            return map_warn, map_done, gen_warn, not gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update, gt # successful generator
+        else: return map_warn, map_done, not gen_warn, gen_done, show_warn, no_update, no_update, no_update # no data selected
     # ========= REF POINTS  =================================================================================================================
     elif "show_btn" in button:
         if name:
             markers = ref2marker(name, check) # converting crs and making markers
             # floorplans + uploaded maps + markers
             layers = floorplan2layer(geojson_style) + upload2layer(geojson_style) + [dl.Overlay(dl.LayerGroup(markers), name="Waypoints", checked=True)]
-            return map_warn, map_done, gen_warn, gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update # successful
-        else: return map_warn, map_done, gen_warn, gen_done, not show_warn, no_update, no_update # no data selected
+            return map_warn, map_done, gen_warn, gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update, no_update # successful
+        else: return map_warn, map_done, gen_warn, gen_done, not show_warn, no_update, no_update, no_update # no data selected
     # ====== no button clicked =============================================================================================================
     # this else-section is always activated, when the page refreshes -> load layers
     else:
         layers = floorplan2layer(geojson_style) + upload2layer(geojson_style)
-        return map_warn, map_done, gen_warn, gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update
+        return map_warn, map_done, gen_warn, gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update, no_update
 
 # ==============  export ===========================================================================================================
 @app.callback(
@@ -400,7 +404,59 @@ def ref_table(name):
     # no file selected
     else: return no_update, no_update, name
 
-
+# ========= simulate measuremant ===================================================================================================
+@app.callback(
+    ### Outputs ###
+    Output("sim_warn", "is_open"),   # freq and or err is missing
+    Output("sim_done", "is_open"),   # simulation successful
+    Output("sim_download", "data"),  # download simulation data
+    ### Inputs ###
+    # modal
+    State("sim_warn", "is_open"),
+    State("sim_done", "is_open"),
+    # button
+    Input("sim_btn", "n_clicks"),
+    # data
+    Input("gt", "data"),              # gorund truth data
+    Input("ti_coo", "value"),         # input - error
+    Input("fr_dis", "value")          # input - frequency
+)
+def ref_table(
+    # canvas status
+    sim_warn,
+    sim_done,
+    # button
+    sim_btn,
+    # data
+    gt,
+    freq,
+    err
+):
+    button = [p["prop_id"] for p in callback_context.triggered][0]
+    #============= MAP =====================================================================================================================
+    if "sim_btn" in button:
+        if freq and err and gt:
+            try:
+                # simulate measurement
+                time_stamps, positions, errors, qualities = simulate_positions(gt, float(err), float(freq))
+                # formatting it
+                formatted = f"""
+                time stamps:\n
+                {time_stamps}\n\n
+                positions:\n
+                {positions}\n\n
+                errors:\n
+                {errors}\n\n
+                qualities:\n
+                {qualities}\n
+                """
+                # download it
+                download = dict(content = formatted,  filename="simulation.txt")
+                return sim_warn, not sim_done, download
+            except:
+                return not sim_warn, sim_done, no_update
+        else: return not sim_warn, sim_done, no_update
+    else: return sim_warn, sim_done, no_update
 
 # pushing the page to the web
 if __name__ == "__main__":
