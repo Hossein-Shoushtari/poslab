@@ -18,11 +18,14 @@ from util import upload_encoder, floorplan2layer
 from util import export_data, hover_info
 from util import upload2layer, gt2marker
 from util import ref_tab, ref_checked
-from util import ref2marker
+from util import ref2marker, deleter
 
 # generators/simulations/calculations
 from ground_truth_generator import generate_gt
 
+# first deleting the "empty"-files -> due to github, that does not commit empty folders
+try: deleter()
+except: pass
 
 # Geojson rendering logic, must be JavaScript and only initialized once!
 geojson_style = assign("""function(feature, context){

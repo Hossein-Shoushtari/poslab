@@ -10,7 +10,7 @@ from dash_extensions.javascript import arrow_function
 import numpy as np
 from datetime import datetime
 from base64 import b64decode
-from os import listdir
+from os import listdir, remove
 # installed
 from geopandas import GeoDataFrame
 from shapely.geometry import Point
@@ -332,4 +332,12 @@ def ref2marker(name: str, check: tuple) -> list:
             markers.append(marker)
 
     return markers
+
+def deleter():
+    remove("assets/antennas/empty")
+    remove("assets/export/empty")
+    remove("assets/groundtruth/empty")
+    remove("assets/maps/empty")
+    remove("assets/sensors/empty")
+    remove("assets/waypoints/empty")
 
