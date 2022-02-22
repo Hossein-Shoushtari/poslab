@@ -151,6 +151,14 @@ def simulate_positions(data, error, freq, number_range=[1, 10], error_range=[1, 
 
         return time_stamps, positions, error_list, qualities_list
 
+def create_output_file(time_stamps, positions, error_list, qualities_list):
+    lines = [[time_stamps[i], positions[i][0],positions[i][1], error_list[i], qualities_list[i]] for i in range(len(time_stamps))]
+    output = "time stamp;x;y;error;quality\n"
+    for row in lines:
+        output += f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]}\n"
+    return output
+
+
 if __name__ == "__main__":    
     ####Coordinate Simulation
     """

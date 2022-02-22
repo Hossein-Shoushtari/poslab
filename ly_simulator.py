@@ -26,18 +26,27 @@ def simulator_card(geojson_style):
         fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "black"},
         spinnerClassName="spinner"
     )
+    spin3 = dbc.Spinner(
+        children=[html.Div(id="spin3", style={"display": "none"})],
+        type=None,
+        fullscreen=True,
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "black"},
+        spinnerClassName="spinner"
+    )
 
     ### STORAGE
     # dcc.Store to store and share data between callbacks
     storage = html.Div([
         # filename from dropdown
-        dcc.Store(id='dd_filename', data=[], storage_type='memory'),
+        dcc.Store(id='ref_data', data=[], storage_type='memory'),
+        # checked boxes
+        dcc.Store(id='checked_boxes', data=[], storage_type='memory'),
         # generated ground truth
         dcc.Store(id='gt', data=[], storage_type='memory')
     ])
 
     ### DOWNLOAD
-    download = dcc.Download(id="sim_download")
+    sim_download = dcc.Download(id="sim_download")
 
     ### MODALs
     # upload warning
@@ -327,9 +336,11 @@ def simulator_card(geojson_style):
                 html.P("🢖 Select the data", style={"color": "gray", "marginBottom": "-5px", "text-indent": "10px"}),
                 html.P("🢖 Show Waypoints on the map", style={"color": "gray", "marginBottom": "-5px", "text-indent": "10px"}),
                 html.P("🢖 Select Waypoints you want", style={"color": "gray", "marginBottom": "-5px", "text-indent": "10px"}),
-                html.P("🢖 Generate Ground Truth Trajectory", style={"color": "gray", "text-indent": "10px"})
+                html.P("🢖 Generate Ground Truth Trajectory", style={"color": "gray", "marginBottom": "3px", "text-indent": "10px"}),
+                html.P("⚠️ Please note:", style={"color": "gray", "marginBottom": "-7px"}),
+                html.P(" The first and last point is always selected.", style={"color": "gray", "text-indent": "26px"}),
             ],
-            style={"border": "1px solid #E45E07", "border-radius": 10, "padding": "10px", "marginBottom": "15px", "height": "140px"}),
+            style={"border": "1px solid #E45E07", "border-radius": 10, "padding": "10px", "marginBottom": "15px", "height": "180px"}),
 
             html.Div([
                 # buttons
@@ -421,8 +432,8 @@ def simulator_card(geojson_style):
                     # storage
                     storage,
                     # download
-                    download,
-                    # modals, giving alert
+                    sim_download,
+                    # modals
                     ul_warn,
                     ul_done,
                     map_warn,
@@ -442,6 +453,7 @@ def simulator_card(geojson_style):
                     # spinners
                     spin1,
                     spin2,
+                    spin3,
                     # card content
                     html.Div(
                         [

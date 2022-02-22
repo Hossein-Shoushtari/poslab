@@ -7,6 +7,7 @@ from dash_extensions.javascript import assign
 # built in
 from os import listdir
 import numpy as np
+from datetime import datetime
 # installed
 from geopandas import GeoDataFrame, read_file
 # layouts (ly)
@@ -22,7 +23,7 @@ from util import ref_tab, ref_checked
 from util import ref2marker, deleter
 # generators/simulations/calculations
 from ground_truth_generator import generate_gt
-from coordinate_simulation import simulate_positions
+from coordinate_simulation import simulate_positions, create_output_file
 
 # first deleting the "empty"-files -> due to github, that does not commit empty folders
 try: deleter()
@@ -96,7 +97,8 @@ app.layout = html.Div(
     ]
 )
 
-# =============  upload ============================================================================================================
+### CALLBACKS ###
+# ============== upload ============================================================================================================
 @app.callback(
     ### Outputs ###
     # modals
@@ -207,7 +209,7 @@ def upload(
     # this else-section is always activated, when the page refreshes -> no warnings
     else: return ul_warn, ul_done, no_update
 
-# ===========  map display =========================================================================================================
+# ============ map display =========================================================================================================
 @app.callback(
     ### Outputs ###
     # modals
@@ -219,7 +221,7 @@ def upload(
     # layers
     Output("layers", "children"),    # layers
     # loading (invisible div)
-    Output("spin2", "children"),      # loading status
+    Output("spin2", "children"),     # loading status
     # store generated ground truth
     Output("gt", "data"),
     ### Inputs ###
@@ -236,8 +238,8 @@ def upload(
     Input("gen_btn", "n_clicks"),
     # reference points
     Input("show_btn", "n_clicks"),
-    Input("dd_filename", "data"),
-    [Input(f"check{i}", "value") for i in range(100)]
+    Input("ref_data", "data"),
+    Input("checked_boxes", "data")
 )
 def display(
     ## modals
@@ -254,7 +256,7 @@ def display(
     # ref points
     show_btn,
     name,
-    *check
+    check
     ):
     button = [p["prop_id"] for p in callback_context.triggered][0]
     #============= MAP =====================================================================================================================
@@ -292,7 +294,115 @@ def display(
         layers = floorplan2layer(geojson_style) + upload2layer(geojson_style)
         return map_warn, map_done, gen_warn, gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update, no_update
 
-# ==============  export ===========================================================================================================
+
+
+# ========== ground truth canvas ===================================================================================================
+@app.callback(
+    ### Outputs ###
+    Output("gt_cv", "is_open"),       # canvas
+    Output("ref_select", "options"),  # ref points dropdown
+    ### Inputs ###
+    State("gt_cv", "is_open"),        # canvas status
+    Input("gt_btn", "n_clicks")       # button
+)
+def gt_canvas(
+    # canvas status
+    gt_cv,
+    # button
+    gt_clicks
+    ):
+    if gt_clicks:
+        options = [{"label": name.split(".")[0], "value": name.split(".")[0]} for name in listdir("assets/waypoints")]
+        return not gt_cv, options     # activate gt offcanvas and filling dropdown with data
+    else: return gt_cv, []            # offcanvas is closed
+
+# ======== reference points table ==================================================================================================
+@app.callback(
+    ### Outputs ###
+    Output("ref_tab", "children"),    # table
+    Output("invisible", "children"),  # 100 invisible checkboxes
+    Output("ref_data", "data"),       # filename from dropdown
+    ### Inputs ###
+    Input("ref_select", "value")      # dropdown
+)
+def ref_table(name):
+    if name: # file is selected
+        # list of rows filled with selecet coordinates
+        tr_list = ref_tab(name)
+        # filling table with rows
+        table = dbc.Table(
+            html.Tbody(tr_list),
+            style={"marginTop": "-7px"},
+            size="sm",
+            bordered=True,
+            color="primary"
+        )
+        # refreshing the invisible checklist
+        checklist = [dbc.Checklist(options=[{"value": 1}], value=[1], id=f"check{i}") for i in range(len(tr_list), 100)]
+        return table, checklist, name
+    # no file selected
+    else: return no_update, no_update, name
+
+# ============== checkboxes ========================================================================================================
+@app.callback(
+    ### Outputs ###
+    Output("checked_boxes", "data"),  # filename from dropdown
+    ### Inputs ###
+    [Input(f"check{i}", "value") for i in range(100)]
+)
+def checkboxes(*check):
+    return check
+
+# ========= simulate measuremant ===================================================================================================
+@app.callback(
+    ### Outputs ###
+    Output("sim_warn", "is_open"),   # freq and or err is missing
+    Output("sim_done", "is_open"),   # simulation successful
+    Output("sim_download", "data"),  # download simulation data
+    # loading (invisible div)
+    Output("spin3", "children"),     # loading status
+    ### Inputs ###
+    # modal
+    State("sim_warn", "is_open"),
+    State("sim_done", "is_open"),
+    # button
+    Input("sim_btn", "n_clicks"),
+    # data
+    Input("gt", "data"),              # gorund truth data
+    Input("ti_coo", "value"),         # input - error
+    Input("fr_dis", "value")          # input - frequency
+)
+def simulation(
+    # canvas status
+    sim_warn,
+    sim_done,
+    # button
+    sim_btn,
+    # data
+    gt,
+    freq,
+    err
+    ):
+    button = [p["prop_id"] for p in callback_context.triggered][0]
+    #============= MAP =====================================================================================================================
+    if "sim_btn" in button:
+        if freq and err and gt:
+            try:
+                # simulate measurement
+                time_stamps, positions, errors, qualities = simulate_positions(gt, float(err), float(freq))
+                # formatting it
+                formatted = create_output_file(time_stamps, positions, errors, qualities)
+                # download it
+                download = dict(content = formatted,  filename=f"output{datetime.now()}.csv")
+                return sim_warn, not sim_done, download, no_update
+            except:
+                return not sim_warn, sim_done, no_update, no_update
+        else: return not sim_warn, sim_done, no_update, no_update
+    else: return sim_warn, sim_done, no_update, no_update
+
+
+
+# =============== export ===========================================================================================================
 @app.callback(
     ### Outputs ###
     # modal
@@ -322,7 +432,7 @@ def export(
         return exp_done, not exp_warn # nothing is drawn -> no data exported
     return exp_done, exp_warn # nothing is clicked. nothing happens
 
-# ============  help canvas ========================================================================================================
+# ============= help canvas ========================================================================================================
 @app.callback(
     ### Outputs ###
     Output("help_cv", "is_open"),    # canvas
@@ -357,106 +467,6 @@ def hovering(
     elif feature_4og: return hover_info(feature_4og)   # if 4OGG is clicked
     else: return hover_info()                          # if nothing is clicked
 
-# ========== ground truth canvas ===================================================================================================
-@app.callback(
-    ### Outputs ###
-    Output("gt_cv", "is_open"),       # canvas
-    Output("ref_select", "options"),  # ref points dropdown
-    ### Inputs ###
-    State("gt_cv", "is_open"),        # canvas status
-    Input("gt_btn", "n_clicks")       # button
-)
-def gt_canvas(
-    # canvas status
-    gt_cv,
-    # button
-    gt_clicks
-    ):
-    if gt_clicks:
-        options = [{"label": name.split(".")[0], "value": name.split(".")[0]} for name in listdir("assets/waypoints")]
-        return not gt_cv, options     # activate gt offcanvas and filling dropdown with data
-    else: return gt_cv, []            # offcanvas is closed
-
-# ======== reference points table ==================================================================================================
-@app.callback(
-    ### Outputs ###
-    Output("ref_tab", "children"),    # table
-    Output("invisible", "children"),  # 100 invisible checkboxes
-    Output("dd_filename", "data"),    # filename from dropdown
-    ### Inputs ###
-    Input("ref_select", "value")      # dropdown
-)
-def ref_table(name):
-    if name: # file is selected
-        # list of rows filled with selecet coordinates
-        tr_list = ref_tab(name)
-        # filling table with rows
-        table = dbc.Table(
-            html.Tbody(tr_list),
-            style={"marginTop": "-7px"},
-            size="sm",
-            bordered=True,
-            color="primary"
-        )
-        # refreshing the invisible checklist
-        checklist = [dbc.Checklist(options=[{"value": 1}], value=[1], id=f"check{i}") for i in range(len(tr_list), 100)]
-        return table, checklist, name
-    # no file selected
-    else: return no_update, no_update, name
-
-# ========= simulate measuremant ===================================================================================================
-@app.callback(
-    ### Outputs ###
-    Output("sim_warn", "is_open"),   # freq and or err is missing
-    Output("sim_done", "is_open"),   # simulation successful
-    Output("sim_download", "data"),  # download simulation data
-    ### Inputs ###
-    # modal
-    State("sim_warn", "is_open"),
-    State("sim_done", "is_open"),
-    # button
-    Input("sim_btn", "n_clicks"),
-    # data
-    Input("gt", "data"),              # gorund truth data
-    Input("ti_coo", "value"),         # input - error
-    Input("fr_dis", "value")          # input - frequency
-)
-def ref_table(
-    # canvas status
-    sim_warn,
-    sim_done,
-    # button
-    sim_btn,
-    # data
-    gt,
-    freq,
-    err
-):
-    button = [p["prop_id"] for p in callback_context.triggered][0]
-    #============= MAP =====================================================================================================================
-    if "sim_btn" in button:
-        if freq and err and gt:
-            try:
-                # simulate measurement
-                time_stamps, positions, errors, qualities = simulate_positions(gt, float(err), float(freq))
-                # formatting it
-                formatted = f"""
-                time stamps:\n
-                {time_stamps}\n\n
-                positions:\n
-                {positions}\n\n
-                errors:\n
-                {errors}\n\n
-                qualities:\n
-                {qualities}\n
-                """
-                # download it
-                download = dict(content = formatted,  filename="simulation.txt")
-                return sim_warn, not sim_done, download
-            except:
-                return not sim_warn, sim_done, no_update
-        else: return not sim_warn, sim_done, no_update
-    else: return sim_warn, sim_done, no_update
 
 # pushing the page to the web
 if __name__ == "__main__":
