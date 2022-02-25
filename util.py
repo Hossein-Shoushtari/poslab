@@ -33,7 +33,7 @@ def upload_encoder(content: str) -> str:
 
     return decoded_content
 
-def export_data(data: dict) -> None:
+def export_drawn_data(data: dict) -> None:
     """
     FUNCTION
     - formats received dictionary (replaces ' with ")

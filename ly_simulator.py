@@ -42,11 +42,14 @@ def simulator_card(geojson_style):
         # checked boxes
         dcc.Store(id='checked_boxes', data=[], storage_type='memory'),
         # generated ground truth
-        dcc.Store(id='gt', data=[], storage_type='memory')
+        dcc.Store(id='gt_data', data=[], storage_type='memory'),
+        # simulated measurements
+        dcc.Store(id='sim_data', data=[], storage_type='memory')
     ])
 
     ### DOWNLOAD
-    sim_download = dcc.Download(id="sim_download")
+    export_gt = dcc.Download(id="export_gt")
+    export_sim = dcc.Download(id="export_sim")
 
     ### MODALs
     # upload warning
@@ -94,24 +97,21 @@ def simulator_card(geojson_style):
     # export warning
     exp_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
-        dbc.ModalBody("Nothing to export yet!")],
+        dbc.ModalBody("Please generate ground truth and simulate measurement first!")],
         id="exp_warn",
         is_open=False
     )
     # export done
     exp_done = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("DONE")),
-        dbc.ModalBody("Drawn data successfully exported!")],
+        dbc.ModalBody("Export successful!")],
         id="exp_done",
         is_open=False
     )
     # ref show warning
     show_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
-        dbc.ModalBody(children=[
-            html.P("Nothing to show yet!"),
-            html.P("Please select data first.")
-        ])],
+        dbc.ModalBody("Please select data first!")],
         id="show_warn",
         is_open=False
     )
@@ -282,7 +282,7 @@ def simulator_card(geojson_style):
             dbc.Button("Ground Truth", id="gt_btn", color="light", outline=True, style={"width": "200px"}),
             style={"marginBottom": "5px"}),
         html.Div(
-            dbc.Button("Simulate measurement", id="sim_btn", color="light", outline=True, style={"width": "200px"}),
+            dbc.Button("Simulate Measurement", id="sim_btn", color="light", outline=True, style={"width": "200px"}),
             style={"marginTop": "5px"})            
     ])
 
@@ -299,29 +299,56 @@ def simulator_card(geojson_style):
     }
     # HELP
     help_canvas = html.Div([
-        dbc.Offcanvas([   
-            html.Div([
-                # info upload
-                html.H5("UPLOAD", style={"text-align": "center", "color": "#3B5A7F"}),
-                html.Hr(style={"margin": "auto", "width": "80%", "color": "#3B5A7F"}),
-                html.P("All 7 buttons are for uploading the data required for the simulation.", style={"color": "gray"}),
-                dbc.Row([
-                    dbc.Col(html.Div(html.P("Maps:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                    dbc.Col(html.P("Only GeoJSON files of type crs:32632 are accepted.", style={"color": "gray"}))
-                ], className="g-0"),
-                dbc.Row([
-                    dbc.Col(html.Div(html.P("Waypoints:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                    dbc.Col(html.P("Only TXT, CSV or GeoJSON files are accepted.", style={"color": "gray"}))
-                ], className="g-0"),
-                dbc.Row([
-                    dbc.Col(html.Div(html.P("Antennas:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                    dbc.Col(html.P("Only TXT, CSV or GeoJSON files are accepted.", style={"color": "gray"}))
-                ], className="g-0"),
-                dbc.Row([
-                    dbc.Col(html.Div(html.P("Sensors:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                    dbc.Col(html.P("Only CSV files are accepted.", style={"color": "gray"}))
-                ], className="g-0")],
-            style={"border":"1px solid #3B5A7F", "border-radius": 10, "padding": "10px", "marginBottom": "10px"})],
+        dbc.Offcanvas(
+            [   
+                html.Div([
+                    # info upload
+                    html.H5("UPLOAD", style={"text-align": "center", "color": "#3B5A7F"}),
+                    html.Hr(style={"margin": "auto", "width": "80%", "color": "#3B5A7F"}),
+                    html.P("All 7 buttons are for uploading the data required for the simulation.", style={"color": "gray"}),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Maps:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.P("Only GeoJSON files of type crs:32632 are accepted.", style={"color": "gray"}))
+                    ], className="g-0"),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Waypoints:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.P("Only CSV files are accepted.", style={"color": "gray"}))
+                    ], className="g-0"),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Antennas:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.P("Only TXT, CSV or GeoJSON files are accepted.", style={"color": "gray"}))
+                    ], className="g-0"),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Sensors:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.P("Only CSV files are accepted.", style={"color": "gray"}))
+                    ], className="g-0")],
+                style={"border":"1px solid #3B5A7F", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
+                html.Br(),
+                html.Div([
+                    # info simulation
+                    html.H5("SIMULATION", style={"text-align": "center", "color": "silver"}),
+                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver"}),
+                    html.P("Guide for simulating measurements:", style={"color": "gray"}),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Frequency:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
+                        dbc.Col(html.P("Accepts float values.", style={"color": "gray"}))
+                    ], className="g-0"),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Coord. Qual.:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
+                        dbc.Col(html.P("Accepts float values.", style={"color": "gray"}))
+                    ], className="g-0"),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Ground Truth:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
+                        dbc.Col(html.P("Choose data and generate ground truth trajectory.", style={"color": "gray"}))
+                    ], className="g-0"),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Sim. Measm.:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
+                        dbc.Col(html.P("Simulate the measurement to finish the calculation.", style={"color": "gray"}))
+                    ], className="g-0"),
+                    html.Div(html.P("The ground truth trajectory and the simulated measurement can now be downloaded as two seperate CSV files!", style={"color": "gray"}),
+                    style={"borderLeft": "2px solid #36BD8E", "paddingLeft": "5px"})],
+                style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
+            ],
         id="help_cv",
         scrollable=True,
         title="Help",
@@ -412,11 +439,29 @@ def simulator_card(geojson_style):
                 style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "marginBottom": "4px"})),
 
             dbc.Col(html.Div([
-                html.Div([
-                    html.H5("Export", style=H5_style),
-                    html.Hr(style=hr_style),
-                    html.Div(dbc.Button("Get results", id="exp_btn", color="success", outline=True, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "10px"})],
-                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "100px", "width": "435px"}),
+                html.Div(
+                    [
+                        html.H5("Export", style={"textAlign": "center", "color": "grey", "marginTop": "5px"}),
+                        html.Hr(style={"width": "60%", "margin": "auto"}),
+                        html.Div(
+                            [
+                                dbc.Button(
+                                    [
+                                        "Get results",
+                                        html.Div(id="exp_badge")
+                                    ],
+                                    color="success",
+                                    className="position-relative",
+                                    outline=True,
+                                    style={"width": "150px"},
+                                    id="exp_btn",
+                                )
+                            ],
+                            style={"textAlign": "center", "marginTop": "10px"}
+                        )
+                    ],            
+                    style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "100px", "width": "435px"}
+                ),
                 html.Div([
                     html.Div(dbc.Button("Help", id="help_btn", color="warning", outline=False, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "19px"})],
                 style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "76px", "width": "435px", "marginTop": "4px", "marginBottom": "4px"})]))
@@ -432,7 +477,8 @@ def simulator_card(geojson_style):
                     # storage
                     storage,
                     # download
-                    sim_download,
+                    export_sim,
+                    export_gt,
                     # modals
                     ul_warn,
                     ul_done,

@@ -17,13 +17,13 @@ from ly_evaluator import evaluator_card
 from ly_coming_soon import coming_soon_card
 # utils
 from util import upload_encoder, floorplan2layer
-from util import export_data, hover_info
+from util import export_drawn_data, hover_info
 from util import upload2layer, gt2marker
 from util import ref_tab, ref_checked
 from util import ref2marker, deleter
 # generators/simulations/calculations
-from ground_truth_generator import generate_gt
-from coordinate_simulation import simulate_positions, create_output_file
+from ground_truth_generator import generate_gt, export_gt
+from coordinate_simulation import simulate_positions, export_sim
 
 # first deleting the "empty"-files -> due to github, that does not commit empty folders
 try: deleter()
@@ -223,7 +223,7 @@ def upload(
     # loading (invisible div)
     Output("spin2", "children"),     # loading status
     # store generated ground truth
-    Output("gt", "data"),
+    Output("gt_data", "data"),
     ### Inputs ###
     # modals
     State("map_warn", "is_open"),
@@ -279,7 +279,7 @@ def display(
             # floorplans + uploaded maps + markers
             layers = floorplan2layer(geojson_style) + upload2layer(geojson_style) + [dl.Overlay(dl.LayerGroup(markers), name="GroundTruth", checked=True)]
             return map_warn, map_done, gen_warn, not gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update, gt # successful generator
-        else: return map_warn, map_done, not gen_warn, gen_done, show_warn, no_update, no_update, no_update # no data selected
+        else: return map_warn, map_done, not gen_warn, gen_done, show_warn, no_update, no_update, None # no data selected
     # ========= REF POINTS  =================================================================================================================
     elif "show_btn" in button:
         if name:
@@ -292,7 +292,7 @@ def display(
     # this else-section is always activated, when the page refreshes -> load layers
     else:
         layers = floorplan2layer(geojson_style) + upload2layer(geojson_style)
-        return map_warn, map_done, gen_warn, gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update, no_update
+        return map_warn, map_done, gen_warn, gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update, None
 
 
 
@@ -358,7 +358,7 @@ def checkboxes(*check):
     ### Outputs ###
     Output("sim_warn", "is_open"),   # freq and or err is missing
     Output("sim_done", "is_open"),   # simulation successful
-    Output("sim_download", "data"),  # download simulation data
+    Output("sim_data", "data"),      # sim measurements data
     # loading (invisible div)
     Output("spin3", "children"),     # loading status
     ### Inputs ###
@@ -368,7 +368,7 @@ def checkboxes(*check):
     # button
     Input("sim_btn", "n_clicks"),
     # data
-    Input("gt", "data"),              # gorund truth data
+    Input("gt_data", "data"),         # gorund truth data
     Input("ti_coo", "value"),         # input - error
     Input("fr_dis", "value")          # input - frequency
 )
@@ -384,21 +384,16 @@ def simulation(
     err
     ):
     button = [p["prop_id"] for p in callback_context.triggered][0]
-    #============= MAP =====================================================================================================================
     if "sim_btn" in button:
         if freq and err and gt:
             try:
                 # simulate measurement
-                time_stamps, positions, errors, qualities = simulate_positions(gt, float(err), float(freq))
-                # formatting it
-                formatted = create_output_file(time_stamps, positions, errors, qualities)
-                # download it
-                download = dict(content = formatted,  filename=f"output{datetime.now()}.csv")
-                return sim_warn, not sim_done, download, no_update
+                simulation = simulate_positions(gt, float(err), float(freq))
+                return sim_warn, not sim_done, simulation, no_update
             except:
-                return not sim_warn, sim_done, no_update, no_update
-        else: return not sim_warn, sim_done, no_update, no_update
-    else: return sim_warn, sim_done, no_update, no_update
+                return not sim_warn, sim_done, None, no_update
+        else: return not sim_warn, sim_done, None, no_update
+    else: return sim_warn, sim_done, None, no_update
 
 
 
@@ -408,29 +403,66 @@ def simulation(
     # modal
     Output("exp_done", "is_open"),    # export done status
     Output("exp_warn", "is_open"),    # export warn status
+    # storage
+    Output("export_gt", "data"),      # export gt data
+    Output("export_sim", "data"),     # export sim data
+    # badge
+    Output("exp_badge", "children"),     # export sim data
     ### Inputs ###
     # modal
     State("exp_done", "is_open"),     # done
     State("exp_warn", "is_open"),     # warn
-    # export
+    # button
+    Input("exp_btn", "n_clicks"),     # export button click status
+    # data
     Input("edit_control", "geojson"), # drawn data in geojson format
-    Input("exp_btn", "n_clicks")      # export button click status 
+    Input("gt_data", "data"),         # gorund truth data
+    Input("sim_data", "data"),        # sim measurements data
 )
 def export(
     ## modal
     exp_done,
     exp_warn,
-    # export
-    data,
-    exp_clicks
+    # button
+    exp_clicks,
+    # data
+    drawn_data,
+    gt_data,
+    sim_data
     ):
     button = [p["prop_id"] for p in callback_context.triggered][0]
-    if "exp_btn" in button:
-        if data["features"]:
-            export_data(data)
-            return not exp_done, exp_warn # data successfully exported
-        return exp_done, not exp_warn # nothing is drawn -> no data exported
-    return exp_done, exp_warn # nothing is clicked. nothing happens
+    if sim_data and gt_data:
+        badge = dbc.Badge(
+            "✔️",
+            color="success",
+            pill=True,
+            text_color="white",
+            className="position-absolute top-0 start-100 translate-middle"
+        )
+        if "exp_btn" in button:
+            # if data["features"]: # drawn data
+            #     export_drawn_data(data)
+            # formatting groundtruth
+            gt_format = export_gt(gt_data)
+            # formatting simulation
+            sim_format = export_sim(*sim_data)
+            # downloading it
+            gt_dl = dict(content = gt_format,  filename=f"ground_truth_trajectory{datetime.now()}.csv")
+            sim_dl = dict(content = sim_format,  filename=f"simulated_measurements{datetime.now()}.csv")
+            return not exp_done, exp_warn, gt_dl, sim_dl, badge # export successful
+        return exp_done, exp_warn, no_update, no_update, badge # export doable
+    else:
+        if "exp_btn" in button:
+            return exp_done, not exp_warn, no_update, no_update, no_update # export failed
+        else:
+            badge = dbc.Badge(
+                "🚫",
+                color="danger",
+                pill=True,
+                text_color="white",
+                className="position-absolute top-0 start-100 translate-middle"
+            )
+            return exp_done, exp_warn, no_update, no_update, badge # nothing is clicked. nothing happens
 
 # ============= help canvas ========================================================================================================
 @app.callback(
