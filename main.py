@@ -10,6 +10,8 @@ from ly_evaluator import evaluator_card
 from ly_coming_soon import coming_soon_card
 # callbacks (cb)
 from cb_simulator import simulator_callbacks
+# utils
+from util import deleter
 
 # first deleting the "empty"-files -> due to github, that does not commit empty folders
 try: deleter()

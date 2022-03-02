@@ -12,8 +12,7 @@ from datetime import datetime
 from util import upload_encoder, floorplan2layer
 from util import export_drawn_data, hover_info
 from util import upload2layer, gt2marker
-from util import ref_tab, ref_checked
-from util import ref2marker, deleter
+from util import ref_tab, ref_checked, ref2marker
 # generators/simulators/calculators
 from ground_truth_generator import generate_gt, export_gt
 from coordinate_simulation import simulate_positions, export_sim

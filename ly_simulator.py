@@ -302,7 +302,7 @@ def sim_set_canvas():
                     html.Hr(style={"margin": "auto", "width": "100%", "color": "silver", "height": "3px", "marginBottom": "-10px"}),
                     html.Br(),
 
-                    html.P("Number of intervalls", style={"text-align": "center", "color": "silver", "marginBottom": "2px"}),
+                    html.P("Number of intervals", style={"text-align": "center", "color": "silver", "marginBottom": "2px"}),
                     html.Div(dbc.Input(id="num_int", placeholder="Type a number...", type="text")),
 
                     html.P("Interval range [sec]", style={"text-align": "center", "color": "silver", "marginBottom": "0px", "marginTop": "10px"}),
