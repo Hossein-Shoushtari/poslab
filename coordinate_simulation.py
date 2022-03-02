@@ -262,8 +262,7 @@ if __name__ == "__main__":
     semantic_is_used = False # set this to True if semantic errors are used
 
     time_stamps, positions, errors, qualities = simulate_positions(filename, error, measurement_freq, 500, 1, 1,[1, 15], [1 * 1000, 20 * 1000],semantic_is_used)
-
-
+    
 
     print('qualities',qualities)
     print('errors', errors)

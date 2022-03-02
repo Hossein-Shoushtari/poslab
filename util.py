@@ -198,7 +198,7 @@ def gt2marker(ground_truth: list) -> list:
             children=[
                 dl.Tooltip(nr+1),
                 dl.Popup([
-                    html.H5(nr, style={"text-align": "center", "color": "gray", "marginTop": "-5px"}),
+                    html.H5(nr+1, style={"text-align": "center", "color": "gray", "marginTop": "-5px"}),
                     dbc.Table(html.Tbody([
                         html.Tr([
                             html.Td("Latitude", style={"font-size": "15px", "color": "white"}),

@@ -30,7 +30,9 @@
 
 > **measurement_simulation.py** : Georg's part (?)
 
-> **ly_...** : Design and layout of 4 tabs on web (Home, Simulator, Evaluator, Coming Soon)
+> **ly_...** : Design and layout of all 4 tabs on web (Home, Simulator, Evaluator, Coming Soon)
+
+> **cb_...** : Callbacks of all 4 tabs for every function (Home, Simulator, Evaluator, Coming Soon)
 
 > **util.py** : Needed functions to run all buttons (converting, encoding, etc.)
 
