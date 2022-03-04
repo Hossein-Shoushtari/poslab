@@ -59,14 +59,14 @@ def semantic_error(number, error_range, intervall_range, time_stamps):
 
     return intervall_lengths, errors, intervall_starts
 
-def simulate_positions(filename, error, measurement_freq, query_freq, number_of_users, number_of_intervalls,
+def simulate_positions(groundtruth, error, measurement_freq, query_freq, number_of_users, number_of_intervalls,
                        error_range, intervall_range, semantic):
     """
         creating sample data points for 5G measurements
 
         Parameters
         ----------
-        filename : name of csv file containing groundtrouth data points - string
+        groundtruth : time stamps and position coordinates of the ground truth data set - array of floats
         error : desired error for 5G positions  - float
         measurement_freq : frequency of 5G measurements in (number of measurements/second)  - float
         query_freq : frequency of possible queries to receive the position information (number of queries/second)  - float
@@ -85,107 +85,43 @@ def simulate_positions(filename, error, measurement_freq, query_freq, number_of_
         qualities_list : estimated qualities for each measurement (as limits of a error intervall) - array of floats
         """
 
-    with open(filename, newline='') as f:
+    # with open(filename, newline='') as f:
 
-        reader = csv.reader(f)
+        # reader = csv.reader(f)
 
-        rows = []
-        positions = []
-        time_stamps = []
+    rows = grundtruth
+    positions = []
+    time_stamps = []
 
-        error_list = []
-        for row in reader:
-
-            rows.append([float(row[0].split(' ')[0]), float(row[0].split(' ')[1]), float(row[0].split(' ')[2])])
-
-        original_time_stamps = [r[0] for r in rows]
-        intervall_lengths, semantic_errors, intervall_starts = semantic_error(number_of_intervalls, error_range,
-                                                                              intervall_range, original_time_stamps)
+    error_list = []
+        # for row in reader:
+            # rows.append([float(row[0].split(' ')[0]), float(row[0].split(' ')[1]), float(row[0].split(' ')[2])])
+    original_time_stamps = [r[0] for r in rows]
+    intervall_lengths, semantic_errors, intervall_starts = semantic_error(number_of_intervalls, error_range,
+                                                                          intervall_range, original_time_stamps)
 
 
-        # current_intervall_start = intervall_starts[0]
-        # current_semantic_error = semantic_errors[0]
-        # current_intervall_length = intervall_lengths[0]
-        count = 0
-        semantic_active = False
+    # current_intervall_start = intervall_starts[0]
+    # current_semantic_error = semantic_errors[0]
+    # current_intervall_length = intervall_lengths[0]
+    count = 0
+    semantic_active = False
 
-        if number_of_users > query_freq:
-            #overflow = number_of_users - query_freq
-            duration = (number_of_users / query_freq) * 1000
-            ts = rows[0][0]
-            print(measurement_freq, 'measurement_freq')
-            print(query_freq, 'query_freq')
-            print(number_of_users, 'number of users')
-            print(duration, 'duration')
-            measurement_freq = measurement_freq / 1000
-            query_freq = query_freq / 1000
-            print(rows[1][0] - rows[0][0], 'first sequel')
+    if number_of_users > query_freq:
+        #overflow = number_of_users - query_freq
+        duration = (number_of_users / query_freq) * 1000
+        ts = rows[0][0]
+        print(measurement_freq, 'measurement_freq')
+        print(query_freq, 'query_freq')
+        print(number_of_users, 'number of users')
+        print(duration, 'duration')
+        measurement_freq = measurement_freq / 1000
+        query_freq = query_freq / 1000
+        print(rows[1][0] - rows[0][0], 'first sequel')
 
-            for r in range(len(rows)):
-                if r == 0:
-                    time_stamps.append(ts)
-
-                    if semantic == True:
-                        if rows[r][0] >= intervall_starts[count] and rows[r][0] <= intervall_starts[count] + \
-                                intervall_lengths[count]:
-                            current_error = semantic_errors[count]
-                            semantic_active == True
-
-                        elif semantic_active == True:
-                            current_error = semantic_errors[count]
-                            count += 1
-                        elif semantic_active == False:
-                            current_error = error
-                    else:
-                        current_error = error
-
-                    x_error = np.random.normal(0, current_error)
-                    y_error = np.random.normal(0, current_error)
-                    error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
-                    positions.append([rows[r][1] + x_error, rows[r][2] + y_error])
-                    ts += duration
-
-                else:
-
-                    x_error = np.random.normal(0, current_error)
-                    y_error = np.random.normal(0, current_error)
-                    error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
-                    positions.append([rows[r][1] + x_error, rows[r][2] + y_error])
-
-                    ts += duration
-
-                dt = 1 / measurement_freq
-                t1 = rows[r][0]
-                t2 = rows[r][0] + dt
-
-                if r <= len(rows) - 2:
-                    dx = ((rows[r + 1][1] - rows[r][1]) / (rows[r + 1][0] - rows[r][0])) * dt
-                    dy = ((rows[r + 1][2] - rows[r][2]) / (rows[r + 1][0] - rows[r][0])) * dt
-                    # dz = ((rows[r-1][3] - rows[r][3])/(rows[r-1][0] - rows[r][0]))*dt
-
-                    x_temp = rows[r][1] + dx
-                    y_temp = rows[r][2] + dy
-                    # z_temp = rows[r][3] + dz
-
-                while t2 < rows[-1][0] and t2 < rows[r + 1][0]:
-                    time_stamps.append(ts)
-                    x_error = np.random.normal(0, current_error)
-                    y_error = np.random.normal(0, current_error)
-                    error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
-                    positions.append([x_temp + dx + np.random.uniform(-current_error, current_error, 1)[0],
-                                      y_temp + dy + np.random.uniform(-error, error, 1)[0]])
-                    t2 = t2 + dt
-                    x_temp = x_temp + dx
-                    y_temp = y_temp + dy
-
-                    ts += duration
-
-
-        else:
-
-            for r in range(len(rows)):
-
-                time_stamps.append(rows[r][0])
+        for r in range(len(rows)):
+            if r == 0:
+                time_stamps.append(ts)
 
                 if semantic == True:
                     if rows[r][0] >= intervall_starts[count] and rows[r][0] <= intervall_starts[count] + \
@@ -205,38 +141,100 @@ def simulate_positions(filename, error, measurement_freq, query_freq, number_of_
                 y_error = np.random.normal(0, current_error)
                 error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
                 positions.append([rows[r][1] + x_error, rows[r][2] + y_error])
+                ts += duration
 
-                dt = 1 / measurement_freq
-                t1 = rows[r][0]
-                t2 = rows[r][0] + dt
+            else:
 
-                if r <= len(rows) - 2:
-                    dx = ((rows[r + 1][1] - rows[r][1]) / (rows[r + 1][0] - rows[r][0])) * dt
-                    dy = ((rows[r + 1][2] - rows[r][2]) / (rows[r + 1][0] - rows[r][0])) * dt
-                    # dz = ((rows[r-1][3] - rows[r][3])/(rows[r-1][0] - rows[r][0]))*dt
+                x_error = np.random.normal(0, current_error)
+                y_error = np.random.normal(0, current_error)
+                error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
+                positions.append([rows[r][1] + x_error, rows[r][2] + y_error])
 
-                    x_temp = rows[r][1] + dx
-                    y_temp = rows[r][2] + dy
-                    # z_temp = rows[r][3] + dz
+                ts += duration
 
-                while t2 < rows[-1][0] and t2 < rows[r + 1][0]:
-                    time_stamps.append(t2)
-                    x_error = np.random.normal(0, current_error)
-                    y_error = np.random.normal(0, current_error)
-                    error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
-                    positions.append([x_temp + dx + np.random.uniform(-current_error, current_error, 1)[0],
-                                      y_temp + dy + np.random.uniform(-current_error, current_error, 1)[0]])
-                    t2 = t2 + dt
-                    x_temp = x_temp + dx
-                    y_temp = y_temp + dy
+            dt = 1 / measurement_freq
+            t1 = rows[r][0]
+            t2 = rows[r][0] + dt
 
-            qualities_list = []
-            for e in error_list:
-                quality = closest_value([error / 5, 2 * error / 5, 3 * error / 5, 4 * error / 5, 5 * error / 5],
-                                        e)
-                qualities_list.append(quality)
+            if r <= len(rows) - 2:
+                dx = ((rows[r + 1][1] - rows[r][1]) / (rows[r + 1][0] - rows[r][0])) * dt
+                dy = ((rows[r + 1][2] - rows[r][2]) / (rows[r + 1][0] - rows[r][0])) * dt
+                # dz = ((rows[r-1][3] - rows[r][3])/(rows[r-1][0] - rows[r][0]))*dt
 
-        return time_stamps, positions, error_list, qualities_list
+                x_temp = rows[r][1] + dx
+                y_temp = rows[r][2] + dy
+                # z_temp = rows[r][3] + dz
+
+            while t2 < rows[-1][0] and t2 < rows[r + 1][0]:
+                time_stamps.append(ts)
+                x_error = np.random.normal(0, current_error)
+                y_error = np.random.normal(0, current_error)
+                error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
+                positions.append([x_temp + dx + np.random.uniform(-current_error, current_error, 1)[0],
+                                  y_temp + dy + np.random.uniform(-error, error, 1)[0]])
+                t2 = t2 + dt
+                x_temp = x_temp + dx
+                y_temp = y_temp + dy
+
+                ts += duration
+
+
+    else:
+
+        for r in range(len(rows)):
+
+            time_stamps.append(rows[r][0])
+
+            if semantic == True:
+                if rows[r][0] >= intervall_starts[count] and rows[r][0] <= intervall_starts[count] + \
+                        intervall_lengths[count]:
+                    current_error = semantic_errors[count]
+                    semantic_active == True
+
+                elif semantic_active == True:
+                    current_error = semantic_errors[count]
+                    count += 1
+                elif semantic_active == False:
+                    current_error = error
+            else:
+                current_error = error
+
+            x_error = np.random.normal(0, current_error)
+            y_error = np.random.normal(0, current_error)
+            error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
+            positions.append([rows[r][1] + x_error, rows[r][2] + y_error])
+
+            dt = 1 / measurement_freq
+            t1 = rows[r][0]
+            t2 = rows[r][0] + dt
+
+            if r <= len(rows) - 2:
+                dx = ((rows[r + 1][1] - rows[r][1]) / (rows[r + 1][0] - rows[r][0])) * dt
+                dy = ((rows[r + 1][2] - rows[r][2]) / (rows[r + 1][0] - rows[r][0])) * dt
+                # dz = ((rows[r-1][3] - rows[r][3])/(rows[r-1][0] - rows[r][0]))*dt
+
+                x_temp = rows[r][1] + dx
+                y_temp = rows[r][2] + dy
+                # z_temp = rows[r][3] + dz
+
+            while t2 < rows[-1][0] and t2 < rows[r + 1][0]:
+                time_stamps.append(t2)
+                x_error = np.random.normal(0, current_error)
+                y_error = np.random.normal(0, current_error)
+                error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
+                positions.append([x_temp + dx + np.random.uniform(-current_error, current_error, 1)[0],
+                                  y_temp + dy + np.random.uniform(-current_error, current_error, 1)[0]])
+                t2 = t2 + dt
+                x_temp = x_temp + dx
+                y_temp = y_temp + dy
+
+        qualities_list = []
+        for e in error_list:
+            quality = closest_value([error / 5, 2 * error / 5, 3 * error / 5, 4 * error / 5, 5 * error / 5],
+                                    e)
+            qualities_list.append(quality)
+
+    return time_stamps, positions, error_list, qualities_list
 
 
 def export_sim(time_stamps, positions, error_list, qualities_list):
@@ -254,6 +252,18 @@ if __name__ == "__main__":
     """
 
     filename = 'assets/groundtruth/GroundTruthEight.csv'
+
+    with open(filename, newline='') as f:
+
+        reader = csv.reader(f)
+
+        rows = []
+
+        error_list = []
+        for row in reader:
+            rows.append([float(row[0].split(' ')[0]), float(row[0].split(' ')[1]), float(row[0].split(' ')[2])])
+    grundtruth = rows
+
     error = 2
     measurement_freq = 1
     number_range = [1, 10] # range of number of occurencies for segments with semantic error
@@ -261,7 +271,7 @@ if __name__ == "__main__":
     intervall_range = [1 * 1000, 20 * 1000] # range of intervall lengths where semantic errors are generated
     semantic_is_used = False # set this to True if semantic errors are used
 
-    time_stamps, positions, errors, qualities = simulate_positions(filename, error, measurement_freq, 500, 1, 1,[1, 15], [1 * 1000, 20 * 1000],semantic_is_used)
+    time_stamps, positions, errors, qualities = simulate_positions(grundtruth, error, measurement_freq, 500, 1, 1,[1, 15], [1 * 1000, 20 * 1000],semantic_is_used)
     
 
     print('qualities',qualities)
