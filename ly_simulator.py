@@ -10,6 +10,36 @@ from base64 import b64decode
 # utils
 from util import floorplan2layer, hover_info
 
+def storage():
+    ### STORAGE
+    # dcc.Store to store and share data between callbacks
+    storage = html.Div([
+        # filename from dropdown
+        dcc.Store(id='ref_data', data=[], storage_type='memory'),
+        # checked boxes
+        dcc.Store(id='checked_boxes', data=[], storage_type='memory'),
+        # generated ground truth
+        dcc.Store(id='gt_data', data=[], storage_type='memory'),
+        # simulated measurements
+        dcc.Store(id='sim_data', data=[], storage_type='memory')
+    ])
+    return storage
+
+def tooltips():
+    # tooltips for more information
+    tooltips = html.Div([
+        dbc.Tooltip("geojson",              target="maps_upload",      placement="right"),
+        dbc.Tooltip("csv",                  target="waypoints_upload", placement="right"),
+        dbc.Tooltip("txt, csv or geojson",  target="antennas_upload",  placement="right"),
+        dbc.Tooltip("gyroscope, CSV",       target="ul_gyr",           placement="top"),
+        dbc.Tooltip("acceleration, CSV",    target="ul_acc",           placement="bottom"),
+        dbc.Tooltip("barometer, CSV",       target="ul_bar",           placement="top"),
+        dbc.Tooltip("magnetometer, CSV",    target="ul_mag",           placement="bottom"),
+        dbc.Tooltip("reset",                target="ss_reset",         placement="right"),
+        dbc.Tooltip("settings",             target="sim_set",          placement="right")
+    ])
+    return tooltips
+
 def spinners():
     ### SPINNERs
     spin1 = dbc.Spinner(
@@ -33,14 +63,21 @@ def spinners():
         fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "black"},
         spinnerClassName="spinner"
     )
-    return html.Div([spin1, spin2, spin3])
+    spin4 = dbc.Spinner(
+        children=[html.Div(id="spin4", style={"display": "none"})],
+        type=None,
+        fullscreen=True,
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "black"},
+        spinnerClassName="spinner"
+    )
+    return html.Div([spin1, spin2, spin3, spin4])
 
 def modals():
     ### MODALs
     # upload warning
     ul_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("WARNING")),
-        dbc.ModalBody("At least one wrong file was uploaded!")],
+        dbc.ModalBody("At least one wrong file was meant to be uploaded! Upload denied.")],
         id="ul_warn",
         is_open=False
     )
@@ -54,7 +91,7 @@ def modals():
     # map warning
     map_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("WARNING")),
-        dbc.ModalBody("At least one wrong file was uploaded!")],
+        dbc.ModalBody("At least one wrong file was meant to be uploaded! Upload denied.")],
         id="map_warn",
         is_open=False
     )
@@ -82,7 +119,7 @@ def modals():
     # export warning
     exp_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
-        dbc.ModalBody("Please generate ground truth and simulate measurement first!")],
+        dbc.ModalBody("Please simulate measurements first!")],
         id="exp_warn",
         is_open=False
     )
@@ -103,7 +140,7 @@ def modals():
     # simulation warning
     sim_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
-        dbc.ModalBody("Please generate GroundTruth first, as well as enter integer values for frequency and error!")],
+        dbc.ModalBody("Please generate GroundTruth first, as well as enter values for all required inputs!")],
         id="sim_warn",
         is_open=False
     )
@@ -195,24 +232,32 @@ def help_canvas():
                     # info simulation
                     html.H5("SIMULATION", style={"text-align": "center", "color": "silver"}),
                     html.Hr(style={"margin": "auto", "width": "80%", "color": "silver"}),
-                    html.P("Guide for simulating measurements:", style={"color": "gray"}),
+                    html.P("Instructions for simulating measurements:", style={"color": "gray"}),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Ground Truth:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
+                        dbc.Col(html.P("Select data and generate a ground truth trajectory.", style={"color": "gray"}))
+                    ], className="g-0"),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("⚙", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
+                        dbc.Col(html.P("Change presets to customize the simulation.", style={"color": "gray"}))
+                    ], className="g-0"),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Frequency:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
                         dbc.Col(html.P("Accepts float values.", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Coord. Qual.:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
+                        dbc.Col(html.Div(html.P("Error:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
                         dbc.Col(html.P("Accepts float values.", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Ground Truth:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
-                        dbc.Col(html.P("Choose data and generate ground truth trajectory.", style={"color": "gray"}))
+                        dbc.Col(html.Div(html.P("Semantic Error:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
+                        dbc.Col(html.P("Check or uncheck.", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Sim. Measm.:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
-                        dbc.Col(html.P("Simulate the measurement to finish the calculation.", style={"color": "gray"}))
+                        dbc.Col(html.P("Simulate the measurements to complete the calculation.", style={"color": "gray"}))
                     ], className="g-0"),
-                    html.Div(html.P("The ground truth trajectory and the simulated measurement can now be downloaded as two seperate CSV files!", style={"color": "gray"}),
+                    html.Div(html.P("The ground truth trajectory and the simulated measurements can now be downloaded as two separate CSV files!", style={"color": "gray"}),
                     style={"borderLeft": "2px solid #36BD8E", "paddingLeft": "5px"})],
                 style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
             ],
@@ -299,18 +344,20 @@ def sim_set_canvas():
                     [
                     # Semantic Errors
                     html.H5("Semantic Errors", style={"text-align": "left", "color": "silver"}),
+                    html.Div(dbc.Button('↺', id="ss_reset", color="light", outline=True, style={"border": "0px"}),
+                        style={"text-align": "right","marginTop": "-39px", "marginRight": "-5px"}),
                     html.Hr(style={"margin": "auto", "width": "100%", "color": "silver", "height": "3px", "marginBottom": "-10px"}),
                     html.Br(),
 
                     html.P("Number of intervals", style={"text-align": "center", "color": "silver", "marginBottom": "2px"}),
-                    html.Div(dbc.Input(id="num_int", placeholder="Type a number...", type="text")),
+                    html.Div(dbc.Input(id="num_int", placeholder="Type a number...", type="text", style={"color": "silver", "textAlign": "center"})),
 
                     html.P("Interval range [sec]", style={"text-align": "center", "color": "silver", "marginBottom": "0px", "marginTop": "10px"}),
-                    dcc.RangeSlider(id="int_rang", min=0, max=600, value=[100, 500]),
+                    dcc.RangeSlider(id="int_rang", min=0, max=7000),
                     html.Div(dbc.Row([dbc.Col(html.P(id="int_rang_min")), dbc.Col(html.P(id="int_rang_max", style={"text-align": "right"}))]), style={"margin": "auto", "marginTop": "-25px", "width": "280px"}),
                     
                     html.P("Semantic error", style={"text-align": "center", "color": "silver", "marginBottom": "0px", "marginTop": "-20px"}),
-                    dcc.RangeSlider(id="sem_err_rang", min=0, max=25, value=[7, 18]),
+                    dcc.RangeSlider(id="sem_err_rang", min=0, max=20),
                     html.Div(dbc.Row([dbc.Col(html.P(id="sem_err_rang_min")), dbc.Col(html.P(id="sem_err_rang_max", style={"text-align": "right"}))]), style={"margin": "auto", "marginTop": "-25px", "width": "280px"}),
                     ],
                 style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
@@ -323,7 +370,7 @@ def sim_set_canvas():
                     html.Br(),
 
                     html.P("Query frequency", style={"text-align": "center", "color": "silver", "marginBottom": "2px"}),
-                    html.Div(dbc.Input(id="qu_freq", placeholder="Type a number...", type="text")),
+                    html.Div(dbc.Input(id="qu_freq", placeholder="Type a number...", type="text", style={"color": "silver", "textAlign": "center"})),
                     ],
                 style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
             ],
@@ -337,34 +384,12 @@ def sim_set_canvas():
 
 
 def simulator_card(geojson_style):
-    ### STORAGE
-    # dcc.Store to store and share data between callbacks
-    storage = html.Div([
-        # filename from dropdown
-        dcc.Store(id='ref_data', data=[], storage_type='memory'),
-        # checked boxes
-        dcc.Store(id='checked_boxes', data=[], storage_type='memory'),
-        # generated ground truth
-        dcc.Store(id='gt_data', data=[], storage_type='memory'),
-        # simulated measurements
-        dcc.Store(id='sim_data', data=[], storage_type='memory')
-    ])
 
     ### DOWNLOAD
     export_gt = dcc.Download(id="export_gt")
     export_sim = dcc.Download(id="export_sim")
 
     ### UPLOAD
-    # tooltips for more information
-    ul_tt = html.Div([
-        dbc.Tooltip("geojson",              target="maps_upload",      placement="right"),
-        dbc.Tooltip("csv",  target="waypoints_upload", placement="right"),
-        dbc.Tooltip("txt, csv or geojson",  target="antennas_upload",  placement="right"),
-        dbc.Tooltip("gyroscope, CSV",       target="ul_gyr",           placement="top"),
-        dbc.Tooltip("acceleration, CSV",    target="ul_acc",           placement="bottom"),
-        dbc.Tooltip("barometer, CSV",       target="ul_bar",           placement="top"),
-        dbc.Tooltip("magnetometer, CSV",    target="ul_mag",           placement="bottom")
-    ])
     ## Buttons
     # maps and waypoints
     ul_buttons1 = html.Div([
@@ -472,14 +497,14 @@ def simulator_card(geojson_style):
                             [
                                 dbc.FormFloating(
                                     [    # Frequency
-                                        dbc.Input(id="ip_freq", type="text", placeholder=0, style=input_style),
+                                        dbc.Input(id="ms_freq", type="text", placeholder=0, style=input_style),
                                         dbc.Label("Frequency", style={"color": "gray"})
                                     ],
                                     style={"marginBottom": "4px"}
                                 ),
                                 dbc.FormFloating(
                                     [    # User
-                                        dbc.Input(id="ip_user", type="text", placeholder=0, style=input_style),
+                                        dbc.Input(id="num_user", type="text", placeholder=0, style=input_style),
                                         dbc.Label("User", style={"color": "gray"})
                                     ]
                                 )
@@ -490,7 +515,7 @@ def simulator_card(geojson_style):
                         dbc.Col(html.Div(
                             [
                                 dbc.FormFloating([    # Error
-                                    dbc.Input(id="ip_err", type="text", placeholder=0, style=input_style),
+                                    dbc.Input(id="err", type="text", placeholder=0, style=input_style),
                                     dbc.Label("Error", style={"color": "gray"})]),
                                 html.Div(
                                     [
@@ -507,12 +532,12 @@ def simulator_card(geojson_style):
                         ),
 
                         dbc.Col(html.Div(dbc.Button(
-                                "Simulate",
+                                html.P("Simulate", style={"marginTop": "12px"}),
                                 id="sim_btn",
                                 color="light",
                                 outline=False,
-                                style={"line-height": "1.5", "height": "70px", "width": "70px", "padding": "0px"}),
-                                style={"marginTop": "15px", "marginBottom": "15px", "marginLeft": "-17px"}),
+                                style={"line-height": "1.5", "height": "124px", "width": "70px", "padding": "0px"}),
+                                style={"marginTop": "6px", "marginLeft": "-17px"}),
                             style={"text-align": "center", "margin": "auto"},
                         width=2
                         )
@@ -558,20 +583,16 @@ def simulator_card(geojson_style):
             dbc.CardBody(
                 [
                     # storage
-                    storage,
+                    storage(),
                     # download
                     export_sim,
                     export_gt,
                     # modals
                     modals(),
-                    # tooltips
-                    ul_tt,
                     # canvas
                     help_canvas(),
                     gt_canvas(),
                     sim_set_canvas(),
-                    # spinners
-                    spinners(),
                     # card content
                     html.Div(
                         [
@@ -580,6 +601,10 @@ def simulator_card(geojson_style):
                             dbc.Row(sim_map(geojson_style))
                         ]
                     ),
+                    # spinners
+                    spinners(),
+                    # tooltips
+                    tooltips()
                 ]
             ),
             dbc.CardFooter("Copyright © 2022 Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})

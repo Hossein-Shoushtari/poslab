@@ -1,4 +1,4 @@
-##### Coordinate Simulation class!!!
+##### Coordinate Simulation class
 ### IMPORTS
 # built in
 import csv
@@ -89,7 +89,7 @@ def simulate_positions(groundtruth, error, measurement_freq, query_freq, number_
 
         # reader = csv.reader(f)
 
-    rows = grundtruth
+    rows = groundtruth
     positions = []
     time_stamps = []
 

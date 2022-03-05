@@ -233,7 +233,8 @@ def simulator_callbacks(app, geojson_style):
         # button
         gt_clicks
         ):
-        if gt_clicks:
+        button = [p["prop_id"] for p in callback_context.triggered][0]
+        if "gt_btn" in button:
             options = [{"label": name.split(".")[0], "value": name.split(".")[0]} for name in listdir("assets/waypoints")]
             return not gt_cv, options     # activate gt offcanvas and filling dropdown with data
         else: return gt_cv, []            # offcanvas is closed
@@ -292,7 +293,8 @@ def simulator_callbacks(app, geojson_style):
         # button
         sim_set_clicks
         ):
-        if sim_set_clicks: return not sim_set_cv     # activate sim_set offcanvas
+        button = [p["prop_id"] for p in callback_context.triggered][0]
+        if "sim_set" in button: return not sim_set_cv     # activate sim_set offcanvas
         else: return sim_set_cv                      # offcanvas is closed
     
     
@@ -310,6 +312,22 @@ def simulator_callbacks(app, geojson_style):
     def sim_set_sliders(int_rang, sem_err_rang):
         return int_rang[0], int_rang[1], sem_err_rang[0], sem_err_rang[1]
     
+    
+    # ========== set and restore simulation settings ===================================================================================
+    @app.callback(
+        ### Outputs ###
+        Output("int_rang", "value"),
+        Output("sem_err_rang", "value"),
+        Output("num_int", "value"),
+        Output("qu_freq", "value"),
+        ### Inputs ###
+        Input("ss_reset", "n_clicks")
+    )
+    def restore_sim_set_sliders(ss_reset_clicks):
+        button = [p["prop_id"] for p in callback_context.triggered][0]
+        if "ss_reset" in button: return [4000, 6000], [1, 6], 2, 500   # restore default values
+        else: return [4000, 6000], [1, 6], 2, 500   # set default values
+    
     # ========= simulate measuremant ===================================================================================================
     @app.callback(
         ### Outputs ###
@@ -326,9 +344,14 @@ def simulator_callbacks(app, geojson_style):
         Input("sim_btn", "n_clicks"),
         # data
         Input("gt_data", "data"),         # gorund truth data
-        Input("ip_freq", "value"),         # input - error
-        Input("ip_freq", "value"),         # input - frequency
-        Input("ip_user", "value")          # input - frequency
+        Input("err", "value"),            # error
+        Input("ms_freq", "value"),        # measurement frequency
+        Input("qu_freq", "value"),        # query frequency
+        Input("num_user", "value"),       # number of users
+        Input("num_int", "value"),        # number of intervals
+        Input("sem_err_rang", "value"),   # error range
+        Input("int_rang", "value"),       # intervall range
+        Input("sem_err", "value")         # semantic error
     )
     def simulation(
         # canvas status
@@ -338,18 +361,22 @@ def simulator_callbacks(app, geojson_style):
         sim_btn,
         # data
         gt,
-        freq,
         err,
-        user,
+        ms_freq,
+        qu_freq,
+        num_user,
+        num_int,
+        sem_err_rang,
+        int_rang,
+        sem_err
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "sim_btn" in button:
-            if gt and freq and err and user:
-                try:
-                    # simulate measurement
-                    simulation = simulate_positions(gt, float(err), float(freq))
+            if gt and err and ms_freq and qu_freq and num_user and num_int:
+                try: # simulate measurement
+                    simulation = simulate_positions(gt, float(err), float(ms_freq), float(qu_freq), int(num_user), int(num_int), sem_err_rang, int_rang, sem_err)
                     return sim_warn, not sim_done, simulation, no_update
-                except:
+                except: # simulation failed
                     return not sim_warn, sim_done, None, no_update
             else: return not sim_warn, sim_done, None, no_update
         else: return sim_warn, sim_done, None, no_update
@@ -366,6 +393,8 @@ def simulator_callbacks(app, geojson_style):
         Output("export_sim", "data"),     # export sim data
         # badge
         Output("exp_badge", "children"),     # export sim data
+        # loading (invisible div)
+        Output("spin4", "children"),     # loading status
         ### Inputs ###
         # modal
         State("exp_done", "is_open"),     # done
@@ -405,11 +434,11 @@ def simulator_callbacks(app, geojson_style):
                 # downloading it
                 gt_dl = dict(content = gt_format,  filename=f"ground_truth_trajectory{datetime.now()}.csv")
                 sim_dl = dict(content = sim_format,  filename=f"simulated_measurements{datetime.now()}.csv")
-                return not exp_done, exp_warn, gt_dl, sim_dl, badge # export successful
-            return exp_done, exp_warn, no_update, no_update, badge # export doable
+                return not exp_done, exp_warn, gt_dl, sim_dl, badge, no_update # export successful
+            return exp_done, exp_warn, no_update, no_update, badge, no_update # export doable
         else:
             if "exp_btn" in button:
-                return exp_done, not exp_warn, no_update, no_update, no_update # export failed
+                return exp_done, not exp_warn, no_update, no_update, no_update, no_update # export failed
             else:
                 badge = dbc.Badge(
                     "🚫",
@@ -418,7 +447,7 @@ def simulator_callbacks(app, geojson_style):
                     text_color="white",
                     className="position-absolute top-0 start-100 translate-middle"
                 )
-                return exp_done, exp_warn, no_update, no_update, badge # nothing is clicked. nothing happens
+                return exp_done, exp_warn, no_update, no_update, badge, no_update # nothing is clicked. nothing happens
 
 
     # ============= help canvas ========================================================================================================
@@ -437,7 +466,8 @@ def simulator_callbacks(app, geojson_style):
         # button
         help_clicks
         ):
-        if help_clicks:
+        button = [p["prop_id"] for p in callback_context.triggered][0]
+        if "help_btn" in button:
             if drawn_data["features"]: # drawn data
                 export_drawn_data(drawn_data)
             return not help_cv     # activate help offcanvas
