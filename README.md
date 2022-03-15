@@ -26,7 +26,7 @@
 
 > **coordinate_simulation.py** : Dorian's part
 
-> **ground_truth_generation.py** : Hossein's part
+> **ground_truth_generator.py** : Hossein's part
 
 > **measurement_simulation.py** : Georg's part (?)
 

@@ -208,7 +208,7 @@ def help_canvas():
                 html.Div([
                     # info upload
                     html.H5("UPLOAD", style={"text-align": "center", "color": "#3B5A7F"}),
-                    html.Hr(style={"margin": "auto", "width": "80%", "color": "#3B5A7F"}),
+                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
                     html.P("All 7 buttons are for uploading the data required for the simulation.", style={"color": "gray"}),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Maps:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
@@ -231,7 +231,7 @@ def help_canvas():
                 html.Div([
                     # info simulation
                     html.H5("SIMULATION", style={"text-align": "center", "color": "silver"}),
-                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver"}),
+                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
                     html.P("Instructions for simulating measurements:", style={"color": "gray"}),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Ground Truth:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
@@ -260,6 +260,14 @@ def help_canvas():
                     html.Div(html.P("The ground truth trajectory and the simulated measurements can now be downloaded as two separate CSV files!", style={"color": "gray"}),
                     style={"borderLeft": "2px solid #36BD8E", "paddingLeft": "5px"})],
                 style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
+                html.Br(),
+                html.Div([
+                    # bug info upload
+                    html.H5("🐞", style={"text-align": "center"}),
+                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
+                    html.P("After uploading new layers, the layer names in the layer control are sometimes messed up.", style={"color": "gray"}),
+                    html.P("When changing tabs, the names are automatically updated.", style={"color": "gray", "marginTop": "-10px"})],
+                style={"border":"1px solid red", "border-radius": 10, "padding": "10px", "marginBottom": "0px"})
             ],
         id="help_cv",
         scrollable=True,

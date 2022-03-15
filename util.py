@@ -160,10 +160,6 @@ def upload2layer(geojson_style) -> list:
             hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
             hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""))
         layers.append(dl.Overlay(geojson, name=name, checked=False))
-    # assuring, that only existing map data is returned (not empty one)
-    if len(layers) > 1: layers = layers[1:]
-    else: layers = []
-
     return layers
 
 def gt2marker(ground_truth: list) -> list:
