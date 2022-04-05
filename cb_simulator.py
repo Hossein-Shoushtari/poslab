@@ -8,6 +8,7 @@ from geopandas import GeoDataFrame, read_file
 # built in
 from os import listdir
 from datetime import datetime
+from time import sleep
 # utils
 from util import upload_encoder, floorplan2layer
 from util import export_drawn_data, hover_info
@@ -285,7 +286,7 @@ def simulator_callbacks(app, geojson_style):
         Output("sim_set_cv", "is_open"),  # canvas
         ### Inputs ###
         State("sim_set_cv", "is_open"),   # canvas status
-        Input("sim_set", "n_clicks")       # button
+        Input("sim_set", "n_clicks")      # button
     )
     def sim_set_canvas(
         # canvas status
@@ -319,7 +320,7 @@ def simulator_callbacks(app, geojson_style):
         Output("int_rang", "value"),
         Output("sem_err_rang", "value"),
         Output("num_int", "value"),
-        Output("qu_freq", "value"),
+        Output("net_cap", "value"),
         ### Inputs ###
         Input("ss_reset", "n_clicks")
     )
@@ -346,7 +347,7 @@ def simulator_callbacks(app, geojson_style):
         Input("gt_data", "data"),         # gorund truth data
         Input("err", "value"),            # error
         Input("ms_freq", "value"),        # measurement frequency
-        Input("qu_freq", "value"),        # query frequency
+        Input("net_cap", "value"),        # query frequency
         Input("num_user", "value"),       # number of users
         Input("num_int", "value"),        # number of intervals
         Input("sem_err_rang", "value"),   # error range
@@ -363,7 +364,7 @@ def simulator_callbacks(app, geojson_style):
         gt,
         err,
         ms_freq,
-        qu_freq,
+        net_cap,
         num_user,
         num_int,
         sem_err_rang,
@@ -372,9 +373,9 @@ def simulator_callbacks(app, geojson_style):
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "sim_btn" in button:
-            if gt and err and ms_freq and qu_freq and num_user and num_int:
+            if gt and err and ms_freq and net_cap and num_user and num_int:
                 try: # simulate measurement
-                    simulation = simulate_positions(gt, float(err), float(ms_freq), float(qu_freq), int(num_user), int(num_int), sem_err_rang, int_rang, sem_err)
+                    simulation = simulate_positions(gt, float(err), float(ms_freq), float(net_cap), int(num_user), int(num_int), sem_err_rang, int_rang, sem_err)
                     return sim_warn, not sim_done, simulation, no_update
                 except: # simulation failed
                     return not sim_warn, sim_done, None, no_update
@@ -392,9 +393,9 @@ def simulator_callbacks(app, geojson_style):
         Output("export_gt", "data"),      # export gt data
         Output("export_sim", "data"),     # export sim data
         # badge
-        Output("exp_badge", "children"),     # export sim data
+        Output("exp_badge", "children"),  # export sim data
         # loading (invisible div)
-        Output("spin4", "children"),     # loading status
+        Output("spin4", "children"),      # loading status
         ### Inputs ###
         # modal
         State("exp_done", "is_open"),     # done

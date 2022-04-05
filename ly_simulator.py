@@ -46,28 +46,28 @@ def spinners():
         children=[html.Div(id="spin1", style={"display": "none"})],
         type=None,
         fullscreen=True,
-        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "black"},
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
         spinnerClassName="spinner"
     )
     spin2 = dbc.Spinner(
         children=[html.Div(id="spin2", style={"display": "none"})],
         type=None,
         fullscreen=True,
-        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "black"},
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
         spinnerClassName="spinner"
     )
     spin3 = dbc.Spinner(
         children=[html.Div(id="spin3", style={"display": "none"})],
         type=None,
         fullscreen=True,
-        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "black"},
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
         spinnerClassName="spinner"
     )
     spin4 = dbc.Spinner(
         children=[html.Div(id="spin4", style={"display": "none"})],
         type=None,
         fullscreen=True,
-        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "black"},
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
         spinnerClassName="spinner"
     )
     return html.Div([spin1, spin2, spin3, spin4])
@@ -377,8 +377,8 @@ def sim_set_canvas():
                     html.Hr(style={"margin": "auto", "width": "100%", "color": "silver", "height": "3px", "marginBottom": "-10px"}),
                     html.Br(),
 
-                    html.P("Query frequency", style={"text-align": "center", "color": "silver", "marginBottom": "2px"}),
-                    html.Div(dbc.Input(id="qu_freq", placeholder="Type a number...", type="text", style={"color": "silver", "textAlign": "center"})),
+                    html.P("Network Capacity [req/sec]", style={"text-align": "center", "color": "silver", "marginBottom": "2px"}),
+                    html.Div(dbc.Input(id="net_cap", placeholder="Type a number...", type="text", style={"color": "silver", "textAlign": "center"})),
                     ],
                 style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
             ],
