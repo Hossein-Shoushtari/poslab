@@ -74,7 +74,7 @@ def hover_info(feature=None) -> 'html.Div':
     header = [html.H4("Space Information", style={"textAlign": "center"}), html.Hr(style={"width": "60%", "margin": "auto", "marginBottom": "10px"})]
     # while no hover...
     if not feature:
-        return header + [html.P("Choose a hcu floorplan. Hover over a segment.", style={"textAlign": "center"})]
+        return header + [html.P("Choose a floorplan. Hover over a segment.", style={"textAlign": "center"})]
     # when hover...
     # creating table for properties
     table_header = [html.Thead(html.Tr([html.Th("Properties", style={"width": "80px", "color": "white"}), html.Th("Value", style={"color": "white"})]))]

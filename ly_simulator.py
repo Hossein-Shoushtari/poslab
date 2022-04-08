@@ -168,7 +168,7 @@ def modals():
     # unlock hcu maps
     hcu_modal = dbc.Modal(
         [
-            dbc.ModalHeader(dbc.ModalTitle("Unlock HCU maps")),
+            dbc.ModalHeader(dbc.ModalTitle("Researcher Log in")),
             dbc.ModalBody(
                 html.Div(
                     [
