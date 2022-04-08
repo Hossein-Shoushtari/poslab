@@ -14,14 +14,21 @@ def storage():
     ### STORAGE
     # dcc.Store to store and share data between callbacks
     storage = html.Div([
+        # new layers
+        dcc.Store(id="new_layers", data=[], storage_type="memory"),
+        # password status
+        dcc.Store(id="unlocked", data=[], storage_type="memory"),
         # filename from dropdown
-        dcc.Store(id='ref_data', data=[], storage_type='memory'),
+        dcc.Store(id="ref_data", data=[], storage_type="memory"),
         # checked boxes
-        dcc.Store(id='checked_boxes', data=[], storage_type='memory'),
-        # generated ground truth
-        dcc.Store(id='gt_data', data=[], storage_type='memory'),
+        dcc.Store(id="checked_boxes", data=[], storage_type="memory"),
+        # reference points layer
+        dcc.Store(id="rp_layer", data=[], storage_type="memory"),
+        # ground truth
+        dcc.Store(id="gt_data", data=[], storage_type="memory"),
+        dcc.Store(id="gt_layer", data=[], storage_type="memory"),
         # simulated measurements
-        dcc.Store(id='sim_data', data=[], storage_type='memory')
+        dcc.Store(id="sim_data", data=[], storage_type="memory")
     ])
     return storage
 
@@ -31,10 +38,10 @@ def tooltips():
         dbc.Tooltip("geojson",              target="maps_upload",      placement="right"),
         dbc.Tooltip("csv",                  target="waypoints_upload", placement="right"),
         dbc.Tooltip("txt, csv or geojson",  target="antennas_upload",  placement="right"),
-        dbc.Tooltip("gyroscope, CSV",       target="ul_gyr",           placement="top"),
-        dbc.Tooltip("acceleration, CSV",    target="ul_acc",           placement="bottom"),
-        dbc.Tooltip("barometer, CSV",       target="ul_bar",           placement="top"),
-        dbc.Tooltip("magnetometer, CSV",    target="ul_mag",           placement="bottom"),
+        dbc.Tooltip("gyroscope, csv",       target="ul_gyr",           placement="top"),
+        dbc.Tooltip("acceleration, csv",    target="ul_acc",           placement="bottom"),
+        dbc.Tooltip("barometer, csv",       target="ul_bar",           placement="top"),
+        dbc.Tooltip("magnetometer, csv",    target="ul_mag",           placement="bottom"),
         dbc.Tooltip("reset",                target="ss_reset",         placement="right"),
         dbc.Tooltip("settings",             target="sim_set",          placement="right")
     ])
@@ -70,7 +77,14 @@ def spinners():
         fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
         spinnerClassName="spinner"
     )
-    return html.Div([spin1, spin2, spin3, spin4])
+    spin5 = dbc.Spinner(
+        children=[html.Div(id="spin5", style={"display": "none"})],
+        type=None,
+        fullscreen=True,
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
+        spinnerClassName="spinner"
+    )
+    return html.Div([spin1, spin2, spin3, spin4, spin5])
 
 def modals():
     ### MODALs
@@ -151,11 +165,33 @@ def modals():
         id="sim_done",
         is_open=False
     )
-    return html.Div([ul_warn, ul_done, map_warn, map_done, gen_warn, gen_done, exp_warn, exp_done, show_warn, sim_done, sim_warn,])
+    # unlock hcu maps
+    hcu_modal = dbc.Modal(
+        [
+            dbc.ModalHeader(dbc.ModalTitle("Unlock HCU maps")),
+            dbc.ModalBody(
+                html.Div(
+                    [
+                        dbc.Label("Password"),
+                        dbc.Input(id="password", type="password", placeholder="Enter password", style={"color": "white"}),
+                        dbc.FormFeedback("Access granted", type="valid"),
+                        dbc.FormFeedback("Access denied", type="invalid")
+                    ]
+                )
+            ),
+            dbc.ModalFooter(
+                dbc.Button("Unlock", color="primary", id="unlock")
+            ),
+        ],
+    id="modal",
+    backdrop="static",
+    is_open=False,
+    )
+    return html.Div([ul_warn, ul_done, map_warn, map_done, gen_warn, gen_done, exp_warn, exp_done, show_warn, sim_done, sim_warn, hcu_modal])
 
 def sim_map(geojson_style):
     ### MAP
-    # info panel for geojson layer segments (tooltips while hovering)
+    # info panel for hcu maps
     info = html.Div(
         children=hover_info(),
         id="hover_info",
@@ -173,6 +209,18 @@ def sim_map(geojson_style):
             "width": "240px"
         }
     )
+    # unlock hcu maps button
+    btn_style = {
+        "position": "absolute",
+        "top": "325px",
+        "left": "10px",
+        "z-index": "500",
+        "backgroundColor": "white",
+        "border": "2px solid #B2AFAC",
+        "border-radius": 4,
+        "width": "34px",
+        "height": "34px"
+    }
     # HCU coordinates
     hcu = (53.5403169239316, 10.004875659942629)
     # Tile Layer
@@ -183,9 +231,10 @@ def sim_map(geojson_style):
     _map = html.Div(
         dl.Map(
             [   
-                info,
+                html.Div(id="hcu_panel", children=info, style={"display": "None"}),
+                html.Button("🎓", id="hcu_maps", style=btn_style),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
-                html.Div(id="layers", children=dl.LayersControl(floorplan2layer(geojson_style))), # is previously filled with floorplans
+                html.Div(id="layers", children=html.Div(dl.LayersControl(floorplan2layer(geojson_style)), style={"display": "None"})), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
                 dl.FeatureGroup(dl.EditControl(
                                     id="edit_control",
@@ -194,7 +243,7 @@ def sim_map(geojson_style):
             ],
             zoom=19,
             center=hcu,
-            style={'width': '100%', 'height': '70vh', 'margin': "auto", "display": "block"}
+            style={"width": "100%", "height": "70vh", "margin": "auto", "display": "block"}
         )
     )
     return _map
@@ -265,8 +314,8 @@ def help_canvas():
                     # bug info upload
                     html.H5("🐞", style={"text-align": "center"}),
                     html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
-                    html.P("After uploading new layers, the layer names in the layer control are sometimes messed up.", style={"color": "gray"}),
-                    html.P("When changing tabs, the names are automatically updated.", style={"color": "gray", "marginTop": "-10px"})],
+                    html.P("After uploading new layers, the layer names in the layer control panel are sometimes messed up as well as some tooltips.", style={"color": "gray"}),
+                    html.P("By changing tabs, the names are automatically updated.", style={"color": "gray", "marginTop": "-10px"})],
                 style={"border":"1px solid red", "border-radius": 10, "padding": "10px", "marginBottom": "0px"})
             ],
         id="help_cv",
@@ -352,7 +401,7 @@ def sim_set_canvas():
                     [
                     # Semantic Errors
                     html.H5("Semantic Errors", style={"text-align": "left", "color": "silver"}),
-                    html.Div(dbc.Button('↺', id="ss_reset", color="light", outline=True, style={"border": "0px"}),
+                    html.Div(dbc.Button("↺", id="ss_reset", color="light", outline=True, style={"border": "0px"}),
                         style={"text-align": "right","marginTop": "-39px", "marginRight": "-5px"}),
                     html.Hr(style={"margin": "auto", "width": "100%", "color": "silver", "height": "3px", "marginBottom": "-10px"}),
                     html.Br(),
@@ -483,7 +532,7 @@ def simulator_card(geojson_style):
                 html.Div(
                     [
                         html.H5("Simulation", style=H5_style),
-                        html.Div(dbc.Button('⚙', id="sim_set", color="light", outline=True, style={"border": "0px"}),
+                        html.Div(dbc.Button("⚙", id="sim_set", color="light", outline=True, style={"border": "0px"}),
                             style={"text-align": "right","marginTop": "-35px", "marginRight": "3px"})
                     ]
                 ),

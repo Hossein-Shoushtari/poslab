@@ -8,7 +8,7 @@
 #### assets
 > **antennas** : uploaded antenna data can be found here  
 > **export** : after clicking on 'Get results', drawn geometry types are saved in one geojson file here  
-> **floorplans** : already converted floorplans (EG, 1OG, 4OG) can be found here  
+> **floorplans** : already converted HCU floorplans (EG, 1OG, 4OG) can be found here  
 > **groundtruth** : Dorians groung truth data can be found here  
 > **images** : images for the website can be found here    
 > **maps** : all uploaded map data can be found here 

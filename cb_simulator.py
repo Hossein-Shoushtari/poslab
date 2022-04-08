@@ -21,14 +21,59 @@ from coordinate_simulation import simulate_positions, export_sim
 
 
 def simulator_callbacks(app, geojson_style):
-    # ============== upload ============================================================================================================
+    # ============== upload maps ========================================================================================================
     @app.callback(
         ### Outputs ###
         # modals
-        Output("ul_warn", "is_open"),    # upload warn
-        Output("ul_done", "is_open"),    # upload done
-        # loading (invisible div)
+        Output("map_warn", "is_open"),   # map upload warn
+        Output("map_done", "is_open"),   # map upload done
+        # layers
+        Output("new_layers", "data"),
+        # loading
         Output("spin1", "children"),     # loading status
+        ### Inputs ###
+        # modal
+        State("map_warn", "is_open"),
+        State("map_done", "is_open"),
+        # maps
+        Input("ul_map", "contents"),
+        State("ul_map", "filename"),
+    )
+    def upload(
+        ## modal
+        map_warn,
+        map_done,
+        ## upload
+        map_contents,
+        map_filenames,
+        ): 
+        # getting clicked button
+        button = [p["prop_id"] for p in callback_context.triggered][0]
+        # UPLOAD
+        #============= MAP =====================================================================================================================
+        if "ul_map" in button:
+            file_check = [name.split(".")[-1] for name in map_filenames if name.split(".")[-1] not in ["geojson"]] # getting all wrong file formats
+            if len(file_check) > 0: return not map_warn, map_done, [], no_update # activating modal -> warn
+            for i in range(len(map_filenames)): # only right files were uploaded
+                decoded_content = upload_encoder(map_contents[i]) # decoding uploaded base64 file
+                converted = GeoDataFrame(read_file(decoded_content), crs=32632).to_crs(4326) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
+                converted.to_file(f"assets/maps/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
+            # uploaded maps as converted layers
+            layers = upload2layer(geojson_style)
+            return map_warn, not map_done, layers, no_update # returning uploaded layers
+        # ====== no button clicked =============================================================================================================
+        # this else-section is always activated, when the page refreshes -> no warnings
+        else: return map_warn, map_done, [], no_update
+
+
+    # ============== upload rest ========================================================================================================
+    @app.callback(
+        ### Outputs ###
+        # modals
+        Output("ul_warn", "is_open"),    # rest upload warn
+        Output("ul_done", "is_open"),    # rest upload done
+        # loading
+        Output("spin2", "children"),     # loading status
         ### Inputs ###
         # modals
         State("ul_warn", "is_open"),
@@ -133,93 +178,72 @@ def simulator_callbacks(app, geojson_style):
         else: return ul_warn, ul_done, no_update
 
 
+    # ============ hcu canvas ====================================================================================================================
+    @app.callback(
+        Output("modal", "is_open"),
+        Input("hcu_maps", "n_clicks"),
+        State("modal", "is_open")
+    )
+    def hcu(hcu_maps, is_open):
+        button = [p["prop_id"] for p in callback_context.triggered][0]
+        if "hcu_maps" in button:
+            return not is_open
+        return is_open
+
+
+    # ========== unlock hcu maps =======================================================================================================
+    @app.callback(
+        ### Outputs ###
+        # return messages
+        Output("password", "valid"),
+        Output("password", "invalid"),
+        # unlock status
+        Output("unlocked", "data"),
+        ### Inputs ###
+        Input("unlock", "n_clicks"),
+        Input("password", "value")
+    )
+    def unlock(unlock, password):
+        button = [p["prop_id"] for p in callback_context.triggered][0]
+        if "unlock" in button:
+            if str(password) == "cpsimulation2022":
+                return True, False, True
+            return False, True, None
+        return False, False, None
+
+
     # ============ map display =========================================================================================================
     @app.callback(
         ### Outputs ###
-        # modals
-        Output("map_warn", "is_open"),    # upload/display warn
-        Output("map_done", "is_open"),    # upload/display done
-        Output("gen_warn", "is_open"),    # gt generator warn
-        Output("gen_done", "is_open"),    # gt generator done
-        Output("show_warn", "is_open"),   # show ref points warn
-        # layers
         Output("layers", "children"),    # layers
-        # loading (invisible div)
-        Output("spin2", "children"),     # loading status
-        # store generated ground truth
-        Output("gt_data", "data"),
+        Output("hcu_panel", "style"), # hcu info panel
         ### Inputs ###
-        # modals
-        State("map_warn", "is_open"),
-        State("map_done", "is_open"),
-        State("gen_warn", "is_open"),
-        State("gen_done", "is_open"),
-        State("show_warn", "is_open"),
-        # maps
-        Input("ul_map", "contents"),
-        State("ul_map", "filename"),
-        # ground truth generator
-        Input("gen_btn", "n_clicks"),
-        # reference points
-        Input("show_btn", "n_clicks"),
-        Input("ref_data", "data"),
-        Input("checked_boxes", "data")
+        Input("new_layers", "data"),     # maps
+        Input("rp_layer", "data"),       # reference points
+        Input("gt_layer", "data"),       # ground truth
+        Input("unlocked", "data")        # unlocked status hcu maps
     )
     def display(
-        ## modals
-        map_warn,
-        map_done,
-        gen_warn,
-        gen_done,
-        show_warn,
-        ## upload
-        map_contents,  # maps
-        map_filenames,
-        # gt generator
-        gen_btn,
-        # ref points
-        show_btn,
-        name,
-        check
+        new_layers,
+        rp_layer,
+        gt_layer,
+        unlocked
         ):
-        button = [p["prop_id"] for p in callback_context.triggered][0]
-        #============= MAP =====================================================================================================================
-        if "ul_map" in button:
-            file_check = [name.split(".")[-1] for name in map_filenames if name.split(".")[-1] not in ["geojson"]] # getting all wrong file formats
-            if len(file_check) > 0: return not map_warn, map_done, gen_warn, gen_done, show_warn, no_update, no_update, no_update # activating modal -> warn
-            for i in range(len(map_filenames)): # only right files were uploaded
-                decoded_content = upload_encoder(map_contents[i]) # decoding uploaded base64 file
-                converted = GeoDataFrame(read_file(decoded_content), crs=32632).to_crs(4326) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
-                converted.to_file(f"assets/maps/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
-            # floorplans + uploaded maps
-            layers = floorplan2layer(geojson_style) + upload2layer(geojson_style)
-            return map_warn, not map_done, gen_warn, gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update, no_update # returning uploaded layers
-        # ========= GT GENERATOR  =================================================================================================================
-        elif "gen_btn" in button:
-            if name:
-                ref = ref_checked(name, check)
-                gt = generate_gt(ref) # generating ground truth data
-                markers = gt2marker(gt[:, 1:3]) # converting crs and making markers
-                # floorplans + uploaded maps + markers
-                layers = floorplan2layer(geojson_style) + upload2layer(geojson_style) + [dl.Overlay(dl.LayerGroup(markers), name="GroundTruth", checked=True)]
-                return map_warn, map_done, gen_warn, not gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update, gt # successful generator
-            else: return map_warn, map_done, not gen_warn, gen_done, show_warn, no_update, no_update, None # no data selected
-        # ========= REF POINTS  =================================================================================================================
-        elif "show_btn" in button:
-            if name:
-                markers = ref2marker(name, check) # converting crs and making markers
-                # floorplans + uploaded maps + markers
-                layers = floorplan2layer(geojson_style) + upload2layer(geojson_style) + [dl.Overlay(dl.LayerGroup(markers), name="Waypoints", checked=True)]
-                return map_warn, map_done, gen_warn, gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update, no_update # successful
-            else: return map_warn, map_done, gen_warn, gen_done, not show_warn, no_update, no_update, no_update # no data selected
-        # ====== no button clicked =============================================================================================================
-        # this else-section is always activated, when the page refreshes -> load layers
-        else:
-            layers = floorplan2layer(geojson_style) + upload2layer(geojson_style)
-            return map_warn, map_done, gen_warn, gen_done, show_warn, html.Div(dl.LayersControl(layers)), no_update, None
+        layers = []
+        style = {"display": "None"}
+        if unlocked:
+            layers = floorplan2layer(geojson_style)   # adding hcu floorplans to map
+            style = {"display": "block"}              # displaying info panel
+        if new_layers: layers += new_layers           # adding newly uploaded layers to map
+        if rp_layer: layers += rp_layer               # adding ref points layer to map
+        if gt_layer: layers += gt_layer               # adding ground truth layer to map
+
+        if layers: return html.Div(dl.LayersControl(layers)), style
+        else: return html.Div(style={"display": "None"}), style
 
 
-    # ========== ground truth canvas ===================================================================================================
+
+    # ========= ground truth canvas ===================================================================================================
     @app.callback(
         ### Outputs ###
         Output("gt_cv", "is_open"),       # canvas
@@ -280,6 +304,66 @@ def simulator_callbacks(app, geojson_style):
         return check
 
 
+    # ========== ref points and gt generating ===============================================================================================
+    @app.callback(
+        ### Outputs ###
+        # modals
+        Output("gen_warn", "is_open"),    # gt generator warn
+        Output("gen_done", "is_open"),    # gt generator done
+        Output("show_warn", "is_open"),   # show ref points warn
+        # store ref points (layer)
+        Output("rp_layer", "data"),
+        # store generated gt (layer & data)
+        Output("gt_layer", "data"),
+        Output("gt_data", "data"),
+        # loading
+        Output("spin3", "children"),     # loading status
+        ### Inputs ###
+        # modals
+        State("gen_warn", "is_open"),
+        State("gen_done", "is_open"),
+        State("show_warn", "is_open"),
+        # buttons
+        Input("gen_btn", "n_clicks"),
+        Input("show_btn", "n_clicks"),
+        # reference points
+        Input("ref_data", "data"),
+        Input("checked_boxes", "data")
+    )
+    def ref_gt_gen(
+        ## modals
+        gen_warn,
+        gen_done,
+        show_warn,
+        # gt generator
+        gen_btn,
+        # ref points
+        show_btn,
+        name,
+        check
+        ):
+        button = [p["prop_id"] for p in callback_context.triggered][0]
+        # ========= GROUND TRUTH =================================================================================================================
+        if "gen_btn" in button:
+            if name:
+                ref = ref_checked(name, check)
+                gt = generate_gt(ref) # generating ground truth data
+                markers = gt2marker(gt[:, 1:3]) # converting crs and making markers
+                # ground truth layer
+                layer = [dl.Overlay(dl.LayerGroup(markers), name="GroundTruth", checked=True)]
+                return gen_warn, not gen_done, show_warn, no_update, layer, gt, no_update # successful generator
+            else: return not gen_warn, gen_done, show_warn, no_update, [], [], no_update  # no data selected
+        # ========= REF POINTS  =================================================================================================================
+        elif "show_btn" in button:
+            if name:
+                markers = ref2marker(name, check) # converting crs and making markers
+                # ref points as markers
+                layer = [dl.Overlay(dl.LayerGroup(markers), name="Waypoints", checked=True)]
+                return gen_warn, gen_done, show_warn, layer, no_update, no_update, no_update # successful
+            else: return gen_warn, gen_done, not show_warn, [], no_update, no_update, no_update # no data selected
+        else: return gen_warn, gen_done, show_warn, [], [], [], no_update          # offcanvas is closed
+
+
     # ========== simulation settings canvas ============================================================================================
     @app.callback(
         ### Outputs ###
@@ -329,6 +413,7 @@ def simulator_callbacks(app, geojson_style):
         if "ss_reset" in button: return [4000, 6000], [1, 6], 2, 500   # restore default values
         else: return [4000, 6000], [1, 6], 2, 500   # set default values
     
+
     # ========= simulate measuremant ===================================================================================================
     @app.callback(
         ### Outputs ###
@@ -336,7 +421,7 @@ def simulator_callbacks(app, geojson_style):
         Output("sim_done", "is_open"),   # simulation successful
         Output("sim_data", "data"),      # sim measurements data
         # loading (invisible div)
-        Output("spin3", "children"),     # loading status
+        Output("spin4", "children"),     # loading status
         ### Inputs ###
         # modal
         State("sim_warn", "is_open"),
@@ -395,7 +480,7 @@ def simulator_callbacks(app, geojson_style):
         # badge
         Output("exp_badge", "children"),  # export sim data
         # loading (invisible div)
-        Output("spin4", "children"),      # loading status
+        Output("spin5", "children"),      # loading status
         ### Inputs ###
         # modal
         State("exp_done", "is_open"),     # done
