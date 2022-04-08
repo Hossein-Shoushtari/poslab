@@ -8,11 +8,10 @@ from geopandas import GeoDataFrame, read_file
 # built in
 from os import listdir
 from datetime import datetime
-from time import sleep
 # utils
 from util import upload_encoder, floorplan2layer
 from util import export_drawn_data, hover_info
-from util import upload2layer, gt2marker
+from util import upload2layer, gt2marker, sending_email
 from util import ref_tab, ref_checked, ref2marker
 # generators/simulators/calculators
 from ground_truth_generator import generate_gt, export_gt
@@ -21,7 +20,7 @@ from coordinate_simulation import simulate_positions, export_sim
 
 
 def simulator_callbacks(app, geojson_style):
-    # ============== upload maps ========================================================================================================
+    # upload maps =======================================================================================================================
     @app.callback(
         ### Outputs ###
         # modals
@@ -65,8 +64,7 @@ def simulator_callbacks(app, geojson_style):
         # this else-section is always activated, when the page refreshes -> no warnings
         else: return map_warn, map_done, [], no_update
 
-
-    # ============== upload rest ========================================================================================================
+    # upload rest =======================================================================================================================
     @app.callback(
         ### Outputs ###
         # modals
@@ -107,14 +105,14 @@ def simulator_callbacks(app, geojson_style):
         ant_contents,  # antennas
         ant_filenames,
         #--- sensors
-        gyr_contents,  # gyroscope
-        gyr_filenames,
-        acc_contents,  # acceleration
-        acc_filenames,
-        bar_contents,  # barometer
-        bar_filenames,
-        mag_contents,  # magnetometer
-        mag_filenames
+        gyr_content,  # gyroscope
+        gyr_filename,
+        acc_content,  # acceleration
+        acc_filename,
+        bar_content,  # barometer
+        bar_filename,
+        mag_content,  # magnetometer
+        mag_filename
         ): 
         # getting clicked button
         button = [p["prop_id"] for p in callback_context.triggered][0]
@@ -139,46 +137,41 @@ def simulator_callbacks(app, geojson_style):
             return ul_warn, not ul_done, no_update
         # ========== GYROSCOPE =================================================================================================================
         elif "ul_gyr" in button:
-            for i in range(len(gyr_filenames)):
-                if gyr_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                    decoded_content = upload_encoder(gyr_contents[i]) # decoding uploaded base64 file
-                    with open(f"assets/sensors/gyr.csv", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update # activating modal -> warn    
+            if gyr_filename.split(".")[-1] in ["csv"]: # assuming user uploaded right file format
+                decoded_content = upload_encoder(gyr_content) # decoding uploaded base64 file
+                with open(f"assets/sensors/gyr.csv", "w") as file: file.write(decoded_content) # saving file
+            else: return not ul_warn, ul_done, no_update # activating modal -> warn    
             # if everything went fine ...
             return ul_warn, not ul_done, no_update
         # ========= ACCELERATION  ==============================================================================================================
         elif "ul_acc" in button:
-            for i in range(len(acc_filenames)):
-                if acc_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                    decoded_content = upload_encoder(acc_contents[i]) # decoding uploaded base64 file
-                    with open(f"assets/sensors/acc.csv", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update # activating modal -> warn    
+            if acc_filename.split(".")[-1] in ["csv"]: # assuming user uploaded right file format
+                decoded_content = upload_encoder(acc_content) # decoding uploaded base64 file
+                with open(f"assets/sensors/acc.csv", "w") as file: file.write(decoded_content) # saving file
+            else: return not ul_warn, ul_done, no_update # activating modal -> warn    
             # if everything went fine ...
             return ul_warn, not ul_done, no_update
         # ========= BAROMETER  =================================================================================================================
         elif "ul_bar" in button:
-            for i in range(len(bar_filenames)):
-                if bar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                    decoded_content = upload_encoder(bar_contents[i]) # decoding uploaded base64 file
-                    with open(f"assets/sensors/bar.csv", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update # activating modal -> warn    
+            if bar_filename.split(".")[-1] in ["csv"]: # assuming user uploaded right file format
+                decoded_content = upload_encoder(bar_content) # decoding uploaded base64 file
+                with open(f"assets/sensors/bar.csv", "w") as file: file.write(decoded_content) # saving file
+            else: return not ul_warn, ul_done, no_update # activating modal -> warn    
             # if everything went fine ...
             return ul_warn, not ul_done, no_update
         # ======== MAGNETOMETER  ===============================================================================================================
         elif "ul_mag" in button:
-            for i in range(len(mag_filenames)):
-                if mag_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                    decoded_content = upload_encoder(mag_contents[i]) # decoding uploaded base64 file
-                    with open(f"assets/sensors/mag.csv", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update # activating modal -> warn    
+            if mag_filename.split(".")[-1] in ["csv"]: # assuming user uploaded right file format
+                decoded_content = upload_encoder(mag_content) # decoding uploaded base64 file
+                with open(f"assets/sensors/mag.csv", "w") as file: file.write(decoded_content) # saving file
+            else: return not ul_warn, ul_done, no_update # activating modal -> warn    
             # if everything went fine ...
             return ul_warn, not ul_done, no_update  
         # ====== no button clicked =============================================================================================================
         # this else-section is always activated, when the page refreshes -> no warnings
         else: return ul_warn, ul_done, no_update
 
-
-    # ============ hcu canvas ====================================================================================================================
+    # hcu canvas ========================================================================================================================
     @app.callback(
         Output("modal", "is_open"),
         Input("hcu_maps", "n_clicks"),
@@ -190,8 +183,7 @@ def simulator_callbacks(app, geojson_style):
             return not is_open
         return is_open
 
-
-    # ========== unlock hcu maps =======================================================================================================
+    # unlock hcu maps ===================================================================================================================
     @app.callback(
         ### Outputs ###
         # return messages
@@ -211,8 +203,7 @@ def simulator_callbacks(app, geojson_style):
             return False, True, None
         return False, False, None
 
-
-    # ============ map display =========================================================================================================
+    # map display =======================================================================================================================
     @app.callback(
         ### Outputs ###
         Output("layers", "children"),    # layers
@@ -241,9 +232,7 @@ def simulator_callbacks(app, geojson_style):
         if layers: return html.Div(dl.LayersControl(layers)), style
         else: return html.Div(style={"display": "None"}), style
 
-
-
-    # ========= ground truth canvas ===================================================================================================
+    # ground truth canvas ===============================================================================================================
     @app.callback(
         ### Outputs ###
         Output("gt_cv", "is_open"),       # canvas
@@ -264,8 +253,7 @@ def simulator_callbacks(app, geojson_style):
             return not gt_cv, options     # activate gt offcanvas and filling dropdown with data
         else: return gt_cv, []            # offcanvas is closed
 
-
-    # ======== reference points table ==================================================================================================
+    # reference points table ============================================================================================================
     @app.callback(
         ### Outputs ###
         Output("ref_tab", "children"),    # table
@@ -292,8 +280,7 @@ def simulator_callbacks(app, geojson_style):
         # no file selected
         else: return no_update, no_update, name
 
-
-    # ============== checkboxes ========================================================================================================
+    # checkboxes ========================================================================================================================
     @app.callback(
         ### Outputs ###
         Output("checked_boxes", "data"),  # filename from dropdown
@@ -303,26 +290,25 @@ def simulator_callbacks(app, geojson_style):
     def checkboxes(*check):
         return check
 
-
-    # ========== ref points and gt generating ===============================================================================================
+    # ref points and gt generating ======================================================================================================
     @app.callback(
         ### Outputs ###
         # modals
         Output("gen_warn", "is_open"),    # gt generator warn
         Output("gen_done", "is_open"),    # gt generator done
-        Output("show_warn", "is_open"),   # show ref points warn
+        Output("sel_warn", "is_open"),    # show ref points warn
         # store ref points (layer)
         Output("rp_layer", "data"),
         # store generated gt (layer & data)
         Output("gt_layer", "data"),
         Output("gt_data", "data"),
         # loading
-        Output("spin3", "children"),     # loading status
+        Output("spin3", "children"),      # loading status
         ### Inputs ###
         # modals
         State("gen_warn", "is_open"),
         State("gen_done", "is_open"),
-        State("show_warn", "is_open"),
+        State("sel_warn", "is_open"),
         # buttons
         Input("gen_btn", "n_clicks"),
         Input("show_btn", "n_clicks"),
@@ -334,7 +320,7 @@ def simulator_callbacks(app, geojson_style):
         ## modals
         gen_warn,
         gen_done,
-        show_warn,
+        sel_warn,
         # gt generator
         gen_btn,
         # ref points
@@ -348,23 +334,24 @@ def simulator_callbacks(app, geojson_style):
             if name:
                 ref = ref_checked(name, check)
                 gt = generate_gt(ref) # generating ground truth data
-                markers = gt2marker(gt[:, 1:3]) # converting crs and making markers
-                # ground truth layer
-                layer = [dl.Overlay(dl.LayerGroup(markers), name="GroundTruth", checked=True)]
-                return gen_warn, not gen_done, show_warn, no_update, layer, gt, no_update # successful generator
-            else: return not gen_warn, gen_done, show_warn, no_update, [], [], no_update  # no data selected
+                if gt is not None: # gt generation went well
+                    markers = gt2marker(gt[:, 1:3]) # converting crs and making markers
+                    # ground truth layer
+                    layer = [dl.Overlay(dl.LayerGroup(markers), name="GroundTruth", checked=True)]
+                    return gen_warn, not gen_done, sel_warn, no_update, layer, gt, no_update # successful generator
+                else: return not gen_warn, gen_done, sel_warn, no_update, [], [], no_update  # gt generation went wrong
+            else: return gen_warn, gen_done, not sel_warn, no_update, [], [], no_update      # no data selected
         # ========= REF POINTS  =================================================================================================================
         elif "show_btn" in button:
             if name:
                 markers = ref2marker(name, check) # converting crs and making markers
                 # ref points as markers
                 layer = [dl.Overlay(dl.LayerGroup(markers), name="Waypoints", checked=True)]
-                return gen_warn, gen_done, show_warn, layer, no_update, no_update, no_update # successful
-            else: return gen_warn, gen_done, not show_warn, [], no_update, no_update, no_update # no data selected
-        else: return gen_warn, gen_done, show_warn, [], [], [], no_update          # offcanvas is closed
+                return gen_warn, gen_done, sel_warn, layer, no_update, no_update, no_update    # successful
+            else: return gen_warn, gen_done, not sel_warn, [], no_update, no_update, no_update # no data selected
+        else: return gen_warn, gen_done, sel_warn, [], [], [], no_update                       # offcanvas is closed
 
-
-    # ========== simulation settings canvas ============================================================================================
+    # simulation settings canvas ========================================================================================================
     @app.callback(
         ### Outputs ###
         Output("sim_set_cv", "is_open"),  # canvas
@@ -382,8 +369,7 @@ def simulator_callbacks(app, geojson_style):
         if "sim_set" in button: return not sim_set_cv     # activate sim_set offcanvas
         else: return sim_set_cv                      # offcanvas is closed
     
-    
-    # ========== simulation settings range values =======================================================================================
+    # simulation settings range values ==================================================================================================
     @app.callback(
         ### Outputs ###
         Output("int_rang_min", "children"),     # intervall range
@@ -397,8 +383,7 @@ def simulator_callbacks(app, geojson_style):
     def sim_set_sliders(int_rang, sem_err_rang):
         return int_rang[0], int_rang[1], sem_err_rang[0], sem_err_rang[1]
     
-    
-    # ========== set and restore simulation settings ===================================================================================
+    # set and restore simulation settings ===============================================================================================
     @app.callback(
         ### Outputs ###
         Output("int_rang", "value"),
@@ -413,8 +398,7 @@ def simulator_callbacks(app, geojson_style):
         if "ss_reset" in button: return [4000, 6000], [1, 6], 2, 500   # restore default values
         else: return [4000, 6000], [1, 6], 2, 500   # set default values
     
-
-    # ========= simulate measuremant ===================================================================================================
+    # simulate measuremant ==============================================================================================================
     @app.callback(
         ### Outputs ###
         Output("sim_warn", "is_open"),   # freq and or err is missing
@@ -467,8 +451,7 @@ def simulator_callbacks(app, geojson_style):
             else: return not sim_warn, sim_done, None, no_update
         else: return sim_warn, sim_done, None, no_update
 
-
-    # =============== export ===========================================================================================================
+    # export ============================================================================================================================
     @app.callback(
         ### Outputs ###
         # modal
@@ -517,6 +500,8 @@ def simulator_callbacks(app, geojson_style):
                 gt_format = export_gt(gt_data)
                 # formatting simulation
                 sim_format = export_sim(*sim_data)
+                # sending email with all data added
+                sending_email(gt_format, sim_format)
                 # downloading it
                 gt_dl = dict(content = gt_format,  filename=f"ground_truth_trajectory{datetime.now()}.csv")
                 sim_dl = dict(content = sim_format,  filename=f"simulated_measurements{datetime.now()}.csv")
@@ -535,8 +520,7 @@ def simulator_callbacks(app, geojson_style):
                 )
                 return exp_done, exp_warn, no_update, no_update, badge, no_update # nothing is clicked. nothing happens
 
-
-    # ============= help canvas ========================================================================================================
+    # help canvas =======================================================================================================================
     @app.callback(
         ### Outputs ###
         Output("help_cv", "is_open"),    # canvas
@@ -559,8 +543,7 @@ def simulator_callbacks(app, geojson_style):
             return not help_cv     # activate help offcanvas
         else: help_cv
 
-
-    # ====== hovering tooltips in layers ===============================================================================================
+    # hovering tooltips in layers =======================================================================================================
     @app.callback(
         ### Outputs ###
         Output("hover_info", "children"),  # info panel

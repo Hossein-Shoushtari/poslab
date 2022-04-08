@@ -10,6 +10,7 @@ from base64 import b64decode
 # utils
 from util import floorplan2layer, hover_info
 
+
 def storage():
     ### STORAGE
     # dcc.Store to store and share data between callbacks
@@ -116,39 +117,25 @@ def modals():
         id="map_done",
         is_open=False
     )
-    # calculation warning
-    gen_warn = dbc.Modal([
+    # data selection warning
+    sel_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
         dbc.ModalBody("Please select data first!")],
+        id="sel_warn",
+        is_open=False
+    )
+    # gt calculation warning
+    gen_warn = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
+        dbc.ModalBody("Apparently acc and gyr are missing. Please upload them first!")],
         id="gen_warn",
         is_open=False
     )
-    # calculation done
+    # gt calculation done
     gen_done = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("DONE")),
         dbc.ModalBody("Generation successful!")],
         id="gen_done",
-        is_open=False
-    )
-    # export warning
-    exp_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
-        dbc.ModalBody("Please simulate measurements first!")],
-        id="exp_warn",
-        is_open=False
-    )
-    # export done
-    exp_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("DONE")),
-        dbc.ModalBody("Export successful!")],
-        id="exp_done",
-        is_open=False
-    )
-    # ref show warning
-    show_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
-        dbc.ModalBody("Please select data first!")],
-        id="show_warn",
         is_open=False
     )
     # simulation warning
@@ -165,10 +152,24 @@ def modals():
         id="sim_done",
         is_open=False
     )
+    # export warning
+    exp_warn = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
+        dbc.ModalBody("Please simulate measurements first!")],
+        id="exp_warn",
+        is_open=False
+    )
+    # export done
+    exp_done = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalBody("Export successful!")],
+        id="exp_done",
+        is_open=False
+    )
     # unlock hcu maps
     hcu_modal = dbc.Modal(
         [
-            dbc.ModalHeader(dbc.ModalTitle("Researcher Log in")),
+            dbc.ModalHeader(dbc.ModalTitle("Researcher Login")),
             dbc.ModalBody(
                 html.Div(
                     [
@@ -187,7 +188,7 @@ def modals():
     backdrop="static",
     is_open=False,
     )
-    return html.Div([ul_warn, ul_done, map_warn, map_done, gen_warn, gen_done, exp_warn, exp_done, show_warn, sim_done, sim_warn, hcu_modal])
+    return html.Div([ul_warn, ul_done, map_warn, map_done, gen_warn, gen_done, sel_warn, exp_warn, exp_done, sim_done, sim_warn, hcu_modal])
 
 def sim_map(geojson_style):
     ### MAP
@@ -284,7 +285,7 @@ def help_canvas():
                     html.P("Instructions for simulating measurements:", style={"color": "gray"}),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Ground Truth:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
-                        dbc.Col(html.P("Select data and generate a ground truth trajectory.", style={"color": "gray"}))
+                        dbc.Col(html.P("Select data and generate a ground truth trajectory. Note: acc and gyr data is needed!", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("⚙", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
@@ -473,23 +474,23 @@ def simulator_card(geojson_style):
             dcc.Upload(
                 id="ul_gyr",
                 children=html.Div(dbc.Button("G", color="primary", size="lg", outline=True, style={"width": "86px"})),
-                multiple=True,
+                multiple=False,
                 style={"marginBottom": "6px"}),
             dcc.Upload(
                 id="ul_acc",
                 children=html.Div(dbc.Button("A", color="primary", size="lg", outline=True, style={"width": "86px"})),
-                multiple=True)],
+                multiple=False)],
             style={"textAlign": "left", "marginTop": "18px", "marginBottom": "18px"})),
         dbc.Col(html.Div([  # right column
             dcc.Upload(
                 id="ul_bar",
                 children=html.Div(dbc.Button("B", color="primary", size="lg", outline=True, style={"width": "86px"})),
-                multiple=True,
+                multiple=False,
                 style={"marginBottom": "6px"}),
             dcc.Upload(
                 id="ul_mag",
                 children=html.Div(dbc.Button("M", color="primary", size="lg", outline=True, style={"width": "86px"})),
-                multiple=True)],
+                multiple=False)],
             style={"textAlign": "right", "marginTop": "18px", "marginBottom": "18px"}))],
         className="g-0"),
         style={"width": "180px"}

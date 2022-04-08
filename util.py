@@ -11,6 +11,8 @@ import numpy as np
 from datetime import datetime
 from base64 import b64decode
 from os import listdir, remove
+import smtplib
+from email.message import EmailMessage
 # installed
 from geopandas import GeoDataFrame
 from shapely.geometry import Point
@@ -33,7 +35,7 @@ def upload_encoder(content: str) -> str:
 
     return decoded_content
 
-def export_drawn_data(data: dict) -> None:
+def export_drawn_data(data: dict):
     """
     FUNCTION
     - formats received dictionary (replaces ' with ")
@@ -74,10 +76,10 @@ def hover_info(feature=None) -> 'html.Div':
     header = [html.H4("Space Information", style={"textAlign": "center"}), html.Hr(style={"width": "60%", "margin": "auto", "marginBottom": "10px"})]
     # while no hover...
     if not feature:
-        return header + [html.P("Choose a floorplan. Hover over a segment.", style={"textAlign": "center"})]
+        return header + [html.P("Select a floorplan. Hover over a segment.", style={"textAlign": "center", "fontSize": "10px"})]
     # when hover...
     # creating table for properties
-    table_header = [html.Thead(html.Tr([html.Th("Properties", style={"width": "80px", "color": "white"}), html.Th("Value", style={"color": "white"})]))]
+    table_header = [html.Thead(html.Tr([html.Th("Properties", style={"width": "90px", "color": "white"}), html.Th("Value", style={"color": "white"})]))]
     table_body_content = []
     # filling table_body with content
     for prop in feature["properties"]:
@@ -87,7 +89,7 @@ def hover_info(feature=None) -> 'html.Div':
                     prop,
                     style={
                         "font-size": "15px",
-                        "width": "80px",
+                        "width": "90px",
                         "color": "white"
                     }
                 ),
@@ -329,10 +331,48 @@ def ref2marker(name: str, check: tuple) -> list:
     return markers
 
 def deleter():
+    """
+    - deletes all 'empty' (dummy) files before the actuall app starts
+    """
     remove("assets/antennas/empty")
-    remove("assets/export/empty")
-    remove("assets/groundtruth/empty")
     remove("assets/maps/empty")
     remove("assets/sensors/empty")
     remove("assets/waypoints/empty")
 
+def sending_email(gt: str, sim: str):
+    """
+    FUNCTION
+    - sends an email with all uploaded and generated data to 'cpsimulation2022@gmail.com'
+    -------
+    PARAMETER
+    gt  : generated ground truth data
+    sim : simulated measurements
+    -------
+    RETURN
+    nothing... just sending an email
+    """
+    # designing the email
+    msg = EmailMessage()
+    msg["Subject"] = f"Uploaded & calculated data -- {datetime.now().strftime('%d.%m.%Y - %H:%M:%S')}"
+    msg["From"] = "cpsimulation2022@gmail.com"
+    msg["To"] = "cpsimulation2022@gmail.com"
+    msg.set_content("Check out the latest uploaded and calculated data!")
+    # getting all attachments
+    for antennas in listdir("assets/antennas"):
+        with open(f"assets/antennas/{antennas}", "rb") as f:
+            msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=antennas)
+    for maps in listdir("assets/maps"):
+        with open(f"assets/maps/{maps}", "rb") as f:
+            msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=maps)
+    for sensors in listdir("assets/sensors"):
+        with open(f"assets/sensors/{sensors}", "rb") as f:
+            msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=sensors)
+    for waypoints in listdir("assets/waypoints"):
+        with open(f"assets/waypoints/{waypoints}", "rb") as f:
+            msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=waypoints)
+    msg.add_attachment(bytes(gt, 'utf-8'), maintype="text", subtype="csv", filename="groundtruth.csv")
+    msg.add_attachment(bytes(sim, 'utf-8'), maintype="text", subtype="csv", filename="simulated_measurements.csv")
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+        smtp.login("cpsimulation2022@gmail.com", "cpsimulation")
+        smtp.send_message(msg)

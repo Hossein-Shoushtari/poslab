@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from geojson import Point
 from geopandas import GeoSeries
 
+
 def closest_value(input_list, input_value):
     """
     return the closest value to a given input value from a list of given values
@@ -26,7 +27,6 @@ def closest_value(input_list, input_value):
     i = (np.abs(arr - input_value)).argmin()
 
     return arr[i]
-
 
 def semantic_error(number, error_range, intervall_range, time_stamps):
     """
@@ -235,7 +235,6 @@ def simulate_positions(groundtruth, error, measurement_freq, query_freq, number_
             qualities_list.append(quality)
 
     return time_stamps, positions, error_list, qualities_list
-
 
 def export_sim(time_stamps, positions, error_list, qualities_list):
     lines = [[time_stamps[i], positions[i][0],positions[i][1], error_list[i], qualities_list[i]] for i in range(len(time_stamps))]
