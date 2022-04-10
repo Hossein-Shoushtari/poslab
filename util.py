@@ -332,21 +332,18 @@ def ref2marker(name: str, check: tuple) -> list:
 
 def deleter():
     """
-    - deletes all 'empty' (dummy) files before the actuall app starts
+    - emptying all uploaded or generated files before the actuall app starts
     """
-    remove("assets/antennas/empty")
-    remove("assets/maps/empty")
-    remove("assets/sensors/empty")
-    remove("assets/waypoints/empty")
+    for filename in listdir("assets/antennas"): remove(f"assets/antennas/{filename}")
+    for filename in listdir("assets/export"): remove(f"assets/export/{filename}")
+    for filename in listdir("assets/maps"): remove(f"assets/maps/{filename}")
+    for filename in listdir("assets/sensors"): remove(f"assets/sensors/{filename}")
+    for filename in listdir("assets/waypoints"): remove(f"assets/waypoints/{filename}")
 
-def sending_email(gt: str, sim: str):
+def sending_email():
     """
     FUNCTION
     - sends an email with all uploaded and generated data to 'cpsimulation2022@gmail.com'
-    -------
-    PARAMETER
-    gt  : generated ground truth data
-    sim : simulated measurements
     -------
     RETURN
     nothing... just sending an email
@@ -357,7 +354,7 @@ def sending_email(gt: str, sim: str):
     msg["From"] = "cpsimulation2022@gmail.com"
     msg["To"] = "cpsimulation2022@gmail.com"
     msg.set_content("Check out the latest uploaded and calculated data!")
-    # getting all attachments
+    # attaching all files needed
     for antennas in listdir("assets/antennas"):
         with open(f"assets/antennas/{antennas}", "rb") as f:
             msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=antennas)
@@ -370,9 +367,10 @@ def sending_email(gt: str, sim: str):
     for waypoints in listdir("assets/waypoints"):
         with open(f"assets/waypoints/{waypoints}", "rb") as f:
             msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=waypoints)
-    msg.add_attachment(bytes(gt, 'utf-8'), maintype="text", subtype="csv", filename="groundtruth.csv")
-    msg.add_attachment(bytes(sim, 'utf-8'), maintype="text", subtype="csv", filename="simulated_measurements.csv")
-
+    for export_data in listdir("assets/exports"):
+        with open(f"assets/exports/{export_data}", "rb") as f:
+            msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=f"{export_data}_{datetime.now().strftime('%H:%M:%S')}")
+    # sending email
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
         smtp.login("cpsimulation2022@gmail.com", "cpsimulation")
         smtp.send_message(msg)

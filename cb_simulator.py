@@ -55,7 +55,8 @@ def simulator_callbacks(app, geojson_style):
             if len(file_check) > 0: return not map_warn, map_done, [], no_update # activating modal -> warn
             for i in range(len(map_filenames)): # only right files were uploaded
                 decoded_content = upload_encoder(map_contents[i]) # decoding uploaded base64 file
-                converted = GeoDataFrame(read_file(decoded_content), crs=32632).to_crs(4326) # converting EPSG:32632 to WGS84 and saving it in floorplans_converted
+                gp_file = read_file(decoded_content)
+                converted = GeoDataFrame(gp_file, crs=gp_file.crs).to_crs(4326) # converting crs from uploaded file to WGS84
                 converted.to_file(f"assets/maps/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
             # uploaded maps as converted layers
             layers = upload2layer(geojson_style)
@@ -335,6 +336,8 @@ def simulator_callbacks(app, geojson_style):
                 ref = ref_checked(name, check)
                 gt = generate_gt(ref) # generating ground truth data
                 if gt is not None: # gt generation went well
+                    # formatting and saving groundtruth
+                    export_gt(gt)
                     markers = gt2marker(gt[:, 1:3]) # converting crs and making markers
                     # ground truth layer
                     layer = [dl.Overlay(dl.LayerGroup(markers), name="GroundTruth", checked=True)]
@@ -445,7 +448,9 @@ def simulator_callbacks(app, geojson_style):
             if gt and err and ms_freq and net_cap and num_user and num_int:
                 try: # simulate measurement
                     simulation = simulate_positions(gt, float(err), float(ms_freq), float(net_cap), int(num_user), int(num_int), sem_err_rang, int_rang, sem_err)
-                    return sim_warn, not sim_done, simulation, no_update
+                    # formatting and saving simulation data
+                    export_sim(*simulation)
+                    return sim_warn, not sim_done, True, no_update
                 except: # simulation failed
                     return not sim_warn, sim_done, None, no_update
             else: return not sim_warn, sim_done, None, no_update
@@ -496,15 +501,15 @@ def simulator_callbacks(app, geojson_style):
             if "exp_btn" in button:
                 # if data["features"]: # drawn data
                 #     export_drawn_data(data)
-                # formatting groundtruth
-                gt_format = export_gt(gt_data)
-                # formatting simulation
-                sim_format = export_sim(*sim_data)
                 # sending email with all data added
-                sending_email(gt_format, sim_format)
+                sending_email()
                 # downloading it
-                gt_dl = dict(content = gt_format,  filename=f"ground_truth_trajectory{datetime.now()}.csv")
-                sim_dl = dict(content = sim_format,  filename=f"simulated_measurements{datetime.now()}.csv")
+                with open("assets/exports/ground_truth_trajectory.csv", "r") as f:
+                    gt_format = f.read()
+                with open("assets/exports/simulated_measurements.csv", "r") as f:
+                    sim_format = f.read()
+                gt_dl = dict(content = gt_format,  filename=f"ground_truth_trajectory-{datetime.now().strftime('%H:%M:%S')}.csv")
+                sim_dl = dict(content = sim_format,  filename=f"simulated_measurements-{datetime.now().strftime('%H:%M:%S')}.csv")
                 return not exp_done, exp_warn, gt_dl, sim_dl, badge, no_update # export successful
             return exp_done, exp_warn, no_update, no_update, badge, no_update # export doable
         else:

@@ -262,7 +262,7 @@ def help_canvas():
                     html.P("All 7 buttons are for uploading the data required for the simulation.", style={"color": "gray"}),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Maps:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                        dbc.Col(html.P("Only GeoJSON files of type crs:32632 are accepted.", style={"color": "gray"}))
+                        dbc.Col(html.P("Only GeoJSON files of any type are accepted.", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Waypoints:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
@@ -315,8 +315,8 @@ def help_canvas():
                     # bug info upload
                     html.H5("🐞", style={"text-align": "center"}),
                     html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
-                    html.P("After uploading new layers, the layer names in the layer control panel are sometimes messed up as well as some tooltips.", style={"color": "gray"}),
-                    html.P("By changing tabs, the names are automatically updated.", style={"color": "gray", "marginTop": "-10px"})],
+                    html.P("After uploading new layers sometimes the layer names in the layer control as well as some tooltips are messed up.", style={"color": "gray"}),
+                    html.P("Changing tabs will automatically update the names.", style={"color": "gray", "marginTop": "-10px"})],
                 style={"border":"1px solid red", "border-radius": 10, "padding": "10px", "marginBottom": "0px"})
             ],
         id="help_cv",

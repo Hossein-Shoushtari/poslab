@@ -237,11 +237,12 @@ def simulate_positions(groundtruth, error, measurement_freq, query_freq, number_
     return time_stamps, positions, error_list, qualities_list
 
 def export_sim(time_stamps, positions, error_list, qualities_list):
-    lines = [[time_stamps[i], positions[i][0],positions[i][1], error_list[i], qualities_list[i]] for i in range(len(time_stamps))]
-    output = "time stamp;x;y;error;quality\n"
-    for row in lines:
-        output += f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]}\n"
-    return output
+    with open("assets/exports/simulated_measurements.csv", "w") as f:
+        lines = [[time_stamps[i], positions[i][0],positions[i][1], error_list[i], qualities_list[i]] for i in range(len(time_stamps))]
+        output = "time stamp;x;y;error;quality\n"
+        for row in lines:
+            output += f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]}\n"
+        f.write(output)
 
 
 if __name__ == "__main__":    
