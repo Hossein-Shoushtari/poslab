@@ -335,7 +335,7 @@ def deleter():
     - emptying all uploaded or generated files before the actuall app starts
     """
     for filename in listdir("assets/antennas"): remove(f"assets/antennas/{filename}")
-    for filename in listdir("assets/export"): remove(f"assets/export/{filename}")
+    for filename in listdir("assets/exports"): remove(f"assets/exports/{filename}")
     for filename in listdir("assets/maps"): remove(f"assets/maps/{filename}")
     for filename in listdir("assets/sensors"): remove(f"assets/sensors/{filename}")
     for filename in listdir("assets/waypoints"): remove(f"assets/waypoints/{filename}")

@@ -6,12 +6,13 @@
 ## File Navigation -- Overview
 ### DIRECTORIES
 #### assets
-> **antennas** : uploaded antenna data can be found here  
+> **antennas** : uploaded antenna data is stored here  
+> **exports** : generated ground truth and simulation data is stored here  
 > **floorplans** : already converted HCU floorplans (EG, 1OG, 4OG) can be found here  
 > **images** : images for the website can be found here  
-> **maps** : all uploaded map data can be found here  
-> **sensors** : all uploaded sensor data (acc, bar, gyr, mag) can be found here  
-> **waypoints** : uploaded waypoint data can be found here  
+> **maps** : all uploaded map data is stored here  
+> **sensors** : all uploaded sensor data (acc, bar, gyr, mag) is stored here  
+> **waypoints** : uploaded waypoint data is stored here  
 
 ### FILES
 > **main.py** : self-explanatory :)
