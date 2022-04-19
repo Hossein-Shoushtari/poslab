@@ -378,7 +378,7 @@ def zoom_lvl(lon_raw: list, lat_raw: list) -> int:
     lat_raw : latitude
     -------
     RETURN
-    center : tuple with lat and lon of center
+    zoom : zoom lvl (integer)
     """
     lon = []
     lat = []
