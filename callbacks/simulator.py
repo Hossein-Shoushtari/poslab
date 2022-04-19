@@ -8,18 +8,20 @@ from geopandas import GeoDataFrame, read_file
 # built in
 from os import listdir
 from datetime import datetime
+from numpy import loadtxt
 # utils
-from util import upload_encoder, floorplan2layer
-from util import export_drawn_data, hover_info
+from util import upload_encoder, floorplan2layer, zoom_lvl
+from util import export_drawn_data, hover_info, centroid
 from util import upload2layer, gt2marker, sending_email
-from util import ref_tab, ref_checked, ref2marker
+from util import ref_tab, ref_checked, ref2marker, deleter
+from util import exctract_coordinates, converter
 # generators/simulators/calculators
 from ground_truth_generator import generate_gt, export_gt
 from coordinate_simulation import simulate_positions, export_sim
 
 
 
-def simulator_callbacks(app, geojson_style):
+def sim_calls(app, geojson_style):
     # upload maps =======================================================================================================================
     @app.callback(
         ### Outputs ###
@@ -28,6 +30,8 @@ def simulator_callbacks(app, geojson_style):
         Output("map_done", "is_open"),   # map upload done
         # layers
         Output("new_layers", "data"),
+        # storage
+        Output("z_c_ly", "data"),
         # loading
         Output("spin1", "children"),     # loading status
         ### Inputs ###
@@ -52,18 +56,21 @@ def simulator_callbacks(app, geojson_style):
         #============= MAP =====================================================================================================================
         if "ul_map" in button:
             file_check = [name.split(".")[-1] for name in map_filenames if name.split(".")[-1] not in ["geojson"]] # getting all wrong file formats
-            if len(file_check) > 0: return not map_warn, map_done, [], no_update # activating modal -> warn
+            if len(file_check) > 0: return not map_warn, map_done, no_update, no_update, no_update # activating modal -> warn
             for i in range(len(map_filenames)): # only right files were uploaded
                 decoded_content = upload_encoder(map_contents[i]) # decoding uploaded base64 file
                 gp_file = read_file(decoded_content)
                 converted = GeoDataFrame(gp_file, crs=gp_file.crs).to_crs(4326) # converting crs from uploaded file to WGS84
                 converted.to_file(f"assets/maps/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
+            lon, lat = exctract_coordinates(gp_file)
+            zoom = zoom_lvl(lon, lat)               # zoom for latest uploaded map
+            center = centroid(lon, lat)             # center of latest uploaded map
             # uploaded maps as converted layers
             layers = upload2layer(geojson_style)
-            return map_warn, not map_done, layers, no_update # returning uploaded layers
+            return map_warn, not map_done, layers, [zoom, center], no_update # returning uploaded layers
         # ====== no button clicked =============================================================================================================
         # this else-section is always activated, when the page refreshes -> no warnings
-        else: return map_warn, map_done, [], no_update
+        else: return map_warn, map_done, no_update, no_update, no_update
 
     # upload rest =======================================================================================================================
     @app.callback(
@@ -202,36 +209,56 @@ def simulator_callbacks(app, geojson_style):
             if str(password) == "cpsimulation2022":
                 return True, False, True
             return False, True, None
-        return False, False, None
+        return no_update, no_update, no_update
 
     # map display =======================================================================================================================
     @app.callback(
         ### Outputs ###
         Output("layers", "children"),    # layers
-        Output("hcu_panel", "style"), # hcu info panel
+        Output("MAP", "center"),         # map center
+        Output("MAP", "zoom"),           # map zoom level
+        Output("hcu_panel", "style"),    # hcu info panel
         ### Inputs ###
         Input("new_layers", "data"),     # maps
+        Input("z_c_ly", "data"),         # zoom and center for latest layer
+        Input("z_c_rp_gt", "data"),      # zoom and center for rp and gt
         Input("rp_layer", "data"),       # reference points
         Input("gt_layer", "data"),       # ground truth
         Input("unlocked", "data")        # unlocked status hcu maps
     )
     def display(
         new_layers,
+        zoom_center_ly,
+        zoom_center_rp_gt,
         rp_layer,
         gt_layer,
         unlocked
         ):
-        layers = []
         style = {"display": "None"}
+        # presetting map zoom level and center
+        zoom = 4
+        center = (49.845359730413186, 9.90578149727622) # center of Europe
+        # getting all different layers
+        layers = []
+        if new_layers:
+            zoom = zoom_center_ly[0]      # zoom for latest uploaded map
+            center = zoom_center_ly[1]    # center of latest uploaded map
+            layers += new_layers          # adding newly uploaded layers to map
+        if rp_layer:
+            zoom = zoom_center_rp_gt[0]   # zoom
+            center = zoom_center_rp_gt[1] # center
+            layers += rp_layer            # adding ref points layer to map
+        if gt_layer:
+            zoom = zoom_center_rp_gt[0]   # zoom
+            center = zoom_center_rp_gt[1] # center
+            layers += gt_layer            # adding gt points layer to map
         if unlocked:
-            layers = floorplan2layer(geojson_style)   # adding hcu floorplans to map
-            style = {"display": "block"}              # displaying info panel
-        if new_layers: layers += new_layers           # adding newly uploaded layers to map
-        if rp_layer: layers += rp_layer               # adding ref points layer to map
-        if gt_layer: layers += gt_layer               # adding ground truth layer to map
-
-        if layers: return html.Div(dl.LayersControl(layers)), style
-        else: return html.Div(style={"display": "None"}), style
+            zoom = 19
+            center = (53.540239664876104, 10.004663417352164) # HCU coordinates
+            layers += floorplan2layer(geojson_style)          # adding hcu floorplans to map
+            style = {"display": "block"}                      # displaying info panel
+        if layers: return html.Div(dl.LayersControl(layers)), center, zoom, style
+        else: return html.Div(style={"display": "None"}), center, zoom, style
 
     # ground truth canvas ===============================================================================================================
     @app.callback(
@@ -303,6 +330,8 @@ def simulator_callbacks(app, geojson_style):
         # store generated gt (layer & data)
         Output("gt_layer", "data"),
         Output("gt_data", "data"),
+        # store zoom lvl and center point
+        Output("z_c_rp_gt", "data"),
         # loading
         Output("spin3", "children"),      # loading status
         ### Inputs ###
@@ -338,21 +367,33 @@ def simulator_callbacks(app, geojson_style):
                 if gt is not None: # gt generation went well
                     # formatting and saving groundtruth
                     export_gt(gt)
-                    markers = gt2marker(gt[:, 1:3]) # converting crs and making markers
-                    # ground truth layer
+                    # converting crs and making markers
+                    markers = gt2marker(gt[:, 1:3])
+                    # getting zoom lvl and center point
+                    lon, lat = converter(gt[:,1:3])
+                    zoom = zoom_lvl(lon, lat)     # zoom lvl
+                    center = centroid(lon, lat)   # center
+                    # making ground truth layer
                     layer = [dl.Overlay(dl.LayerGroup(markers), name="GroundTruth", checked=True)]
-                    return gen_warn, not gen_done, sel_warn, no_update, layer, gt, no_update # successful generator
-                else: return not gen_warn, gen_done, sel_warn, no_update, [], [], no_update  # gt generation went wrong
-            else: return gen_warn, gen_done, not sel_warn, no_update, [], [], no_update      # no data selected
+                    return gen_warn, not gen_done, sel_warn, no_update, layer, gt, [zoom, center], no_update # successful generator
+                else: return not gen_warn, gen_done, sel_warn, no_update, [], [], no_update, no_update  # gt generation went wrong
+            else: return gen_warn, gen_done, not sel_warn, no_update, [], [], no_update, no_update      # no data selected
         # ========= REF POINTS  =================================================================================================================
         elif "show_btn" in button:
             if name:
-                markers = ref2marker(name, check) # converting crs and making markers
-                # ref points as markers
+                # loading data
+                data = loadtxt(f"assets/waypoints/{name}.csv")[:, 1:3]
+                # converting crs and making markers
+                markers = ref2marker(data, check)
+                # getting zoom lvl and center point
+                lon, lat = converter(data)
+                zoom = zoom_lvl(lon, lat)     # zoom lvl
+                center = centroid(lon, lat)   # center
+                # turning ref points into markers
                 layer = [dl.Overlay(dl.LayerGroup(markers), name="Waypoints", checked=True)]
-                return gen_warn, gen_done, sel_warn, layer, no_update, no_update, no_update    # successful
-            else: return gen_warn, gen_done, not sel_warn, [], no_update, no_update, no_update # no data selected
-        else: return gen_warn, gen_done, sel_warn, [], [], [], no_update                       # offcanvas is closed
+                return gen_warn, gen_done, sel_warn, layer, no_update, no_update, [zoom, center], no_update    # successful
+            else: return gen_warn, gen_done, not sel_warn, [], no_update, no_update, no_update, no_update # no data selected
+        else: return gen_warn, gen_done, sel_warn, [], [], [], no_update, no_update                       # offcanvas is closed
 
     # simulation settings canvas ========================================================================================================
     @app.callback(
@@ -546,7 +587,9 @@ def simulator_callbacks(app, geojson_style):
             if drawn_data["features"]: # drawn data
                 export_drawn_data(drawn_data)
             return not help_cv     # activate help offcanvas
-        else: help_cv
+        else:
+            deleter() # when page refreshes, emptying all directories
+            return help_cv
 
     # hovering tooltips in layers =======================================================================================================
     @app.callback(

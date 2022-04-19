@@ -1,21 +1,22 @@
 ##### Utils
 ###IMPORTS
 # dash
-from dash import html
 import dash_bootstrap_components as dbc
 import dash_leaflet as dl
 import dash_leaflet.express as dlx
+from dash import html
 from dash_extensions.javascript import arrow_function
 # built in
 import numpy as np
+import os as os
+import smtplib
+import email.message as em
+import math as m
 from datetime import datetime
 from base64 import b64decode
-from os import listdir, remove
-import smtplib
-from email.message import EmailMessage
 # installed
-from geopandas import GeoDataFrame
-from shapely.geometry import Point
+import geopandas as gp
+import shapely.geometry as sh
 
 
 def upload_encoder(content: str) -> str:
@@ -154,7 +155,7 @@ def upload2layer(geojson_style) -> list:
     """
     # initializing list to fill it with newly uploaded layers
     layers = []
-    for geojson_file in listdir("assets/maps"):
+    for geojson_file in os.listdir("assets/maps"):
         name = geojson_file.split(".")[0]  # getting name of geojson file
         geojson = dl.GeoJSON(
             url=f"assets/maps/{geojson_file}",  # url to geojson file
@@ -183,8 +184,8 @@ def gt2marker(ground_truth: list) -> list:
         "iconAnchor": [0, 0],  # point of the icon which will correspond to marker"s location
     }
     # making points out of ground truth data for converting it (crs:32632 to crs:4326)
-    points = {"GroundTruth": [i for i in range(1, ground_truth.shape[0]+1)], "geometry": [Point(lat, lon) for lat, lon in ground_truth]}
-    converted_points = GeoDataFrame(points, crs=32632).to_crs(4326)
+    points = {"GroundTruth": [i for i in range(1, ground_truth.shape[0]+1)], "geometry": [sh.Point(lat, lon) for lat, lon in ground_truth]}
+    converted_points = gp.GeoDataFrame(points, crs=32632).to_crs(4326)
     # making geojson format for creating markers
     geojson = dlx.dicts_to_geojson([dict(lat=row[1].y, lon=row[1].x) for _, row in converted_points.iterrows()])
     # making and designing markers (adding tooltip and popup)
@@ -287,20 +288,19 @@ def ref_checked(name: str, check: tuple) -> list:
     
     return data
 
-def ref2marker(name: str, check: tuple) -> list:
+def ref2marker(data: list, check: tuple) -> list:
     """
     FUNCTION
     - converts lat and lon from crs32632 (reference points) to crs4326
     - makes leaflet markers out of coordinates
     -------
     PARAMETER
-    ref : reference points data
+    data  : reference points data
+    check : checkboxes 
     -------
     RETURN
     markers : list of all created markers with converted lat and lon
     """
-    # loading data
-    data = np.loadtxt(f"assets/waypoints/{name}.csv")[:, 1:3]
     # determing whether checked or unchecked
     keep = np.ones(data.shape[0], dtype=bool)
     for i in range(data.shape[0]):
@@ -313,8 +313,8 @@ def ref2marker(name: str, check: tuple) -> list:
         "iconAnchor": [0, 0],  # point of the icon which will correspond to marker"s location
     }
     # making points out of ground truth data for converting it (crs:32632 to crs:4326)
-    points = {"waypoint": [i for i in range(1, data.shape[0]+1)], "geometry": [Point(lat, lon) for lat, lon in data]}
-    converted_points = GeoDataFrame(points, crs=32632).to_crs(4326)
+    points = {"waypoint": [i for i in range(1, data.shape[0]+1)], "geometry": [sh.Point(lat, lon) for lat, lon in data]}
+    converted_points = gp.GeoDataFrame(points, crs=32632).to_crs(4326)
     # making markers only of checked points
     markers = []
     for nr, row in converted_points.iterrows():
@@ -330,15 +330,99 @@ def ref2marker(name: str, check: tuple) -> list:
 
     return markers
 
+def exctract_coordinates(data: list) -> list:
+    """
+    FUNCTION
+    - extracts lon and lat coordinates from given goejson file
+    -------
+    PARAMETER
+    data : geojson file
+    -------
+    RETURN
+    lon_lat : list with lat and lon coordinates
+    """
+    # getting all coordinates
+    lon = []
+    lat = []
+    for index, row in data.explode(index_parts=True).iterrows():
+        try: data = row['geometry'].exterior.coords
+        except: data = row['geometry'].coords
+        for pt in data:
+            lon.append(pt[0])
+            lat.append(pt[1])
+    return [lon, lat]
+
+def centroid(lon_raw: list, lat_raw: list) -> tuple:
+    """
+    FUNCTION
+    - calculates center of given geojson file
+    -------
+    PARAMETER
+    lon_raw : longitude
+    lat_raw : latitude
+    -------
+    RETURN
+    center : tuple with lat and lon of center
+    """
+    # calculating mean of lat and lon
+    center = (sum(lat_raw)/len(lat_raw), sum(lon_raw)/len(lon_raw))
+    return center
+
+def zoom_lvl(lon_raw: list, lat_raw: list) -> int:
+    """
+    FUNCTION
+    - calculates zoom level of given geojson file
+    -------
+    PARAMETER
+    lon_raw : longitude
+    lat_raw : latitude
+    -------
+    RETURN
+    center : tuple with lat and lon of center
+    """
+    lon = []
+    lat = []
+    # modify all negative coordinates
+    for i in range(len(lon_raw)):
+        if lon_raw[i] < 0: lon.append(lon_raw[i]+360)
+        else: lon.append(lon_raw[i])
+        if lat_raw[i] < 0: lat.append(lat_raw[i]+180)
+        else: lat.append(lat_raw[i])
+    # finding edge points      
+    maxx, minx, maxy, miny = max(lon), min(lon), max(lat), min(lat)
+    # calculating distance in x and y direction
+    d = (abs(maxx - minx), abs(maxy - miny)*16/9) # y-direction factorized by 16/9 because of screen ratio
+    # getting max distance (x or y)
+    d = max(d)
+    # approximate value of latitude proportion at maximum zoom level (20)
+    v = 0.002
+    # calculating final zoom factor
+    if d == 0: zoom = 20            # d=0  (e.g.: simple point was uploaded)
+    else: zoom = 20 - m.log(d/v, 2)     # d>0  (everything else like Polygons, lines, multiple points, etc.)
+    if zoom > 20: zoom = 20         # d>20 (zoom level exceeds 20 | e.g.: simple point)
+    if zoom > 1: zoom -= 1          # always subtract 1 to make sure everything fits safely
+    return zoom
+
+def converter(data: list) -> tuple:
+    # making points out of data and converting it (crs:32632 to crs:4326)
+    points = {"geometry": [sh.Point(lat, lon) for lat, lon in data]}
+    converted_points = gp.GeoDataFrame(points, crs=32632).to_crs(4326)
+    lon = []
+    lat = []
+    for p in converted_points["geometry"]:
+        lon.append(p.x)
+        lat.append(p.y)
+    return [lon, lat]
+
 def deleter():
     """
     - emptying all uploaded or generated files before the actuall app starts
     """
-    for filename in listdir("assets/antennas"): remove(f"assets/antennas/{filename}")
-    for filename in listdir("assets/exports"): remove(f"assets/exports/{filename}")
-    for filename in listdir("assets/maps"): remove(f"assets/maps/{filename}")
-    for filename in listdir("assets/sensors"): remove(f"assets/sensors/{filename}")
-    for filename in listdir("assets/waypoints"): remove(f"assets/waypoints/{filename}")
+    for filename in os.listdir("assets/antennas"): os.remove(f"assets/antennas/{filename}")
+    for filename in os.listdir("assets/exports"): os.remove(f"assets/exports/{filename}")
+    for filename in os.listdir("assets/maps"): os.remove(f"assets/maps/{filename}")
+    for filename in os.listdir("assets/sensors"): os.remove(f"assets/sensors/{filename}")
+    for filename in os.listdir("assets/waypoints"): os.remove(f"assets/waypoints/{filename}")
 
 def sending_email():
     """
@@ -349,25 +433,25 @@ def sending_email():
     nothing... just sending an email
     """
     # designing the email
-    msg = EmailMessage()
+    msg = em.EmailMessage()
     msg["Subject"] = f"Uploaded & calculated data -- {datetime.now().strftime('%d.%m.%Y - %H:%M:%S')}"
     msg["From"] = "cpsimulation2022@gmail.com"
     msg["To"] = "cpsimulation2022@gmail.com"
     msg.set_content("Check out the latest uploaded and calculated data!")
     # attaching all files needed
-    for antennas in listdir("assets/antennas"):
+    for antennas in os.listdir("assets/antennas"):
         with open(f"assets/antennas/{antennas}", "rb") as f:
             msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=antennas)
-    for maps in listdir("assets/maps"):
+    for maps in os.listdir("assets/maps"):
         with open(f"assets/maps/{maps}", "rb") as f:
             msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=maps)
-    for sensors in listdir("assets/sensors"):
+    for sensors in os.listdir("assets/sensors"):
         with open(f"assets/sensors/{sensors}", "rb") as f:
             msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=sensors)
-    for waypoints in listdir("assets/waypoints"):
+    for waypoints in os.listdir("assets/waypoints"):
         with open(f"assets/waypoints/{waypoints}", "rb") as f:
             msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=waypoints)
-    for export_data in listdir("assets/exports"):
+    for export_data in os.listdir("assets/exports"):
         with open(f"assets/exports/{export_data}", "rb") as f:
             msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=f"{export_data}_{datetime.now().strftime('%H:%M:%S')}")
     # sending email

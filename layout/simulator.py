@@ -15,6 +15,9 @@ def storage():
     ### STORAGE
     # dcc.Store to store and share data between callbacks
     storage = html.Div([
+        # zoom lvl and center for latest new layer / rp & gt
+        dcc.Store(id="z_c_ly", data=[], storage_type="memory"),
+        dcc.Store(id="z_c_rp_gt", data=[], storage_type="memory"),
         # new layers
         dcc.Store(id="new_layers", data=[], storage_type="memory"),
         # password status
@@ -222,8 +225,6 @@ def sim_map(geojson_style):
         "width": "34px",
         "height": "34px"
     }
-    # HCU coordinates
-    hcu = (53.5403169239316, 10.004875659942629)
     # Tile Layer
     url = "https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
     # Map info
@@ -242,9 +243,8 @@ def sim_map(geojson_style):
                                     draw=dict(rectangle=False, circle=False), # possibility to draw/edit data
                                     position="topleft")),
             ],
-            zoom=19,
-            center=hcu,
-            style={"width": "100%", "height": "70vh", "margin": "auto", "display": "block"}
+            style={"width": "100%", "height": "70vh", "margin": "auto", "display": "block"},
+            id="MAP"
         )
     )
     return _map

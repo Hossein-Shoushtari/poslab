@@ -4,19 +4,13 @@ from dash import Dash, dcc, html
 import dash_bootstrap_components as dbc
 from dash_extensions.javascript import assign
 # layouts (ly)
-from ly_home import home_card
-from ly_simulator import simulator_card
-from ly_evaluator import evaluator_card
-from ly_coming_soon import coming_soon_card
+from layout.home import home_card
+from layout.simulator import simulator_card
+from layout.evaluator import evaluator_card
+from layout.coming_soon import coming_soon_card
 # callbacks (cb)
-from cb_simulator import simulator_callbacks
-# utils
-from util import deleter
+from callbacks.simulator import sim_calls
 
-
-# first deleting the "empty"-files -> due to github, that does not commit empty folders
-try: deleter()
-except: pass
 
 # Geojson rendering logic, must be JavaScript and only initialized once!
 geojson_style = assign("""function(feature, context){
@@ -87,7 +81,7 @@ app.layout = html.Div(
 )
 
 ### CALLBACKS ###
-simulator_callbacks(app, geojson_style)
+sim_calls(app, geojson_style)
 
 # pushing the page to the web
 if __name__ == "__main__":
