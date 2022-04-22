@@ -25,6 +25,8 @@ app = Dash(__name__, external_stylesheets=ex_ss)
 server = app.server
 # title
 app.title = "L5IN"
+# favicon
+#app._favicon = "favicon.ico"
 
 ### LAYOUT ###
 ## Home page ##
