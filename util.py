@@ -8,12 +8,15 @@ from dash import html
 from dash_extensions.javascript import arrow_function
 # built in
 import numpy as np
-import os as os
-import smtplib
-import email.message as em
 import math as m
-from datetime import datetime
 from base64 import b64decode
+from datetime import datetime
+import shutil as st
+import os
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+from email.mime.text import MIMEText
 # installed
 import geopandas as gp
 import shapely.geometry as sh
@@ -419,42 +422,45 @@ def deleter():
     - emptying all uploaded or generated files before the actuall app starts
     """
     for filename in os.listdir("assets/antennas"): os.remove(f"assets/antennas/{filename}")
-    for filename in os.listdir("assets/exports"): os.remove(f"assets/exports/{filename}")
+    for filename in os.listdir("assets/exports/gt"): os.remove(f"assets/exports/gt/{filename}")
+    for filename in os.listdir("assets/exports/sm"): os.remove(f"assets/exports/sm/{filename}")
     for filename in os.listdir("assets/maps"): os.remove(f"assets/maps/{filename}")
     for filename in os.listdir("assets/sensors"): os.remove(f"assets/sensors/{filename}")
     for filename in os.listdir("assets/waypoints"): os.remove(f"assets/waypoints/{filename}")
+    for filename in os.listdir("assets/zip"): os.remove(f"assets/zip/{filename}")
 
 def sending_email():
     """
     FUNCTION
-    - sends an email with all uploaded and generated data to 'cpsimulation2022@gmail.com'
+    - sends an email with all uploaded and generated data as zip files to 'cpsimulation2022@gmail.com'
     -------
     RETURN
     nothing... just sending an email
     """
-    # designing the email
-    msg = em.EmailMessage()
-    msg["Subject"] = f"Uploaded & calculated data -- {datetime.now().strftime('%d.%m.%Y - %H:%M:%S')}"
-    msg["From"] = "cpsimulation2022@gmail.com"
-    msg["To"] = "cpsimulation2022@gmail.com"
-    msg.set_content("Check out the latest uploaded and calculated data!")
-    # attaching all files needed
-    for antennas in os.listdir("assets/antennas"):
-        with open(f"assets/antennas/{antennas}", "rb") as f:
-            msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=antennas)
-    for maps in os.listdir("assets/maps"):
-        with open(f"assets/maps/{maps}", "rb") as f:
-            msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=maps)
-    for sensors in os.listdir("assets/sensors"):
-        with open(f"assets/sensors/{sensors}", "rb") as f:
-            msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=sensors)
-    for waypoints in os.listdir("assets/waypoints"):
-        with open(f"assets/waypoints/{waypoints}", "rb") as f:
-            msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=waypoints)
-    for export_data in os.listdir("assets/exports"):
-        with open(f"assets/exports/{export_data}", "rb") as f:
-            msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=f"{export_data}_{datetime.now().strftime('%H:%M:%S')}")
-    # sending email
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-        smtp.login("cpsimulation2022@gmail.com", "cpsimulation")
-        smtp.send_message(msg)
+    # creating a multipart message
+    msg = MIMEMultipart()
+    body_part = MIMEText("Check out the latest uploaded and calculated data!", 'plain')
+    msg['Subject'] = f"Uploaded & calculated data -- {datetime.now().strftime('%d.%m.%Y - %H:%M:%S')}"
+    msg['From'] = "cpsimulation2022@gmail.com"
+    msg['To'] = "cpsimulation2022@gmail.com"
+    # adding body to email
+    msg.attach(body_part)
+    # zipping all dirs if not empty
+    if len(os.listdir("assets/antennas")): st.make_archive(f"assets/zip/antennas-{datetime.now().strftime('%H_%M')}", 'zip', "assets/antennas")
+    if len(os.listdir("assets/maps")): st.make_archive(f"assets/zip/maps-{datetime.now().strftime('%H_%M')}", 'zip', "assets/maps")
+    if len(os.listdir("assets/sensors")): st.make_archive(f"assets/zip/sensors-{datetime.now().strftime('%H_%M')}", 'zip', "assets/sensors")
+    if len(os.listdir("assets/waypoints")): st.make_archive(f"assets/zip/waypoints-{datetime.now().strftime('%H_%M')}", 'zip', "assets/waypoints")
+    # attaching all files 
+    for zip in os.listdir("assets/zip"):
+        # open and read the file in binary
+        with open(f"assets/zip/{zip}","rb") as file:
+            # Attach the file with filename to the email
+            msg.attach(MIMEApplication(file.read(), Name=f'{zip}.zip'))
+    # creating SMTP object
+    smtp_obj = smtplib.SMTP_SSL("smtp.gmail.com")
+    # login to the server
+    smtp_obj.login("cpsimulation2022@gmail.com", "simulation2evaluation20xx")
+
+    # converting the message to a string and send it
+    smtp_obj.sendmail(msg['From'], msg['To'], msg.as_string())
+    smtp_obj.quit()

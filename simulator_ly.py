@@ -8,7 +8,7 @@ from dash_extensions.javascript import arrow_function
 # built in
 from base64 import b64decode
 # utils
-from util import floorplan2layer, hover_info
+import util as u
 
 
 def storage():
@@ -22,14 +22,13 @@ def storage():
         dcc.Store(id="new_layers", data=[], storage_type="memory"),
         # password status
         dcc.Store(id="unlocked", data=[], storage_type="memory"),
-        # filename from dropdown
+        # filename from ref dropdown
         dcc.Store(id="ref_data", data=[], storage_type="memory"),
         # checked boxes
         dcc.Store(id="checked_boxes", data=[], storage_type="memory"),
         # reference points layer
         dcc.Store(id="rp_layer", data=[], storage_type="memory"),
         # ground truth
-        dcc.Store(id="gt_data", data=[], storage_type="memory"),
         dcc.Store(id="gt_layer", data=[], storage_type="memory"),
         # simulated measurements
         dcc.Store(id="sim_data", data=[], storage_type="memory")
@@ -144,7 +143,7 @@ def modals():
     # simulation warning
     sim_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
-        dbc.ModalBody("Please generate GroundTruth first, as well as enter values for all required inputs!")],
+        dbc.ModalBody("Please select data first, as well as enter values for all required inputs!")],
         id="sim_warn",
         is_open=False
     )
@@ -158,7 +157,7 @@ def modals():
     # export warning
     exp_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
-        dbc.ModalBody("Please simulate measurements first!")],
+        dbc.ModalBody("Nothing to export!")],
         id="exp_warn",
         is_open=False
     )
@@ -187,17 +186,47 @@ def modals():
                 dbc.Button("Unlock", color="primary", id="unlock")
             ),
         ],
-    id="modal",
+    id="research",
     backdrop="static",
     is_open=False,
     )
-    return html.Div([ul_warn, ul_done, map_warn, map_done, gen_warn, gen_done, sel_warn, exp_warn, exp_done, sim_done, sim_warn, hcu_modal])
+
+    # simulate measurements - select ground truth
+    sim_modal = dbc.Modal(
+        [
+            dbc.ModalHeader(dbc.ModalTitle("Simulate Measurements")),
+            dbc.ModalBody(
+                html.Div(
+                    [
+                        dbc.Label("Ground Truth"),
+                        dcc.Dropdown(
+                            id="gt_select",
+                            options=[],
+                            placeholder="Select Data",
+                            clearable=True,
+                            optionHeight=35,
+                            multi=False,
+                            searchable=True,
+                            style={"marginBottom": "15px", "color": "black"},
+                        )
+                    ]
+                )
+            ),
+            dbc.ModalFooter(
+                dbc.Button("Simulate", color="primary", id="sim_btn")
+            )
+        ],
+        id="sim_modal",
+        backdrop="static",
+        is_open=False,
+    )
+    return html.Div([ul_warn, ul_done, map_warn, map_done, gen_warn, gen_done, sel_warn, exp_warn, exp_done, sim_done, sim_warn, hcu_modal, sim_modal])
 
 def sim_map(geojson_style):
     ### MAP
     # info panel for hcu maps
     info = html.Div(
-        children=hover_info(),
+        children=u.hover_info(),
         id="hover_info",
         style={
             "position": "absolute",
@@ -236,7 +265,7 @@ def sim_map(geojson_style):
                 html.Div(id="hcu_panel", children=info, style={"display": "None"}),
                 html.Button("🎓", id="hcu_maps", style=btn_style),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
-                html.Div(id="layers", children=html.Div(dl.LayersControl(floorplan2layer(geojson_style)), style={"display": "None"})), # is previously filled with invisible floorplans for initialization
+                html.Div(id="layers", children=html.Div(dl.LayersControl(u.floorplan2layer(geojson_style)), style={"display": "None"})), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
                 dl.FeatureGroup(dl.EditControl(
                                     id="edit_control",
@@ -444,8 +473,7 @@ def sim_set_canvas():
 def simulator_card(geojson_style):
 
     ### DOWNLOAD
-    export_gt = dcc.Download(id="export_gt")
-    export_sim = dcc.Download(id="export_sim")
+    export = dcc.Download(id="export")
 
     ### UPLOAD
     ## Buttons
@@ -591,7 +619,7 @@ def simulator_card(geojson_style):
 
                         dbc.Col(html.Div(dbc.Button(
                                 html.P("Simulate", style={"marginTop": "12px"}),
-                                id="sim_btn",
+                                id="open_sim",
                                 color="light",
                                 outline=False,
                                 style={"line-height": "1.5", "height": "124px", "width": "70px", "padding": "0px"}),
@@ -611,11 +639,7 @@ def simulator_card(geojson_style):
                         html.Hr(style=hr_style),
                         html.Div(
                             [
-                                dbc.Button(
-                                    [
-                                        "Get results",
-                                        html.Div(id="exp_badge")
-                                    ],
+                                dbc.Button("Get results",
                                     color="success",
                                     className="position-relative",
                                     outline=True,
@@ -643,8 +667,7 @@ def simulator_card(geojson_style):
                     # storage
                     storage(),
                     # download
-                    export_sim,
-                    export_gt,
+                    export,
                     # modals
                     modals(),
                     # canvas

@@ -4,6 +4,7 @@
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
+from datetime import datetime
 # installed
 from geojson import Point
 from geopandas import GeoSeries
@@ -237,7 +238,7 @@ def simulate_positions(groundtruth, error, measurement_freq, query_freq, number_
     return time_stamps, positions, error_list, qualities_list
 
 def export_sim(time_stamps, positions, error_list, qualities_list):
-    with open("assets/exports/simulated_measurements.csv", "w") as f:
+    with open(f"assets/exports/sm/simulated_measurements__{datetime.now().strftime('%H-%M-%S')}.csv", "w") as f:
         lines = [[time_stamps[i], positions[i][0],positions[i][1], error_list[i], qualities_list[i]] for i in range(len(time_stamps))]
         output = "time stamp;x;y;error;quality\n"
         for row in lines:

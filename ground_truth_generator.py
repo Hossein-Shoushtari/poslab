@@ -3,6 +3,7 @@
 ### IMPORTS
 # built in
 import numpy as np
+from datetime import datetime
 # installed
 import shapely
 import shapely.geometry as sg
@@ -435,7 +436,7 @@ def generate_gt(ref: list):
         return None  # something went wrong
 
 def export_gt(ground_truth):
-    with open("assets/exports/ground_truth_trajectory.csv", "w") as f:
+    with open(f"assets/exports/gt/ground_truth_trajectory__{datetime.now().strftime('%H+%M+%S')}.csv", "w") as f:
         lines = [[ground_truth[i][0], ground_truth[i][1],ground_truth[i][2]] for i in range(len(ground_truth))]
         output = "time stamp;x;y\n"
         for row in lines:
