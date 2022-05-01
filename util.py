@@ -406,7 +406,17 @@ def zoom_lvl(lon_raw: list, lat_raw: list) -> int:
     if zoom > 1: zoom -= 1          # always subtract 1 to make sure everything fits safely
     return zoom
 
-def converter(data: list) -> tuple:
+def from_32632_to_4326(data: list) -> tuple:
+    """
+    FUNCTION
+    - makes shapely points out of given data and converts it to crs:4326 
+    -------
+    PARAMETER
+    data : data
+    -------
+    RETURN
+    list of lon and lat of converted points
+    """
     # making points out of data and converting it (crs:32632 to crs:4326)
     points = {"geometry": [sh.Point(lat, lon) for lat, lon in data]}
     converted_points = gp.GeoDataFrame(points, crs=32632).to_crs(4326)
@@ -425,7 +435,10 @@ def deleter():
     for filename in os.listdir("assets/exports/gt"): os.remove(f"assets/exports/gt/{filename}")
     for filename in os.listdir("assets/exports/sm"): os.remove(f"assets/exports/sm/{filename}")
     for filename in os.listdir("assets/maps"): os.remove(f"assets/maps/{filename}")
-    for filename in os.listdir("assets/sensors"): os.remove(f"assets/sensors/{filename}")
+    for filename in os.listdir("assets/sensors/acc"): os.remove(f"assets/sensors/acc/{filename}")
+    for filename in os.listdir("assets/sensors/bar"): os.remove(f"assets/sensors/bar/{filename}")
+    for filename in os.listdir("assets/sensors/gyr"): os.remove(f"assets/sensors/gyr/{filename}")
+    for filename in os.listdir("assets/sensors/mag"): os.remove(f"assets/sensors/mag/{filename}")
     for filename in os.listdir("assets/waypoints"): os.remove(f"assets/waypoints/{filename}")
     for filename in os.listdir("assets/zip"): os.remove(f"assets/zip/{filename}")
 

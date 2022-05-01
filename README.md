@@ -13,6 +13,7 @@
 > **maps** : all uploaded map data  
 > **sensors** : all uploaded sensor data (acc, bar, gyr, mag)  
 > **waypoints** : uploaded waypoints  
+> **zip** : zip dirs to be either downloaded for the user or sended as an attachment to us in an email  
 #### callbacks
 > all callbacks for the respective tabs
 #### layout

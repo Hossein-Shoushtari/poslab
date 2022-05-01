@@ -111,14 +111,14 @@ def sim_calls(app, geojson_style):
         ant_contents,  # antennas
         ant_filenames,
         #--- sensors
-        gyr_content,  # gyroscope
-        gyr_filename,
-        acc_content,  # acceleration
-        acc_filename,
-        bar_content,  # barometer
+        gyr_contents,  # gyroscope
+        gyr_filenames,
+        acc_contents,  # acceleration
+        acc_filenames,
+        bar_contents,  # barometer
         bar_filename,
-        mag_content,  # magnetometer
-        mag_filename
+        mag_contents,  # magnetometer
+        mag_filenames
         ): 
         # getting clicked button
         button = [p["prop_id"] for p in callback_context.triggered][0]
@@ -129,7 +129,7 @@ def sim_calls(app, geojson_style):
                 if way_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(way_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/waypoints/{way_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update # activating modal -> warn    
+                else: return not ul_warn, ul_done, no_update # activating modal -> warn
             # if everything went fine ...
             return ul_warn, not ul_done, no_update
         # ========== ANTENNAS ==================================================================================================================
@@ -138,39 +138,43 @@ def sim_calls(app, geojson_style):
                 if ant_filenames[i].split(".")[-1] in ["geojson", "txt", "csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(ant_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/antennas/{ant_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update # activating modal -> warn    
+                else: return not ul_warn, ul_done, no_update # activating modal -> warn
             # if everything went fine ...
             return ul_warn, not ul_done, no_update
         # ========== GYROSCOPE =================================================================================================================
         elif "ul_gyr" in button:
-            if gyr_filename.split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                decoded_content = u.upload_encoder(gyr_content) # decoding uploaded base64 file
-                with open(f"assets/sensors/gyr.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warn, ul_done, no_update # activating modal -> warn    
+            for i in range(len(gyr_filenames)):
+                if gyr_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
+                    decoded_content = u.upload_encoder(gyr_contents[i]) # decoding uploaded base64 file
+                    with open(f"assets/sensors/gyr/{gyr_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
+                else: return not ul_warn, ul_done, no_update # activating modal -> warn
             # if everything went fine ...
             return ul_warn, not ul_done, no_update
         # ========= ACCELERATION  ==============================================================================================================
         elif "ul_acc" in button:
-            if acc_filename.split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                decoded_content = u.upload_encoder(acc_content) # decoding uploaded base64 file
-                with open(f"assets/sensors/acc.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warn, ul_done, no_update # activating modal -> warn    
+            for i in range(len(acc_filenames)):
+                if acc_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
+                    decoded_content = u.upload_encoder(acc_contents[i]) # decoding uploaded base64 file
+                    with open(f"assets/sensors/acc/{acc_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
+                else: return not ul_warn, ul_done, no_update # activating modal -> warn
             # if everything went fine ...
             return ul_warn, not ul_done, no_update
         # ========= BAROMETER  =================================================================================================================
         elif "ul_bar" in button:
-            if bar_filename.split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                decoded_content = u.upload_encoder(bar_content) # decoding uploaded base64 file
-                with open(f"assets/sensors/bar.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warn, ul_done, no_update # activating modal -> warn    
+            for i in range(len(bar_filenames)):
+                if bar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
+                    decoded_content = u.upload_encoder(bar_contents[i]) # decoding uploaded base64 file
+                    with open(f"assets/sensors/bar/{bar_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
+                else: return not ul_warn, ul_done, no_update # activating modal -> warn
             # if everything went fine ...
             return ul_warn, not ul_done, no_update
         # ======== MAGNETOMETER  ===============================================================================================================
         elif "ul_mag" in button:
-            if mag_filename.split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                decoded_content = u.upload_encoder(mag_content) # decoding uploaded base64 file
-                with open(f"assets/sensors/mag.csv", "w") as file: file.write(decoded_content) # saving file
-            else: return not ul_warn, ul_done, no_update # activating modal -> warn    
+            for i in range(len(mag_filenames)):
+                if mag_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
+                    decoded_content = u.upload_encoder(mag_contents[i]) # decoding uploaded base64 file
+                    with open(f"assets/sensors/mag/{mag_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
+                else: return not ul_warn, ul_done, no_update # activating modal -> warn
             # if everything went fine ...
             return ul_warn, not ul_done, no_update  
         # ====== no button clicked =============================================================================================================
@@ -263,6 +267,8 @@ def sim_calls(app, geojson_style):
         ### Outputs ###
         Output("gt_cv", "is_open"),       # canvas
         Output("ref_select", "options"),  # ref points dropdown
+        Output("acc_select", "options"),  # acc data dropdown
+        Output("gyr_select", "options"),  # gyr data dropdown
         ### Inputs ###
         State("gt_cv", "is_open"),        # canvas status
         Input("gt_btn", "n_clicks")       # button
@@ -275,9 +281,11 @@ def sim_calls(app, geojson_style):
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "gt_btn" in button:
-            options = [{"label": name.split(".")[0], "value": name.split(".")[0]} for name in listdir("assets/waypoints")]
-            return not gt_cv, options     # activate gt offcanvas and filling dropdown with data
-        else: return gt_cv, []            # offcanvas is closed
+            ref_options = [{"label": name.split(".")[0], "value": name.split(".")[0]} for name in listdir("assets/waypoints")]
+            acc_options = [{"label": name.split(".")[0], "value": name.split(".")[0]} for name in listdir("assets/sensors/acc")]
+            gyr_options = [{"label": name.split(".")[0], "value": name.split(".")[0]} for name in listdir("assets/sensors/gyr")]
+            return not gt_cv, ref_options, acc_options, gyr_options     # activate gt offcanvas and filling dropdowns with data
+        else: return gt_cv, [], [], []                                  # offcanvas is closed
 
     # reference points table ============================================================================================================
     @app.callback(
@@ -304,7 +312,15 @@ def sim_calls(app, geojson_style):
             checklist = [dbc.Checklist(options=[{"value": 1}], value=[1], id=f"check{i}") for i in range(len(tr_list), 100)]
             return table, checklist, name
         # no file selected
-        else: return no_update, no_update, name
+        else:
+            table = dbc.Table(
+                html.Tbody(),
+                style={"marginTop": "-7px"},
+                size="sm",
+                bordered=True,
+                color="primary"
+            )
+            return table, no_update, name
 
     # checkboxes ========================================================================================================================
     @app.callback(
@@ -339,8 +355,11 @@ def sim_calls(app, geojson_style):
         # buttons
         Input("gen_btn", "n_clicks"),
         Input("show_btn", "n_clicks"),
-        # reference points
+        # data from dropdowns
         Input("ref_data", "data"),
+        Input("acc_select", "value"),
+        Input("gyr_select", "value"),
+        # checked waypoints
         Input("checked_boxes", "data")
     )
     def ref_gt_gen(
@@ -352,22 +371,28 @@ def sim_calls(app, geojson_style):
         gen_btn,
         # ref points
         show_btn,
-        name,
+        ref_data,
+        acc_data,
+        gyr_data,
         check
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         # ========= GROUND TRUTH =================================================================================================================
         if "gen_btn" in button:
-            if name:
-                ref = u.ref_checked(name, check)
-                gt = generate_gt(ref) # generating ground truth data
+            if ref_data and acc_data and gyr_data:
+                # Loading Data
+                ref = u.ref_checked(ref_data, check)
+                acc = np.loadtxt(f"assets/sensors/acc/{acc_data}.csv")
+                gyr = np.loadtxt(f"assets/sensors/gyr/{gyr_data}.csv")
+                # generating ground truth data
+                gt = generate_gt(ref, acc, gyr)
                 if gt is not None: # gt generation went well
                     # formatting and saving groundtruth
                     export_gt(gt)
                     # converting crs and making markers
                     markers = u.gt2marker(gt[:, 1:3])
                     # getting zoom lvl and center point
-                    lon, lat = u.converter(gt[:,1:3])
+                    lon, lat = u.from_32632_to_4326(gt[:,1:3])
                     zoom = u.zoom_lvl(lon, lat)     # zoom lvl
                     center = u.centroid(lon, lat)   # center
                     # making ground truth layer
@@ -377,13 +402,13 @@ def sim_calls(app, geojson_style):
             else: return gen_warn, gen_done, not sel_warn, no_update, [], no_update, no_update          # no data selected
         # ========= REF POINTS  =================================================================================================================
         elif "show_btn" in button:
-            if name:
+            if ref_data:
                 # loading data
-                data = np.loadtxt(f"assets/waypoints/{name}.csv")[:, 1:3]
+                data = np.loadtxt(f"assets/waypoints/{ref_data}.csv")[:, 1:3]
                 # converting crs and making markers
                 markers = u.ref2marker(data, check)
                 # getting zoom lvl and center point
-                lon, lat = u.converter(data)
+                lon, lat = u.from_32632_to_4326(data)
                 zoom = u.zoom_lvl(lon, lat)     # zoom lvl
                 center = u.centroid(lon, lat)   # center
                 # turning ref points into markers

@@ -362,12 +362,12 @@ def gt_canvas():
             # steps
             html.Div([
                 html.H5("Procedure", style={"color": "silver", "text-indent": "15px"}),
-                html.P("🢖 Select the data", style={"color": "gray", "marginBottom": "-5px", "text-indent": "10px"}),
-                html.P("🢖 Show Waypoints on the map", style={"color": "gray", "marginBottom": "-5px", "text-indent": "10px"}),
-                html.P("🢖 Select Waypoints you want", style={"color": "gray", "marginBottom": "-5px", "text-indent": "10px"}),
+                html.P("🢖 Select all data needed", style={"color": "gray", "marginBottom": "-5px", "text-indent": "10px"}),
+                html.P("🢖 Show Waypoints on the map, if you like", style={"color": "gray", "marginBottom": "-5px", "text-indent": "10px"}),
+                html.P("🢖 Check or uncheck Waypoints you want", style={"color": "gray", "marginBottom": "-5px", "text-indent": "10px"}),
                 html.P("🢖 Generate Ground Truth Trajectory", style={"color": "gray", "marginBottom": "3px", "text-indent": "10px"}),
                 html.P("⚠️ Please note:", style={"color": "gray", "marginBottom": "-7px"}),
-                html.P(" The first and last point is always selected.", style={"color": "gray", "text-indent": "26px"}),
+                html.P(" The first and last point are always selected.", style={"color": "gray", "text-indent": "26px"}),
             ],
             style={"border": "1px solid #E45E07", "border-radius": 10, "padding": "10px", "marginBottom": "15px", "height": "180px"}),
 
@@ -379,15 +379,38 @@ def gt_canvas():
                 ], className="g-0"),
                 style={"text-align": "center", "marginBottom": "15px"}),
                 # dropdown
+                html.Div(dbc.Row([
+                    dbc.Col(dcc.Dropdown(
+                        id="acc_select",
+                        options=[],
+                        placeholder="Accelerator",
+                        clearable=True,
+                        optionHeight=35,
+                        multi=False,
+                        searchable=True,
+                        style={"margin": "auto", "color": "black", "width": "160px"},
+                    )),
+                    dbc.Col(dcc.Dropdown(
+                        id="gyr_select",
+                        options=[],
+                        placeholder="Gyroscope",
+                        clearable=True,
+                        optionHeight=35,
+                        multi=False,
+                        searchable=True,
+                        style={"margin": "auto", "color": "black", "width": "160px"},
+                    ))
+                ], className="g-0"),
+                style={"marginBottom": "8px"}),
                 dcc.Dropdown(
                     id="ref_select",
                     options=[],
-                    placeholder="Select Data",
+                    placeholder="Waypoints",
                     clearable=True,
                     optionHeight=35,
                     multi=False,
                     searchable=True,
-                    style={"marginBottom": "15px", "color": "black"},
+                    style={"margin": "auto", "marginBottom": "15px", "color": "black", "width": "324px"},
                 ),
                 # headline
                 html.Div(html.H5("Waypoints", style={"color": "#ADB5BD", "text-align": "center"}),
@@ -502,23 +525,23 @@ def simulator_card(geojson_style):
             dcc.Upload(
                 id="ul_gyr",
                 children=html.Div(dbc.Button("G", color="primary", size="lg", outline=True, style={"width": "86px"})),
-                multiple=False,
+                multiple=True,
                 style={"marginBottom": "6px"}),
             dcc.Upload(
                 id="ul_acc",
                 children=html.Div(dbc.Button("A", color="primary", size="lg", outline=True, style={"width": "86px"})),
-                multiple=False)],
+                multiple=True)],
             style={"textAlign": "left", "marginTop": "18px", "marginBottom": "18px"})),
         dbc.Col(html.Div([  # right column
             dcc.Upload(
                 id="ul_bar",
                 children=html.Div(dbc.Button("B", color="primary", size="lg", outline=True, style={"width": "86px"})),
-                multiple=False,
+                multiple=True,
                 style={"marginBottom": "6px"}),
             dcc.Upload(
                 id="ul_mag",
                 children=html.Div(dbc.Button("M", color="primary", size="lg", outline=True, style={"width": "86px"})),
-                multiple=False)],
+                multiple=True)],
             style={"textAlign": "right", "marginTop": "18px", "marginBottom": "18px"}))],
         className="g-0"),
         style={"width": "180px"}

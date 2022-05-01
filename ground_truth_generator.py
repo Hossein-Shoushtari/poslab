@@ -418,13 +418,9 @@ def heading_thomas(acc, gyr, freq):
         
     return headings
 
-def generate_gt(ref: list):
+def generate_gt(ref: list, acc: list, gyr: list):
     try:
-        # Loading Data
-        acc = np.loadtxt("assets/sensors/acc.csv")
-        gyr = np.loadtxt("assets/sensors/gyr.csv")
-
-        # Calculation
+        # calculation
         step_timestamps, step_indexs, step_acce_max_mins = compute_steps(acc)
         headings = heading_thomas(acc, gyr, 100)
         stride_lengths = compute_stride_length(step_acce_max_mins)
