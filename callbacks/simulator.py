@@ -592,22 +592,17 @@ def sim_calls(app, geojson_style):
         ### Outputs ###
         Output("help_cv", "is_open"),    # canvas
         ### Inputs ###
-        Input("edit_control", "geojson"), # drawn data in geojson format
         State("help_cv", "is_open"),     # canvas status
         Input("help_btn", "n_clicks")    # button
     )
     def help(
-        drawn_data,
         # canvas status
         help_cv,
         # button
         help_clicks
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
-        if "help_btn" in button:
-            if drawn_data["features"]: # drawn data
-                u.export_drawn_data(drawn_data)
-            return not help_cv     # activate help offcanvas
+        if "help_btn" in button: return not help_cv     # activate help offcanvas
         else:
             u.deleter() # when page refreshes, emptying all directories
             return help_cv

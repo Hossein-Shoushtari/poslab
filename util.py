@@ -431,17 +431,17 @@ def deleter():
     """
     - emptying all uploaded or generated files before the actuall app starts
     """
-    for filename in os.listdir("assets/antennas"): os.remove(f"assets/antennas/{filename}")
-    for filename in os.listdir("assets/exports/gt"): os.remove(f"assets/exports/gt/{filename}")
-    for filename in os.listdir("assets/exports/sm"): os.remove(f"assets/exports/sm/{filename}")
-    for filename in os.listdir("assets/exports/draw"): os.remove(f"assets/exports/draw/{filename}")
-    for filename in os.listdir("assets/maps"): os.remove(f"assets/maps/{filename}")
-    for filename in os.listdir("assets/sensors/acc"): os.remove(f"assets/sensors/acc/{filename}")
-    for filename in os.listdir("assets/sensors/bar"): os.remove(f"assets/sensors/bar/{filename}")
-    for filename in os.listdir("assets/sensors/gyr"): os.remove(f"assets/sensors/gyr/{filename}")
-    for filename in os.listdir("assets/sensors/mag"): os.remove(f"assets/sensors/mag/{filename}")
-    for filename in os.listdir("assets/waypoints"): os.remove(f"assets/waypoints/{filename}")
-    for filename in os.listdir("assets/zip"): os.remove(f"assets/zip/{filename}")
+    #for filename in os.listdir("assets/antennas"): os.remove(f"assets/antennas/{filename}")
+    #for filename in os.listdir("assets/exports/gt"): os.remove(f"assets/exports/gt/{filename}")
+    #for filename in os.listdir("assets/exports/sm"): os.remove(f"assets/exports/sm/{filename}")
+    #for filename in os.listdir("assets/exports/draw"): os.remove(f"assets/exports/draw/{filename}")
+    #for filename in os.listdir("assets/maps"): os.remove(f"assets/maps/{filename}")
+    #for filename in os.listdir("assets/sensors/acc"): os.remove(f"assets/sensors/acc/{filename}")
+    #for filename in os.listdir("assets/sensors/bar"): os.remove(f"assets/sensors/bar/{filename}")
+    #for filename in os.listdir("assets/sensors/gyr"): os.remove(f"assets/sensors/gyr/{filename}")
+    #for filename in os.listdir("assets/sensors/mag"): os.remove(f"assets/sensors/mag/{filename}")
+    #for filename in os.listdir("assets/waypoints"): os.remove(f"assets/waypoints/{filename}")
+    #for filename in os.listdir("assets/zip"): os.remove(f"assets/zip/{filename}")
 
 def azimuth(point1: tuple, point2: tuple) -> float:
     '''azimuth between 2 shapely points (interval 0 - 360)'''
