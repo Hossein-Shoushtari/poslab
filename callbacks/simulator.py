@@ -116,7 +116,7 @@ def sim_calls(app, geojson_style):
         acc_contents,  # acceleration
         acc_filenames,
         bar_contents,  # barometer
-        bar_filename,
+        bar_filenames,
         mag_contents,  # magnetometer
         mag_filenames
         ): 
@@ -558,27 +558,31 @@ def sim_calls(app, geojson_style):
         # modal
         State("exp_done", "is_open"),     # done
         State("exp_warn", "is_open"),     # warn
+        # leaflet drawings
+        Input("edit_control", "geojson"),
         # button
         Input("exp_btn", "n_clicks"),     # export button click status
     )
     def export(
-        ## modal
+        # modal
         exp_done,
         exp_warn,
+        # drawings
+        drawings,
         # button
         exp_clicks
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "exp_btn" in button:
-            if len(listdir("assets/exports/gt")):
-                # if data["features"]: # drawn data
-                #     u.export_drawn_data(data)
+            if drawings["features"]: # save drawn data if so
+                u.export_drawings(drawings)
+            if len(listdir("assets/exports/gt")) or len(listdir("assets/exports/draw")):
                 # zipping
-                zip_folder = st.make_archive(f"assets/zip/gt_sm-{datetime.now().strftime('%H_%M_%S')}", 'zip', "assets/exports")
+                zip_folder = st.make_archive(f"assets/zip/L5IN_export_{datetime.now().strftime('%H_%M_%S')}", 'zip', "assets/exports")
                 # sending email with all data added
                 u.sending_email()
                 # downloading
-                download = dcc.send_file(zip_folder[-29:], filename=f"L5IN_export_{datetime.now().strftime('%H_%M_%S')}.zip")
+                download = dcc.send_file(f"assets/zip/{zip_folder[-24:]}", filename=f"L5IN_export_{datetime.now().strftime('%H_%M_%S')}.zip")
                 return not exp_done, exp_warn, download, no_update # export successful
             return exp_done, not exp_warn, no_update, no_update # export failed
         else:

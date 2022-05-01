@@ -39,11 +39,11 @@ def upload_encoder(content: str) -> str:
 
     return decoded_content
 
-def export_drawn_data(data: dict):
+def export_drawings(data: dict):
     """
     FUNCTION
     - formats received dictionary (replaces ' with ")
-    - saves formatted file as geojson file (>assets/export<)
+    - saves formatted file as geojson file (>assets/export/draw<)
     -------
     PARAMETER
     data : data to export/save
@@ -57,7 +57,7 @@ def export_drawn_data(data: dict):
     # getting the current date and time for unique filename
     name = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
     # storing data as geojson file
-    with open(f"assets/export/exportdata_{name}.geojson", "w") as file:
+    with open(f"assets/exports/draw/drawings_{name}.geojson", "w") as file:
         # formatting data-string
         data_str = str(data).replace(old, new[1])
         # ...saving
@@ -434,6 +434,7 @@ def deleter():
     for filename in os.listdir("assets/antennas"): os.remove(f"assets/antennas/{filename}")
     for filename in os.listdir("assets/exports/gt"): os.remove(f"assets/exports/gt/{filename}")
     for filename in os.listdir("assets/exports/sm"): os.remove(f"assets/exports/sm/{filename}")
+    for filename in os.listdir("assets/exports/draw"): os.remove(f"assets/exports/draw/{filename}")
     for filename in os.listdir("assets/maps"): os.remove(f"assets/maps/{filename}")
     for filename in os.listdir("assets/sensors/acc"): os.remove(f"assets/sensors/acc/{filename}")
     for filename in os.listdir("assets/sensors/bar"): os.remove(f"assets/sensors/bar/{filename}")
@@ -441,6 +442,11 @@ def deleter():
     for filename in os.listdir("assets/sensors/mag"): os.remove(f"assets/sensors/mag/{filename}")
     for filename in os.listdir("assets/waypoints"): os.remove(f"assets/waypoints/{filename}")
     for filename in os.listdir("assets/zip"): os.remove(f"assets/zip/{filename}")
+
+def azimuth(point1: tuple, point2: tuple) -> float:
+    '''azimuth between 2 shapely points (interval 0 - 360)'''
+    angle = np.arctan2(point2[0] - point1[0], point2[1] - point1[1])
+    return np.degrees(angle) if angle >= 0 else np.degrees(angle) + 360
 
 def sending_email():
     """
@@ -461,14 +467,14 @@ def sending_email():
     # zipping all dirs if not empty
     if len(os.listdir("assets/antennas")): st.make_archive(f"assets/zip/antennas-{datetime.now().strftime('%H_%M')}", 'zip', "assets/antennas")
     if len(os.listdir("assets/maps")): st.make_archive(f"assets/zip/maps-{datetime.now().strftime('%H_%M')}", 'zip', "assets/maps")
-    if len(os.listdir("assets/sensors")): st.make_archive(f"assets/zip/sensors-{datetime.now().strftime('%H_%M')}", 'zip', "assets/sensors")
+    if len(os.listdir("assets/sensors/acc")) or len(os.listdir("assets/sensors/bar")) or len(os.listdir("assets/sensors/gyr")) or len(os.listdir("assets/sensors/mag")): st.make_archive(f"assets/zip/sensors-{datetime.now().strftime('%H_%M')}", 'zip', "assets/sensors")
     if len(os.listdir("assets/waypoints")): st.make_archive(f"assets/zip/waypoints-{datetime.now().strftime('%H_%M')}", 'zip', "assets/waypoints")
     # attaching all files 
     for zip in os.listdir("assets/zip"):
         # open and read the file in binary
         with open(f"assets/zip/{zip}","rb") as file:
             # Attach the file with filename to the email
-            msg.attach(MIMEApplication(file.read(), Name=f'{zip}.zip'))
+            msg.attach(MIMEApplication(file.read(), Name=f'{zip}'))
     # creating SMTP object
     smtp_obj = smtplib.SMTP_SSL("smtp.gmail.com")
     # login to the server
