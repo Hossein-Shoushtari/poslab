@@ -3,13 +3,13 @@
 from dash import Dash, dcc, html
 import dash_bootstrap_components as dbc
 from dash_extensions.javascript import assign
-# layouts (ly)
-from home_ly import home_card
-from simulator_ly import simulator_card
-from evaluator_ly import evaluator_card
-from coming_soon_ly import coming_soon_card
-# callbacks (cb)
-from simulator_cb import sim_calls
+# layouts
+from layout.home import home_card
+from layout.simulator import simulator_card
+from layout.evaluator import evaluator_card
+from layout.coming_soon import coming_soon_card
+# callbacks
+from callbacks.simulator import sim_calls
 
 
 # Geojson rendering logic, must be JavaScript and only initialized once!

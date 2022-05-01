@@ -11,7 +11,6 @@ from datetime import datetime
 import numpy as np
 import shutil as st
 from zipfile import ZipFile
-import csv
 # utils
 import util as u
 # generators/simulators/calculators
@@ -510,16 +509,13 @@ def sim_calls(app, geojson_style):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "sim_btn" in button:
             if gt_select and err and ms_freq and net_cap and num_user and num_int:
-                #try: # simulate measurement
-                with open(f"assets/exports/gt/{gt_select}.csv", "r") as f:
-                    gt = list(csv.reader(f, delimiter=";"))[1:]
-                    gt = np.array(gt).astype(np.float)
-                simulation = simulate_positions(gt, float(err), float(ms_freq), float(net_cap), int(num_user), int(num_int), sem_err_rang, int_rang, sem_err)
-                # formatting and saving simulation data
-                export_sim(*simulation)
-                return sim_warn, not sim_done, True, no_update
-                #except: # simulation failed
-                #    return not sim_warn, sim_done, None, no_update
+                try: # simulate measurement
+                    simulation = simulate_positions(gt_select, float(err), float(ms_freq), float(net_cap), int(num_user), int(num_int), sem_err_rang, int_rang, sem_err)
+                    # formatting and saving simulation data
+                    export_sim(*simulation)
+                    return sim_warn, not sim_done, True, no_update
+                except: # simulation failed
+                    return not sim_warn, sim_done, None, no_update
             else: return not sim_warn, sim_done, None, no_update
         else: return sim_warn, sim_done, None, no_update
 

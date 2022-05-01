@@ -85,12 +85,12 @@ def simulate_positions(groundtruth, error, measurement_freq, query_freq, number_
         error_list : generated error values for every position - list of floats
         qualities_list : estimated qualities for each measurement (as limits of a error intervall) - array of floats
         """
+    # getting selected ground truth data
+    with open(f"assets/exports/gt/{groundtruth}.csv", "r") as f:
+        gt = list(csv.reader(f, delimiter=";"))[1:]
+        gt = np.array(gt).astype(np.float)
 
-    # with open(filename, newline='') as f:
-
-        # reader = csv.reader(f)
-
-    rows = groundtruth
+    rows = gt
     positions = []
     time_stamps = []
 
@@ -236,6 +236,7 @@ def simulate_positions(groundtruth, error, measurement_freq, query_freq, number_
             qualities_list.append(quality)
 
     return time_stamps, positions, error_list, qualities_list
+
 
 def export_sim(time_stamps, positions, error_list, qualities_list):
     with open(f"assets/exports/sm/simulated_measurements__{datetime.now().strftime('%H-%M-%S')}.csv", "w") as f:
