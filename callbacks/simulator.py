@@ -20,16 +20,16 @@ from coordinate_simulation import simulate_positions, export_sim
 
 
 def sim_calls(app, geojson_style):
-    # upload maps =======================================================================================================================
+    # upload maps =====================================================================================================================
     @app.callback(
         ### Outputs ###
         # modals
         Output("map_warn", "is_open"),   # map upload warn
         Output("map_done", "is_open"),   # map upload done
         # layers
-        Output("new_layers", "data"),
+        Output("map_layer", "data"),
         # storage
-        Output("z_c_ly", "data"),
+        Output("z_c_map", "data"),
         # loading
         Output("spin1", "children"),     # loading status
         ### Inputs ###
@@ -64,7 +64,7 @@ def sim_calls(app, geojson_style):
             zoom = u.zoom_lvl(lon, lat)               # zoom for latest uploaded map
             center = u.centroid(lon, lat)             # center of latest uploaded map
             # uploaded maps as converted layers
-            layers = u.upload2layer(geojson_style)
+            layers = u.map2layer(geojson_style)
             return map_warn, not map_done, layers, [zoom, center], no_update # returning uploaded layers
         # ====== no button clicked =============================================================================================================
         # this else-section is always activated, when the page refreshes -> no warnings
@@ -76,6 +76,10 @@ def sim_calls(app, geojson_style):
         # modals
         Output("ul_warn", "is_open"),    # rest upload warn
         Output("ul_done", "is_open"),    # rest upload done
+        # antenna layer
+        Output("ant_layer", "data"),
+        # storage
+        Output("z_c_ant", "data"),
         # loading
         Output("spin2", "children"),     # loading status
         ### Inputs ###
@@ -108,8 +112,8 @@ def sim_calls(app, geojson_style):
         ## upload
         way_contents,  # waypoints
         way_filenames,
-        ant_contents,  # antennas
-        ant_filenames,
+        ant_content,  # antennas
+        ant_filename,
         #--- sensors
         gyr_contents,  # gyroscope
         gyr_filenames,
@@ -129,57 +133,65 @@ def sim_calls(app, geojson_style):
                 if way_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(way_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/waypoints/{way_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update # activating modal -> warn
+                else: return not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
             # if everything went fine ...
-            return ul_warn, not ul_done, no_update
+            return ul_warn, not ul_done, no_update, no_update, no_update
         # ========== ANTENNAS ==================================================================================================================
         elif "ul_ant" in button:
-            for i in range(len(ant_filenames)):
-                if ant_filenames[i].split(".")[-1] in ["geojson", "txt", "csv"]: # assuming user uploaded right file format
-                    decoded_content = u.upload_encoder(ant_contents[i]) # decoding uploaded base64 file
-                    with open(f"assets/antennas/{ant_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update # activating modal -> warn
-            # if everything went fine ...
-            return ul_warn, not ul_done, no_update
+            if ant_filename.split(".")[-1] == "csv": # assuming user uploaded right file format
+                ant_decoded = u.upload_encoder(ant_content) # decoding uploaded base64 file
+                with open("assets/antennas/antennas.csv", "w") as file: file.write(ant_decoded) # saving file
+                # getting converted antenna coordinates
+                ant = np.loadtxt("assets/antennas/antennas.csv")[:, 1:]
+                # making layer out of markers
+                markers = u.ant2marker(ant)
+                layer = [dl.Overlay(dl.LayerGroup(markers), name="Antennas", checked=True)]
+                # zoom and center
+                ant = u.from_32632_to_4326(ant)
+                lon, lat = ant[0], ant[1]
+                zoom = u.zoom_lvl(lon, lat)
+                center = u.centroid(lon, lat)
+                return ul_warn, not ul_done, layer, [zoom, center], no_update # if everything went fine ...
+            else: return not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
         # ========== GYROSCOPE =================================================================================================================
         elif "ul_gyr" in button:
             for i in range(len(gyr_filenames)):
                 if gyr_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(gyr_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/sensors/gyr/{gyr_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update # activating modal -> warn
+                else: return not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
             # if everything went fine ...
-            return ul_warn, not ul_done, no_update
+            return ul_warn, not ul_done, no_update, no_update, no_update
         # ========= ACCELERATION  ==============================================================================================================
         elif "ul_acc" in button:
             for i in range(len(acc_filenames)):
                 if acc_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(acc_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/sensors/acc/{acc_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update # activating modal -> warn
+                else: return not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
             # if everything went fine ...
-            return ul_warn, not ul_done, no_update
+            return ul_warn, not ul_done, no_update, no_update, no_update
         # ========= BAROMETER  =================================================================================================================
         elif "ul_bar" in button:
             for i in range(len(bar_filenames)):
                 if bar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(bar_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/sensors/bar/{bar_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update # activating modal -> warn
+                else: return not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
             # if everything went fine ...
-            return ul_warn, not ul_done, no_update
+            return ul_warn, not ul_done, no_update, no_update, no_update
         # ======== MAGNETOMETER  ===============================================================================================================
         elif "ul_mag" in button:
             for i in range(len(mag_filenames)):
                 if mag_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(mag_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/sensors/mag/{mag_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update # activating modal -> warn
+                else: return not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
             # if everything went fine ...
-            return ul_warn, not ul_done, no_update  
+            return ul_warn, not ul_done, no_update, no_update, no_update  
         # ====== no button clicked =============================================================================================================
         # this else-section is always activated, when the page refreshes -> no warnings
-        else: return ul_warn, ul_done, no_update
+        else: return ul_warn, ul_done, no_update, no_update, no_update
 
     # hcu canvas ========================================================================================================================
     @app.callback(
@@ -221,19 +233,23 @@ def sim_calls(app, geojson_style):
         Output("MAP", "zoom"),           # map zoom level
         Output("hcu_panel", "style"),    # hcu info panel
         ### Inputs ###
-        Input("new_layers", "data"),     # maps
-        Input("z_c_ly", "data"),         # zoom and center for latest layer
-        Input("z_c_rp_gt", "data"),      # zoom and center for rp and gt
+        Input("map_layer", "data"),      # maps
+        Input("z_c_map", "data"),        # zoom and center for latest map
+        Input("ant_layer", "data"),      # antennas
+        Input("z_c_ant", "data"),        # zoom and center for antennas
         Input("rp_layer", "data"),       # reference points
         Input("gt_layer", "data"),       # ground truth
+        Input("z_c_rp_gt", "data"),      # zoom and center for rp and gt
         Input("unlocked", "data")        # unlocked status hcu maps
     )
     def display(
-        new_layers,
-        zoom_center_ly,
-        zoom_center_rp_gt,
+        map_layer,
+        zoom_center_map,
+        ant_layer,
+        zoom_center_ant,
         rp_layer,
         gt_layer,
+        zoom_center_rp_gt,
         unlocked
         ):
         style = {"display": "None"}
@@ -242,10 +258,14 @@ def sim_calls(app, geojson_style):
         center = (49.845359730413186, 9.90578149727622) # center of Europe
         # getting all different layers
         layers = []
-        if new_layers:
-            zoom = zoom_center_ly[0]      # zoom for latest uploaded map
-            center = zoom_center_ly[1]    # center of latest uploaded map
-            layers += new_layers          # adding newly uploaded layers to map
+        if map_layer:
+            zoom = zoom_center_map[0]      # zoom for latest uploaded map layer
+            center = zoom_center_map[1]    # center of latest uploaded map layer
+            layers += map_layer            # adding newly uploaded map layers to map
+        if ant_layer:
+            zoom = zoom_center_ant[0]      # zoom
+            center = zoom_center_ant[1]    # center
+            layers += ant_layer            # adding antenna layer to map
         if rp_layer:
             zoom = zoom_center_rp_gt[0]   # zoom
             center = zoom_center_rp_gt[1] # center
@@ -392,6 +412,7 @@ def sim_calls(app, geojson_style):
                     # converting crs and making markers
                     markers = u.gt2marker(gt[:, 1:3])
                     # getting zoom lvl and center point
+                    print(u.from_32632_to_4326(gt[:,1:3]))
                     lon, lat = u.from_32632_to_4326(gt[:,1:3])
                     zoom = u.zoom_lvl(lon, lat)     # zoom lvl
                     center = u.centroid(lon, lat)   # center
@@ -587,6 +608,7 @@ def sim_calls(app, geojson_style):
             return exp_done, not exp_warn, no_update, no_update # export failed
         else:
             return exp_done, exp_warn, no_update, no_update # no button clicked
+    
     # help canvas =======================================================================================================================
     @app.callback(
         ### Outputs ###

@@ -15,11 +15,14 @@ def storage():
     ### STORAGE
     # dcc.Store to store and share data between callbacks
     storage = html.Div([
-        # zoom lvl and center for latest new layer / rp & gt
-        dcc.Store(id="z_c_ly", data=[], storage_type="memory"),
+        # zoom lvl and center for latest map / antennas / rp & gt
+        dcc.Store(id="z_c_map", data=[], storage_type="memory"),
+        dcc.Store(id="z_c_ant", data=[], storage_type="memory"),
         dcc.Store(id="z_c_rp_gt", data=[], storage_type="memory"),
-        # new layers
-        dcc.Store(id="new_layers", data=[], storage_type="memory"),
+        # map layer
+        dcc.Store(id="map_layer", data=[], storage_type="memory"),
+        # antenna layer
+        dcc.Store(id="ant_layer", data=[], storage_type="memory"),
         # password status
         dcc.Store(id="unlocked", data=[], storage_type="memory"),
         # filename from ref dropdown
@@ -28,7 +31,7 @@ def storage():
         dcc.Store(id="checked_boxes", data=[], storage_type="memory"),
         # reference points layer
         dcc.Store(id="rp_layer", data=[], storage_type="memory"),
-        # ground truth
+        # ground truth layer
         dcc.Store(id="gt_layer", data=[], storage_type="memory"),
         # simulated measurements
         dcc.Store(id="sim_data", data=[], storage_type="memory")
@@ -40,7 +43,7 @@ def tooltips():
     tooltips = html.Div([
         dbc.Tooltip("geojson",              target="maps_upload",      placement="right"),
         dbc.Tooltip("csv",                  target="waypoints_upload", placement="right"),
-        dbc.Tooltip("txt, csv or geojson",  target="antennas_upload",  placement="right"),
+        dbc.Tooltip("csv",                  target="antennas_upload",  placement="right"),
         dbc.Tooltip("gyroscope, csv",       target="ul_gyr",           placement="top"),
         dbc.Tooltip("acceleration, csv",    target="ul_acc",           placement="bottom"),
         dbc.Tooltip("barometer, csv",       target="ul_bar",           placement="top"),
@@ -516,7 +519,7 @@ def simulator_card(geojson_style):
             id="ul_ant",
             children=html.Div(dbc.Button("Antennas", id="antennas_upload", color="info", outline=True, style={"width": "148px"})),
             style={"marginTop": "5px", "marginBottom": "8px"},
-            multiple=True)],
+            multiple=False)],
         style={"width": "150px"}
     )
     # gyroscope, acceleration, barometer and magnetometer

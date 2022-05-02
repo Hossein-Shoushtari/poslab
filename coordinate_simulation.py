@@ -5,6 +5,7 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
+import os
 # installed
 from geojson import Point
 from geopandas import GeoSeries
@@ -237,13 +238,37 @@ def simulate_positions(groundtruth, error, measurement_freq, query_freq, number_
 
     return time_stamps, positions, error_list, qualities_list
 
+def azimuth(point1: tuple, point2: tuple) -> float:
+    '''azimuth between 2 points (interval 0 - 360)'''
+    angle = np.arctan2(point2[0] - point1[0], point2[1] - point1[1])
+    return np.degrees(angle) if angle >= 0 else np.degrees(angle) + 360
 
-def export_sim(time_stamps, positions, error_list, qualities_list):
+def distance(point1: tuple, point2: tuple) -> float:
+    '''distance between 2 points'''
+    return np.sqrt((point2[0] - point1[0])**2 + (point2[1] - point1[1])**2)
+
+def export_sim(time_stamps: list, positions: list, errors: list, qualities: list):
+    ant_header = ""
+    ants = []
+    if len(os.listdir("assets/antennas")):
+        antennas = np.loadtxt("assets/antennas/antennas.csv")
+        ant = []
+        for i in range(antennas.shape[0]):
+            ant_header += f"ant{i+1}_dist;ant{i+1}_azim;"
+            ant_pos = antennas[i][1:]
+            liste = [f"{distance(ant_pos, positions[j])};{azimuth(ant_pos, positions[j])};" for j in range(len(time_stamps))]
+            ant.append(liste)
+        for i in range(len(liste)):
+            line = ""
+            for j in range(len(ant)):
+                line += ant[j][i]
+            ants.append(line)
+
     with open(f"assets/exports/sm/simulated_measurements__{datetime.now().strftime('%H-%M-%S')}.csv", "w") as f:
-        lines = [[time_stamps[i], positions[i][0],positions[i][1], error_list[i], qualities_list[i]] for i in range(len(time_stamps))]
-        output = "time stamp;x;y;error;quality\n"
+        lines = [[time_stamps[i], positions[i][0],positions[i][1], errors[i], qualities[i], ants[i]] for i in range(len(time_stamps))]
+        output = f"time stamp;x;y;error;quality;{ant_header[:-1]}\n"
         for row in lines:
-            output += f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]}\n"
+            output += f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]};{row[5]}\n"
         f.write(output)
 
 

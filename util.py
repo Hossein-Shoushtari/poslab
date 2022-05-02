@@ -145,10 +145,10 @@ def floorplan2layer(geojson_style) -> list:
 
     return layers
 
-def upload2layer(geojson_style) -> list:
+def map2layer(geojson_style) -> list:
     """
     FUNCTION
-    - makes layers out of newly uploaded geojson files
+    - makes layers out of newly uploaded map files
     -------
     PARAMETER
     geojson_style : geojson rendering logic in java script
@@ -315,7 +315,7 @@ def ref2marker(data: list, check: tuple) -> list:
         "iconSize": [10, 10],  # size of the icon
         "iconAnchor": [0, 0],  # point of the icon which will correspond to marker"s location
     }
-    # making points out of ground truth data for converting it (crs:32632 to crs:4326)
+    # making points for converting it (crs:32632 to crs:4326)
     points = {"waypoint": [i for i in range(1, data.shape[0]+1)], "geometry": [sh.Point(lat, lon) for lat, lon in data]}
     converted_points = gp.GeoDataFrame(points, crs=32632).to_crs(4326)
     # making markers only of checked points
@@ -330,6 +330,35 @@ def ref2marker(data: list, check: tuple) -> list:
                 ]
             )
             markers.append(marker)
+
+    return markers
+
+def ant2marker(ant: list) -> list:
+    """
+    FUNCTION
+    - converts lat and lon from crs32632 (reference points) to crs4326
+    - makes leaflet markers out of antenna coordinates
+    -------
+    RETURN
+    markers : list of all created markers with converted lat and lon
+    """
+    # designing icon (from https://icons8.de/icons/set/marker)
+    icon = {
+        "iconUrl": "https://img.icons8.com/ios-filled/50/000000/radio-tower.png",
+        "iconSize": [20, 20],  # size of the icon
+        "iconAnchor": [0, 0],  # point of the icon which will correspond to marker"s location
+    }    
+    # making points for converting it (crs:32632 to crs:4326)
+    points = {"antenna": [i for i in range(1, len(ant)+1)], "geometry": [sh.Point(lat, lon) for lat, lon in ant]}
+    converted_points = gp.GeoDataFrame(points, crs=32632).to_crs(4326)
+    # making markers
+    markers = []
+    for nr, row in converted_points.iterrows():
+        marker = dl.Marker(
+            position=[row[1].y, row[1].x],
+            icon=icon,
+        )
+        markers.append(marker)
 
     return markers
 
@@ -443,11 +472,6 @@ def deleter():
     for filename in os.listdir("assets/waypoints"): os.remove(f"assets/waypoints/{filename}")
     for filename in os.listdir("assets/zip"): os.remove(f"assets/zip/{filename}")
 
-def azimuth(point1: tuple, point2: tuple) -> float:
-    '''azimuth between 2 shapely points (interval 0 - 360)'''
-    angle = np.arctan2(point2[0] - point1[0], point2[1] - point1[1])
-    return np.degrees(angle) if angle >= 0 else np.degrees(angle) + 360
-
 def sending_email():
     """
     FUNCTION
@@ -473,7 +497,7 @@ def sending_email():
     for zip in os.listdir("assets/zip"):
         # open and read the file in binary
         with open(f"assets/zip/{zip}","rb") as file:
-            # Attach the file with filename to the email
+            # attach the file with filename to the email
             msg.attach(MIMEApplication(file.read(), Name=f'{zip}'))
     # creating SMTP object
     smtp_obj = smtplib.SMTP_SSL("smtp.gmail.com")
