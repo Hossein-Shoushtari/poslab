@@ -1,7 +1,7 @@
 from dash import html, dcc, Dash, Output, Input, State, no_update
 import dash_bootstrap_components as dbc
 
-def home_card():
+def home_layout():
     return dbc.Card([
         dbc.CardBody(
             [

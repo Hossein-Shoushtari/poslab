@@ -3,13 +3,16 @@
 from dash import Dash, dcc, html
 import dash_bootstrap_components as dbc
 from dash_extensions.javascript import assign
-# layouts
-from layout.home import home_card
-from layout.simulator import simulator_card
-from layout.evaluator import evaluator_card
-from layout.coming_soon import coming_soon_card
-# callbacks
-from callbacks.simulator import sim_calls
+# home
+from home.layout import home_layout
+# simulator
+from simulator.layout import sim_layout
+from simulator.callbacks import sim_calls
+# evaluator
+from evaluator.layout import eval_layout
+from evaluator.callbacks import eval_calls
+# coming soon
+from coming_soon.layout import com_layout
 
 
 # Geojson rendering logic, must be JavaScript and only initialized once!
@@ -30,13 +33,13 @@ app.title = "L5IN"
 
 ### LAYOUT ###
 ## Home page ##
-home_tab = home_card()  # getting the card content from home.py
+home_tab = home_layout()
 ## Simulator ##
-sim_tab = simulator_card(geojson_style)  # from simulator.py
+sim_tab = sim_layout(geojson_style)
 ## Evaluator ##
-ev_tab = evaluator_card()  # from evaluator.py
+ev_tab = eval_layout(geojson_style)
 ## Comming Soon ##
-cs_tab = coming_soon_card()  # from comming_soon.py    
+cs_tab = com_layout()  
 
 # putting all together
 app.layout = html.Div(
@@ -84,6 +87,7 @@ app.layout = html.Div(
 
 ### CALLBACKS ###
 sim_calls(app, geojson_style)
+eval_calls(app, geojson_style)
 
 # pushing the page to the web
 if __name__ == "__main__":

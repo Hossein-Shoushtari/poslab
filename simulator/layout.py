@@ -1,14 +1,11 @@
 ##### Simulator Tab -- Layout
 ###IMPORTS
 # dash
-from dash import html, dcc, Dash, Output, Input, State, no_update
+from dash import html, dcc
 import dash_bootstrap_components as dbc
 import dash_leaflet as dl
-from dash_extensions.javascript import arrow_function
-# built in
-from base64 import b64decode
-# utils
-import util as u
+# utils (simulator)
+import simulator.utils as su
 
 
 def storage():
@@ -41,13 +38,13 @@ def storage():
 def tooltips():
     # tooltips for more information
     tooltips = html.Div([
-        dbc.Tooltip("geojson",              target="maps_upload",      placement="right"),
+        dbc.Tooltip("geojson",              target="sim_maps_upload",  placement="right"),
         dbc.Tooltip("csv",                  target="waypoints_upload", placement="right"),
         dbc.Tooltip("csv",                  target="antennas_upload",  placement="right"),
-        dbc.Tooltip("gyroscope, csv",       target="ul_gyr",           placement="top"),
-        dbc.Tooltip("acceleration, csv",    target="ul_acc",           placement="bottom"),
-        dbc.Tooltip("barometer, csv",       target="ul_bar",           placement="top"),
-        dbc.Tooltip("magnetometer, csv",    target="ul_mag",           placement="bottom"),
+        dbc.Tooltip("gyroscope | csv",      target="sim_ul_gyr",       placement="top"),
+        dbc.Tooltip("accelerator | csv",    target="sim_ul_acc",       placement="bottom"),
+        dbc.Tooltip("barometer | csv",      target="sim_ul_bar",       placement="top"),
+        dbc.Tooltip("magnetometer | csv",   target="sim_ul_mag",       placement="bottom"),
         dbc.Tooltip("reset",                target="ss_reset",         placement="right"),
         dbc.Tooltip("settings",             target="sim_set",          placement="right")
     ])
@@ -229,8 +226,8 @@ def sim_map(geojson_style):
     ### MAP
     # info panel for hcu maps
     info = html.Div(
-        children=u.hover_info(),
-        id="hover_info",
+        children=su.hover_info(),
+        id="sim_hover_info",
         style={
             "position": "absolute",
             "top": "10px",
@@ -265,10 +262,10 @@ def sim_map(geojson_style):
     _map = html.Div(
         dl.Map(
             [   
-                html.Div(id="hcu_panel", children=info, style={"display": "None"}),
-                html.Button("🎓", id="hcu_maps", style=btn_style),
+                html.Div(id="sim_hcu_panel", children=info, style={"display": "None"}),
+                html.Button("🎓", id="sim_hcu_maps", style=btn_style),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
-                html.Div(id="layers", children=html.Div(dl.LayersControl(u.floorplan2layer(geojson_style)), style={"display": "None"})), # is previously filled with invisible floorplans for initialization
+                html.Div(id="sim_layers", children=html.Div(dl.LayersControl(su.floorplan2layer(geojson_style)), style={"display": "None"})), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
                 dl.FeatureGroup(dl.EditControl(
                                     id="edit_control",
@@ -276,7 +273,7 @@ def sim_map(geojson_style):
                                     position="topleft")),
             ],
             style={"width": "100%", "height": "70vh", "margin": "auto", "display": "block"},
-            id="MAP"
+            id="sim_map"
         )
     )
     return _map
@@ -332,7 +329,7 @@ def help_canvas():
                         dbc.Col(html.P("Accepts float values.", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Semantic Error:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
+                        dbc.Col(html.Div(html.P("Semantic Error", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
                         dbc.Col(html.P("Check or uncheck.", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
@@ -351,7 +348,7 @@ def help_canvas():
                     html.P("Changing tabs will automatically update the names.", style={"color": "gray", "marginTop": "-10px"})],
                 style={"border":"1px solid red", "border-radius": 10, "padding": "10px", "marginBottom": "0px"})
             ],
-        id="help_cv",
+        id="sim_help_cv",
         scrollable=True,
         title="Help",
         is_open=False)
@@ -496,18 +493,18 @@ def sim_set_canvas():
     return sim_set_canvas
 
 
-def simulator_card(geojson_style):
+def sim_layout(geojson_style):
 
     ### DOWNLOAD
-    export = dcc.Download(id="export")
+    export = dcc.Download(id="sim_export")
 
     ### UPLOAD
     ## Buttons
     # maps and waypoints
     ul_buttons1 = html.Div([
         dcc.Upload(
-            id="ul_map",
-            children=html.Div(dbc.Button("Maps", id="maps_upload", color="info", outline=True, style={"width": "148px"})),
+            id="sim_ul_map",
+            children=html.Div(dbc.Button("Maps", id="sim_maps_upload", color="info", outline=True, style={"width": "148px"})),
             style={"marginTop": "8px", "marginBottom": "5px"},
             multiple=True),
         dcc.Upload(
@@ -526,23 +523,23 @@ def simulator_card(geojson_style):
     ul_buttons2 = html.Div(dbc.Row([
         dbc.Col(html.Div([  # left column
             dcc.Upload(
-                id="ul_gyr",
+                id="sim_ul_gyr",
                 children=html.Div(dbc.Button("G", color="primary", size="lg", outline=True, style={"width": "86px"})),
                 multiple=True,
                 style={"marginBottom": "6px"}),
             dcc.Upload(
-                id="ul_acc",
+                id="sim_ul_acc",
                 children=html.Div(dbc.Button("A", color="primary", size="lg", outline=True, style={"width": "86px"})),
                 multiple=True)],
             style={"textAlign": "left", "marginTop": "18px", "marginBottom": "18px"})),
         dbc.Col(html.Div([  # right column
             dcc.Upload(
-                id="ul_bar",
+                id="sim_ul_bar",
                 children=html.Div(dbc.Button("B", color="primary", size="lg", outline=True, style={"width": "86px"})),
                 multiple=True,
                 style={"marginBottom": "6px"}),
             dcc.Upload(
-                id="ul_mag",
+                id="sim_ul_mag",
                 children=html.Div(dbc.Button("M", color="primary", size="lg", outline=True, style={"width": "86px"})),
                 multiple=True)],
             style={"textAlign": "right", "marginTop": "18px", "marginBottom": "18px"}))],
@@ -575,13 +572,13 @@ def simulator_card(geojson_style):
     first_row = html.Div([dbc.Row(
         [
             dbc.Col(html.Div([
-                    html.H5("Upload", style=H5_style),
-                    html.Hr(style=hr_style),
-                    dbc.Row([
-                        dbc.Col(html.Div(html.Div(ul_buttons1), style={"marginLeft": "40px"})),
-                        dbc.Col(html.Div(html.Div(ul_buttons2)))],
-                    className="g-0")],
-                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "marginBottom": "4px"})),
+                html.H5("Upload", style=H5_style),
+                html.Hr(style=hr_style),
+                dbc.Row([
+                    dbc.Col(html.Div(html.Div(ul_buttons1), style={"marginLeft": "40px"})),
+                    dbc.Col(html.Div(html.Div(ul_buttons2)))],
+                className="g-0")],
+            style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "marginBottom": "4px"})),
 
             dbc.Col(html.Div([
                 html.Div(
@@ -631,7 +628,7 @@ def simulator_card(geojson_style):
                                     dbc.Label("Error", style={"color": "gray"})]),
                                 html.Div(
                                     [
-                                        html.Div(html.P("Semantic Error:"),
+                                        html.Div(html.P("Semantic Error"),
                                             style={"width": "118px", "height": "29px", "text-align": "center"}),
                                         html.Div(dbc.Checklist(options=[{"value": 1}], value=[1], id="sem_err", style={"marginLeft": "50px"}),
                                             style={"width": "118px", "height": "29px" }
@@ -670,7 +667,7 @@ def simulator_card(geojson_style):
                                     className="position-relative",
                                     outline=True,
                                     style={"width": "150px"},
-                                    id="exp_btn",
+                                    id="sim_exp_btn",
                                 )
                             ],
                             style={"textAlign": "center", "marginTop": "10px"}
@@ -679,7 +676,7 @@ def simulator_card(geojson_style):
                     style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "100px", "width": "435px"}
                 ),
                 html.Div([
-                    html.Div(dbc.Button("Help", id="help_btn", color="warning", outline=False, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "19px"})],
+                    html.Div(dbc.Button("Help", id="sim_help_btn", color="warning", outline=False, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "19px"})],
                 style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "76px", "width": "435px", "marginTop": "4px", "marginBottom": "4px"})]))
         ],
         className="g-0")

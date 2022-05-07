@@ -11,11 +11,12 @@ from datetime import datetime
 import numpy as np
 import shutil as st
 from zipfile import ZipFile
-# utils
-import util as u
-# generators/simulators/calculators
-from ground_truth_generator import generate_gt, export_gt
-from coordinate_simulation import simulate_positions, export_sim
+# utils (general & simulator)
+import utils as u
+import simulator.utils as su
+# simulation & ground truth
+from simulator.ground_truth import generate_gt, export_gt
+from simulator.simulation import simulate_positions, export_sim
 
 
 
@@ -37,8 +38,8 @@ def sim_calls(app, geojson_style):
         State("map_warn", "is_open"),
         State("map_done", "is_open"),
         # maps
-        Input("ul_map", "contents"),
-        State("ul_map", "filename"),
+        Input("sim_ul_map", "contents"),
+        State("sim_ul_map", "filename"),
     )
     def upload(
         ## modal
@@ -52,7 +53,7 @@ def sim_calls(app, geojson_style):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         # UPLOAD
         #============= MAP =====================================================================================================================
-        if "ul_map" in button:
+        if "sim_ul_map" in button:
             file_check = [name.split(".")[-1] for name in map_filenames if name.split(".")[-1] not in ["geojson"]] # getting all wrong file formats
             if len(file_check) > 0: return not map_warn, map_done, no_update, no_update, no_update # activating modal -> warn
             for i in range(len(map_filenames)): # only right files were uploaded
@@ -60,11 +61,11 @@ def sim_calls(app, geojson_style):
                 gp_file = gp.read_file(decoded_content)
                 converted = gp.GeoDataFrame(gp_file, crs=gp_file.crs).to_crs(4326) # converting crs from uploaded file to WGS84
                 converted.to_file(f"assets/maps/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
-            lon, lat = u.exctract_coordinates(gp_file)
+            lon, lat = su.exctract_coordinates(gp_file)
             zoom = u.zoom_lvl(lon, lat)               # zoom for latest uploaded map
             center = u.centroid(lon, lat)             # center of latest uploaded map
             # uploaded maps as converted layers
-            layers = u.map2layer(geojson_style)
+            layers = su.map2layer(geojson_style)
             return map_warn, not map_done, layers, [zoom, center], no_update # returning uploaded layers
         # ====== no button clicked =============================================================================================================
         # this else-section is always activated, when the page refreshes -> no warnings
@@ -93,17 +94,17 @@ def sim_calls(app, geojson_style):
         Input("ul_ant", "contents"),
         State("ul_ant", "filename"),
         # gyroscope
-        Input("ul_gyr", "contents"),
-        State("ul_gyr", "filename"),
+        Input("sim_ul_gyr", "contents"),
+        State("sim_ul_gyr", "filename"),
         # acceleration
-        Input("ul_acc", "contents"),
-        State("ul_acc", "filename"),
+        Input("sim_ul_acc", "contents"),
+        State("sim_ul_acc", "filename"),
         # barometer
-        Input("ul_bar", "contents"),
-        State("ul_bar", "filename"),
+        Input("sim_ul_bar", "contents"),
+        State("sim_ul_bar", "filename"),
         # magnetometer
-        Input("ul_mag", "contents"),
-        State("ul_mag", "filename")
+        Input("sim_ul_mag", "contents"),
+        State("sim_ul_mag", "filename")
     )
     def upload(
         ## modals
@@ -144,17 +145,17 @@ def sim_calls(app, geojson_style):
                 # getting converted antenna coordinates
                 ant = np.loadtxt("assets/antennas/antennas.csv")[:, 1:]
                 # making layer out of markers
-                markers = u.ant2marker(ant)
+                markers = su.ant2marker(ant)
                 layer = [dl.Overlay(dl.LayerGroup(markers), name="Antennas", checked=True)]
                 # zoom and center
-                ant = u.from_32632_to_4326(ant)
+                ant = su.from_32632_to_4326(ant)
                 lon, lat = ant[0], ant[1]
                 zoom = u.zoom_lvl(lon, lat)
                 center = u.centroid(lon, lat)
                 return ul_warn, not ul_done, layer, [zoom, center], no_update # if everything went fine ...
             else: return not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
         # ========== GYROSCOPE =================================================================================================================
-        elif "ul_gyr" in button:
+        elif "sim_ul_gyr" in button:
             for i in range(len(gyr_filenames)):
                 if gyr_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(gyr_contents[i]) # decoding uploaded base64 file
@@ -163,7 +164,7 @@ def sim_calls(app, geojson_style):
             # if everything went fine ...
             return ul_warn, not ul_done, no_update, no_update, no_update
         # ========= ACCELERATION  ==============================================================================================================
-        elif "ul_acc" in button:
+        elif "sim_ul_acc" in button:
             for i in range(len(acc_filenames)):
                 if acc_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(acc_contents[i]) # decoding uploaded base64 file
@@ -172,7 +173,7 @@ def sim_calls(app, geojson_style):
             # if everything went fine ...
             return ul_warn, not ul_done, no_update, no_update, no_update
         # ========= BAROMETER  =================================================================================================================
-        elif "ul_bar" in button:
+        elif "sim_ul_bar" in button:
             for i in range(len(bar_filenames)):
                 if bar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(bar_contents[i]) # decoding uploaded base64 file
@@ -181,7 +182,7 @@ def sim_calls(app, geojson_style):
             # if everything went fine ...
             return ul_warn, not ul_done, no_update, no_update, no_update
         # ======== MAGNETOMETER  ===============================================================================================================
-        elif "ul_mag" in button:
+        elif "sim_ul_mag" in button:
             for i in range(len(mag_filenames)):
                 if mag_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(mag_contents[i]) # decoding uploaded base64 file
@@ -196,12 +197,12 @@ def sim_calls(app, geojson_style):
     # hcu canvas ========================================================================================================================
     @app.callback(
         Output("research", "is_open"),
-        Input("hcu_maps", "n_clicks"),
+        Input("sim_hcu_maps", "n_clicks"),
         State("research", "is_open")
     )
     def hcu(hcu_maps, is_open):
         button = [p["prop_id"] for p in callback_context.triggered][0]
-        if "hcu_maps" in button:
+        if "sim_hcu_maps" in button:
             return not is_open
         return is_open
 
@@ -228,10 +229,10 @@ def sim_calls(app, geojson_style):
     # map display =======================================================================================================================
     @app.callback(
         ### Outputs ###
-        Output("layers", "children"),    # layers
-        Output("MAP", "center"),         # map center
-        Output("MAP", "zoom"),           # map zoom level
-        Output("hcu_panel", "style"),    # hcu info panel
+        Output("sim_layers", "children"),  # layers
+        Output("sim_map", "center"),       # map center
+        Output("sim_map", "zoom"),         # map zoom level
+        Output("sim_hcu_panel", "style"),  # hcu info panel
         ### Inputs ###
         Input("map_layer", "data"),      # maps
         Input("z_c_map", "data"),        # zoom and center for latest map
@@ -277,7 +278,7 @@ def sim_calls(app, geojson_style):
         if unlocked:
             zoom = 19
             center = (53.540239664876104, 10.004663417352164) # HCU coordinates
-            layers += u.floorplan2layer(geojson_style)          # adding hcu floorplans to map
+            layers += su.floorplan2layer(geojson_style)          # adding hcu floorplans to map
             style = {"display": "block"}                      # displaying info panel
         if layers: return html.Div(dl.LayersControl(layers)), center, zoom, style
         else: return html.Div(style={"display": "None"}), center, zoom, style
@@ -401,7 +402,7 @@ def sim_calls(app, geojson_style):
         if "gen_btn" in button:
             if ref_data and acc_data and gyr_data:
                 # Loading Data
-                ref = u.ref_checked(ref_data, check)
+                ref = su.ref_checked(ref_data, check)
                 acc = np.loadtxt(f"assets/sensors/acc/{acc_data}.csv")
                 gyr = np.loadtxt(f"assets/sensors/gyr/{gyr_data}.csv")
                 # generating ground truth data
@@ -410,10 +411,9 @@ def sim_calls(app, geojson_style):
                     # formatting and saving groundtruth
                     export_gt(gt)
                     # converting crs and making markers
-                    markers = u.gt2marker(gt[:, 1:3])
+                    markers = su.gt2marker(gt[:, 1:3])
                     # getting zoom lvl and center point
-                    print(u.from_32632_to_4326(gt[:,1:3]))
-                    lon, lat = u.from_32632_to_4326(gt[:,1:3])
+                    lon, lat = su.from_32632_to_4326(gt[:,1:3])
                     zoom = u.zoom_lvl(lon, lat)     # zoom lvl
                     center = u.centroid(lon, lat)   # center
                     # making ground truth layer
@@ -427,9 +427,9 @@ def sim_calls(app, geojson_style):
                 # loading data
                 data = np.loadtxt(f"assets/waypoints/{ref_data}.csv")[:, 1:3]
                 # converting crs and making markers
-                markers = u.ref2marker(data, check)
+                markers = su.ref2marker(data, check)
                 # getting zoom lvl and center point
-                lon, lat = u.from_32632_to_4326(data)
+                lon, lat = su.from_32632_to_4326(data)
                 zoom = u.zoom_lvl(lon, lat)     # zoom lvl
                 center = u.centroid(lon, lat)   # center
                 # turning ref points into markers
@@ -572,7 +572,7 @@ def sim_calls(app, geojson_style):
         Output("exp_done", "is_open"),    # export done status
         Output("exp_warn", "is_open"),    # export warn status
         # download
-        Output("export", "data"),         # export data
+        Output("sim_export", "data"),         # export data
         # loading (invisible div)
         Output("spin5", "children"),      # loading status
         ### Inputs ###
@@ -582,7 +582,7 @@ def sim_calls(app, geojson_style):
         # leaflet drawings
         Input("edit_control", "geojson"),
         # button
-        Input("exp_btn", "n_clicks"),     # export button click status
+        Input("sim_exp_btn", "n_clicks"),     # export button click status
     )
     def export(
         # modal
@@ -594,9 +594,9 @@ def sim_calls(app, geojson_style):
         exp_clicks
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
-        if "exp_btn" in button:
+        if "sim_exp_btn" in button:
             if drawings["features"]: # save drawn data if so
-                u.export_drawings(drawings)
+                su.export_drawings(drawings)
             if len(listdir("assets/exports/gt")) or len(listdir("assets/exports/draw")):
                 # zipping
                 zip_folder = st.make_archive(f"assets/zip/L5IN_export_{datetime.now().strftime('%H_%M_%S')}", 'zip', "assets/exports")
@@ -612,27 +612,27 @@ def sim_calls(app, geojson_style):
     # help canvas =======================================================================================================================
     @app.callback(
         ### Outputs ###
-        Output("help_cv", "is_open"),    # canvas
+        Output("sim_help_cv", "is_open"),    # canvas
         ### Inputs ###
-        State("help_cv", "is_open"),     # canvas status
-        Input("help_btn", "n_clicks")    # button
+        State("sim_help_cv", "is_open"),     # canvas status
+        Input("sim_help_btn", "n_clicks")    # button
     )
     def help(
         # canvas status
-        help_cv,
+        sim_help_cv,
         # button
         help_clicks
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
-        if "help_btn" in button: return not help_cv     # activate help offcanvas
+        if "sim_help_btn" in button: return not sim_help_cv     # activate help offcanvas
         else:
             u.deleter() # when page refreshes, emptying all directories
-            return help_cv
+            return sim_help_cv
 
     # hovering tooltips in hcu floorplans ===============================================================================================
     @app.callback(
         ### Outputs ###
-        Output("hover_info", "children"),  # info panel
+        Output("sim_hover_info", "children"),  # info panel
         ### Inputs ###
         Input("EG", "hover_feature"),      # EG
         Input("1OG", "hover_feature"),     # 1OG
@@ -642,8 +642,8 @@ def sim_calls(app, geojson_style):
         # geojson info of all three layers
         feature_eg, feature_1og, feature_4og
         ):
-        if feature_eg: return u.hover_info(feature_eg)       # if EG is clicked
-        elif feature_1og: return u.hover_info(feature_1og)   # if 1OG is clicked
-        elif feature_4og: return u.hover_info(feature_4og)   # if 4OGG is clicked
-        else: return u.hover_info()                          # if nothing is clicked
+        if feature_eg: return su.hover_info(feature_eg)       # if EG is clicked
+        elif feature_1og: return su.hover_info(feature_1og)   # if 1OG is clicked
+        elif feature_4og: return su.hover_info(feature_4og)   # if 4OGG is clicked
+        else: return su.hover_info()                          # if nothing is clicked
 
