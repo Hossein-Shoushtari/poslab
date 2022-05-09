@@ -66,22 +66,6 @@ def sending_email():
     smtp_obj.sendmail(msg['From'], msg['To'], msg.as_string())
     smtp_obj.quit()
 
-def deleter():
-    """
-    - emptying all uploaded or generated files before the actuall app starts
-    """
-    for filename in os.listdir("assets/antennas"): os.remove(f"assets/antennas/{filename}")
-    for filename in os.listdir("assets/exports/gt"): os.remove(f"assets/exports/gt/{filename}")
-    for filename in os.listdir("assets/exports/sm"): os.remove(f"assets/exports/sm/{filename}")
-    for filename in os.listdir("assets/exports/draw"): os.remove(f"assets/exports/draw/{filename}")
-    for filename in os.listdir("assets/maps"): os.remove(f"assets/maps/{filename}")
-    for filename in os.listdir("assets/sensors/acc"): os.remove(f"assets/sensors/acc/{filename}")
-    for filename in os.listdir("assets/sensors/bar"): os.remove(f"assets/sensors/bar/{filename}")
-    for filename in os.listdir("assets/sensors/gyr"): os.remove(f"assets/sensors/gyr/{filename}")
-    for filename in os.listdir("assets/sensors/mag"): os.remove(f"assets/sensors/mag/{filename}")
-    for filename in os.listdir("assets/waypoints"): os.remove(f"assets/waypoints/{filename}")
-    for filename in os.listdir("assets/zip"): os.remove(f"assets/zip/{filename}")
-
 def centroid(lon_raw: list, lat_raw: list) -> tuple:
     """
     FUNCTION
@@ -133,16 +117,36 @@ def zoom_lvl(lon_raw: list, lat_raw: list) -> int:
     if zoom > 1: zoom -= 1          # always subtract 1 to make sure everything fits safely
     return zoom
 
+def deleter():
+    """
+    - emptying all uploaded or generated files before the actuall app starts
+    """
+    for filename in os.listdir("assets/antennas"): os.remove(f"assets/antennas/{filename}")
+    for filename in os.listdir("assets/exports/gt"): os.remove(f"assets/exports/gt/{filename}")
+    for filename in os.listdir("assets/exports/sm"): os.remove(f"assets/exports/sm/{filename}")
+    for filename in os.listdir("assets/exports/draw"): os.remove(f"assets/exports/draw/{filename}")
+    for filename in os.listdir("assets/groundtruth"): os.remove(f"assets/groundtruth/{filename}")
+    for filename in os.listdir("assets/maps"): os.remove(f"assets/maps/{filename}")
+    for filename in os.listdir("assets/sensors/acc"): os.remove(f"assets/sensors/acc/{filename}")
+    for filename in os.listdir("assets/sensors/bar"): os.remove(f"assets/sensors/bar/{filename}")
+    for filename in os.listdir("assets/sensors/gyr"): os.remove(f"assets/sensors/gyr/{filename}")
+    for filename in os.listdir("assets/sensors/mag"): os.remove(f"assets/sensors/mag/{filename}")
+    for filename in os.listdir("assets/trajectories"): os.remove(f"assets/trajectories/{filename}")
+    for filename in os.listdir("assets/waypoints"): os.remove(f"assets/waypoints/{filename}")
+    for filename in os.listdir("assets/zip"): os.remove(f"assets/zip/{filename}")
+
 def dummy():
     with open("assets/antennas/dummy", "w") as f: f.write("")
     with open("assets/exports/gt/dummy", "w") as f: f.write("")
     with open("assets/exports/sm/dummy", "w") as f: f.write("")
     with open("assets/exports/draw/dummy", "w") as f: f.write("")
     with open("assets/maps/dummy", "w") as f: f.write("")
+    with open("assets/groundtruth/dummy", "w") as f: f.write("")
     with open("assets/sensors/acc/dummy", "w") as f: f.write("")
     with open("assets/sensors/bar/dummy", "w") as f: f.write("")
     with open("assets/sensors/gyr/dummy", "w") as f: f.write("")
     with open("assets/sensors/mag/dummy", "w") as f: f.write("")
+    with open("assets/trajectories/dummy", "w") as f: f.write("")
     with open("assets/waypoints/dummy", "w") as f: f.write("")
     with open("assets/zip/dummy", "w") as f: f.write("")
 

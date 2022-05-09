@@ -1,4 +1,4 @@
-##### Simulator Tab -- Layout
+##### Evaluator Tab -- Layout
 ###IMPORTS
 # dash
 from dash import html, dcc
@@ -21,6 +21,148 @@ def tooltips():
         dbc.Tooltip("magnetometer | csv",   target="eval_ul_mag",        placement="bottom")
     ])
     return tooltips
+
+def spinners():
+    ### SPINNERs
+    spin1 = dbc.Spinner(
+        children=[html.Div(id="eval_spin1", style={"display": "none"})],
+        type=None,
+        fullscreen=True,
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
+        spinnerClassName="spinner"
+    )
+    spin2 = dbc.Spinner(
+        children=[html.Div(id="eval_spin2", style={"display": "none"})],
+        type=None,
+        fullscreen=True,
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
+        spinnerClassName="spinner"
+    )
+    spin3 = dbc.Spinner(
+        children=[html.Div(id="eval_spin3", style={"display": "none"})],
+        type=None,
+        fullscreen=True,
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
+        spinnerClassName="spinner"
+    )
+    spin4 = dbc.Spinner(
+        children=[html.Div(id="eval_spin4", style={"display": "none"})],
+        type=None,
+        fullscreen=True,
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
+        spinnerClassName="spinner"
+    )
+    spin5 = dbc.Spinner(
+        children=[html.Div(id="eval_spin5", style={"display": "none"})],
+        type=None,
+        fullscreen=True,
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
+        spinnerClassName="spinner"
+    )
+    return html.Div([spin1, spin2, spin3, spin4, spin5])
+
+def modals():
+    ### MODALs
+    # upload warning
+    ul_warn = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("WARNING")),
+        dbc.ModalBody("At least one wrong file was meant to be uploaded! Upload denied.")],
+        id="eval_ul_warn",
+        is_open=False
+    )
+    # upload done
+    ul_done = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalBody("File(s) uploaded successfully!")],
+        id="eval_ul_done",
+        is_open=False
+    )
+    # cdf warning
+    cdf_warn = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
+        dbc.ModalBody("Select data first!")],
+        id="cdf_warn",
+        is_open=False
+    )
+    # cdf done
+    cdf_done = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalBody("Calculation successful! The graph can be viewed by clicking Visual..")],
+        id="cdf_done",
+        is_open=False
+    )
+    # cdf - select trajectory
+    cdf_modal = dbc.Modal(
+        [
+            dbc.ModalHeader(dbc.ModalTitle("CDF")),
+            dbc.ModalBody(
+                html.Div(
+                    [
+                        dbc.Label("Ground Truth"),
+                        dcc.Dropdown(
+                            id="eval_gt_select",
+                            options=[],
+                            placeholder="Select Data",
+                            clearable=True,
+                            optionHeight=35,
+                            multi=False,
+                            searchable=True,
+                            style={"marginBottom": "15px", "color": "black"}
+                        ),
+                        dbc.Label("Trajectory"),
+                        dcc.Dropdown(
+                            id="traj_select",
+                            options=[],
+                            placeholder="Select Data",
+                            clearable=True,
+                            optionHeight=35,
+                            multi=False,
+                            searchable=True,
+                            style={"marginBottom": "15px", "color": "black"}
+                        ),
+                        dbc.Label("MAP | optional (calculates percentage of points-in-polygon)"),
+                        dcc.Dropdown(
+                            id="map_select",
+                            options=[],
+                            placeholder="Select Data",
+                            clearable=True,
+                            optionHeight=35,
+                            multi=False,
+                            searchable=True,
+                            style={"marginBottom": "15px", "color": "black"}
+                        )
+                    ]
+                )
+            ),
+            dbc.ModalFooter(
+                dbc.Button("CDF", color="primary", id="cdf_btn")
+            )
+        ],
+        id="cdf_modal",
+        backdrop="static",
+        is_open=False,
+    )
+    graph_modal = dbc.Modal(
+        [
+            dbc.ModalHeader(dbc.ModalTitle("CDF Plot")),
+            dbc.ModalBody(
+                dcc.Graph(figure={}, config={
+                    'staticPlot': False,     # True, False
+                    'scrollZoom': True,      # True, False
+                    'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
+                    'showTips': True,        # True, False
+                    'displayModeBar': True,  # True, False, 'hover'
+                    'watermark': True
+                    },
+                    id="graph",
+                    className="six columns")
+                )
+        ],
+        id="visual_modal",
+        size="xl",
+        is_open=False
+    )
+    return html.Div([ul_warn, ul_done, cdf_warn, cdf_done, cdf_modal, graph_modal])
 
 def eval_map(geojson_style):
     ### MAP
@@ -69,6 +211,8 @@ def eval_map(geojson_style):
                 dl.FullscreenControl(), # possibility to get map fullscreen
             ],
             style={"width": "100%", "height": "70vh", "margin": "auto", "display": "block"},
+            center=(49.845359730413186, 9.90578149727622),
+            zoom=4,
             id="eval_map"
         )
     )
@@ -79,70 +223,8 @@ def help_canvas():
     # HELP
     help_canvas = html.Div([
         dbc.Offcanvas(
-            [   
-                html.Div([
-                    # info upload
-                    html.H5("UPLOAD", style={"text-align": "center", "color": "#3B5A7F"}),
-                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
-                    html.P("All 7 buttons are for uploading the data required for the simulation.", style={"color": "gray"}),
-                    dbc.Row([
-                        dbc.Col(html.Div(html.P("Maps:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                        dbc.Col(html.P("Only GeoJSON files of any type are accepted.", style={"color": "gray"}))
-                    ], className="g-0"),
-                    dbc.Row([
-                        dbc.Col(html.Div(html.P("Waypoints:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                        dbc.Col(html.P("Only CSV files are accepted.", style={"color": "gray"}))
-                    ], className="g-0"),
-                    dbc.Row([
-                        dbc.Col(html.Div(html.P("Antennas:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                        dbc.Col(html.P("Only TXT, CSV or GeoJSON files are accepted.", style={"color": "gray"}))
-                    ], className="g-0"),
-                    dbc.Row([
-                        dbc.Col(html.Div(html.P("Sensors:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                        dbc.Col(html.P("Only CSV files are accepted.", style={"color": "gray"}))
-                    ], className="g-0")],
-                style={"border":"1px solid #3B5A7F", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
-                html.Br(),
-                html.Div([
-                    # info simulation
-                    html.H5("SIMULATION", style={"text-align": "center", "color": "silver"}),
-                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
-                    html.P("Instructions for simulating measurements:", style={"color": "gray"}),
-                    dbc.Row([
-                        dbc.Col(html.Div(html.P("Ground Truth:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
-                        dbc.Col(html.P("Select data and generate a ground truth trajectory. Note: acc and gyr data is needed!", style={"color": "gray"}))
-                    ], className="g-0"),
-                    dbc.Row([
-                        dbc.Col(html.Div(html.P("⚙", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
-                        dbc.Col(html.P("Change presets to customize the simulation.", style={"color": "gray"}))
-                    ], className="g-0"),
-                    dbc.Row([
-                        dbc.Col(html.Div(html.P("Frequency:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
-                        dbc.Col(html.P("Accepts float values.", style={"color": "gray"}))
-                    ], className="g-0"),
-                    dbc.Row([
-                        dbc.Col(html.Div(html.P("Error:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
-                        dbc.Col(html.P("Accepts float values.", style={"color": "gray"}))
-                    ], className="g-0"),
-                    dbc.Row([
-                        dbc.Col(html.Div(html.P("Semantic Error", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
-                        dbc.Col(html.P("Check or uncheck.", style={"color": "gray"}))
-                    ], className="g-0"),
-                    dbc.Row([
-                        dbc.Col(html.Div(html.P("Sim. Measm.:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
-                        dbc.Col(html.P("Simulate the measurements to complete the calculation.", style={"color": "gray"}))
-                    ], className="g-0"),
-                    html.Div(html.P("The ground truth trajectory and the simulated measurements can now be downloaded as two separate CSV files!", style={"color": "gray"}),
-                    style={"borderLeft": "2px solid #36BD8E", "paddingLeft": "5px"})],
-                style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
-                html.Br(),
-                html.Div([
-                    # bug info upload
-                    html.H5("🐞", style={"text-align": "center"}),
-                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
-                    html.P("After uploading new layers sometimes the layer names in the layer control as well as some tooltips are messed up.", style={"color": "gray"}),
-                    html.P("Changing tabs will automatically update the names.", style={"color": "gray", "marginTop": "-10px"})],
-                style={"border":"1px solid red", "border-radius": 10, "padding": "10px", "marginBottom": "0px"})
+            [
+                html.Div()
             ],
         id="eval_help_cv",
         scrollable=True,
@@ -152,7 +234,6 @@ def help_canvas():
     return help_canvas
 
 def eval_layout(geojson_style):
-
     ### DOWNLOAD
     export = dcc.Download(id="eval_export")
 
@@ -183,10 +264,10 @@ def eval_layout(geojson_style):
             style={"marginTop": "5px", "marginBottom": "5px"},
             multiple=True),
         dcc.Upload(
-            id="ul_traj",
+            id="ul_tra",
             children=html.Div(dbc.Button("Trajectory", id="trajectory_upload", color="info", outline=True, style={"width": "148px"})),
             style={"marginTop": "5px", "marginBottom": "8px"},
-            multiple=False)],
+            multiple=True)],
         style={"width": "150px"}
     )
     # gyroscope, acceleration, barometer and magnetometer
@@ -257,7 +338,7 @@ def eval_layout(geojson_style):
                     [
                         dbc.Col(html.Div(dbc.Button(
                                 "CDF",
-                                id="cdf_btn",
+                                id="open_cdf",
                                 color="light",
                                 outline=False,
                                 style={"line-height": "1.5", "height": "124px", "width": "70px", "padding": "0px"}),
@@ -368,6 +449,8 @@ def eval_layout(geojson_style):
                 [
                     # download
                     export,
+                    # modals
+                    modals(),
                     # canvas
                     help_canvas(),
                     # card content
@@ -378,6 +461,8 @@ def eval_layout(geojson_style):
                             dbc.Row(eval_map(geojson_style))
                         ]
                     ),
+                    # spinners
+                    spinners(),
                     # tooltips
                     tooltips()
                 ]

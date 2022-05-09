@@ -53,35 +53,35 @@ def tooltips():
 def spinners():
     ### SPINNERs
     spin1 = dbc.Spinner(
-        children=[html.Div(id="spin1", style={"display": "none"})],
+        children=[html.Div(id="sim_spin1", style={"display": "none"})],
         type=None,
         fullscreen=True,
         fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
         spinnerClassName="spinner"
     )
     spin2 = dbc.Spinner(
-        children=[html.Div(id="spin2", style={"display": "none"})],
+        children=[html.Div(id="sim_spin2", style={"display": "none"})],
         type=None,
         fullscreen=True,
         fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
         spinnerClassName="spinner"
     )
     spin3 = dbc.Spinner(
-        children=[html.Div(id="spin3", style={"display": "none"})],
+        children=[html.Div(id="sim_spin3", style={"display": "none"})],
         type=None,
         fullscreen=True,
         fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
         spinnerClassName="spinner"
     )
     spin4 = dbc.Spinner(
-        children=[html.Div(id="spin4", style={"display": "none"})],
+        children=[html.Div(id="sim_spin4", style={"display": "none"})],
         type=None,
         fullscreen=True,
         fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
         spinnerClassName="spinner"
     )
     spin5 = dbc.Spinner(
-        children=[html.Div(id="spin5", style={"display": "none"})],
+        children=[html.Div(id="sim_spin5", style={"display": "none"})],
         type=None,
         fullscreen=True,
         fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
@@ -95,28 +95,28 @@ def modals():
     ul_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("WARNING")),
         dbc.ModalBody("At least one wrong file was meant to be uploaded! Upload denied.")],
-        id="ul_warn",
+        id="sim_ul_warn",
         is_open=False
     )
     # upload done
     ul_done = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("DONE")),
         dbc.ModalBody("File(s) uploaded successfully!")],
-        id="ul_done",
+        id="sim_ul_done",
         is_open=False
     )
     # map warning
     map_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("WARNING")),
         dbc.ModalBody("At least one wrong file was meant to be uploaded! Upload denied.")],
-        id="map_warn",
+        id="sim_map_warn",
         is_open=False
     )
     # map done
     map_done = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("DONE")),
         dbc.ModalBody("File(s) uploaded and layered successfully!")],
-        id="map_done",
+        id="sim_map_done",
         is_open=False
     )
     # data selection warning
@@ -200,7 +200,7 @@ def modals():
                     [
                         dbc.Label("Ground Truth"),
                         dcc.Dropdown(
-                            id="gt_select",
+                            id="sim_gt_select",
                             options=[],
                             placeholder="Select Data",
                             clearable=True,

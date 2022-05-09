@@ -27,7 +27,7 @@ ex_ss = [dbc.themes.DARKLY]
 app = Dash(__name__, external_stylesheets=ex_ss)
 server = app.server
 # title
-app.title = "L5IN"
+app.title = "L5IN+"
 # favicon
 #app._favicon = "favicon.ico"
 
@@ -37,7 +37,7 @@ home_tab = home_layout()
 ## Simulator ##
 sim_tab = sim_layout(geojson_style)
 ## Evaluator ##
-ev_tab = eval_layout(geojson_style)
+eval_tab = eval_layout(geojson_style)
 ## Comming Soon ##
 cs_tab = com_layout()  
 
@@ -68,7 +68,7 @@ app.layout = html.Div(
                     className='custom-tab',
                     selected_className='custom-tab--selected',
                     selected_style={"color": "#DC6000", "background": "#303030"},
-                    children=ev_tab),
+                    children=eval_tab),
                 dcc.Tab(
                     value="tab4",
                     label="Coming Soon",

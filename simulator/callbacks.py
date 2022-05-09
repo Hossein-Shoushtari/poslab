@@ -1,3 +1,4 @@
+##### Callbacks Simulator
 #### IMPORTS
 # dash
 from dash import html, Output, Input, State, no_update, callback_context, dcc
@@ -10,11 +11,10 @@ from os import listdir
 from datetime import datetime
 import numpy as np
 import shutil as st
-from zipfile import ZipFile
 # utils (general & simulator)
 import utils as u
 import simulator.utils as su
-# simulation & ground truth
+# ground truth & simulation
 from simulator.ground_truth import generate_gt, export_gt
 from simulator.simulation import simulate_positions, export_sim
 
@@ -25,18 +25,18 @@ def sim_calls(app, geojson_style):
     @app.callback(
         ### Outputs ###
         # modals
-        Output("map_warn", "is_open"),   # map upload warn
-        Output("map_done", "is_open"),   # map upload done
+        Output("sim_map_warn", "is_open"), # map upload warn
+        Output("sim_map_done", "is_open"), # map upload done
         # layers
         Output("map_layer", "data"),
         # storage
         Output("z_c_map", "data"),
         # loading
-        Output("spin1", "children"),     # loading status
+        Output("sim_spin1", "children"),   # loading status
         ### Inputs ###
         # modal
-        State("map_warn", "is_open"),
-        State("map_done", "is_open"),
+        State("sim_map_warn", "is_open"),
+        State("sim_map_done", "is_open"),
         # maps
         Input("sim_ul_map", "contents"),
         State("sim_ul_map", "filename"),
@@ -75,18 +75,18 @@ def sim_calls(app, geojson_style):
     @app.callback(
         ### Outputs ###
         # modals
-        Output("ul_warn", "is_open"),    # rest upload warn
-        Output("ul_done", "is_open"),    # rest upload done
+        Output("sim_ul_warn", "is_open"), # rest upload warn
+        Output("sim_ul_done", "is_open"), # rest upload done
         # antenna layer
         Output("ant_layer", "data"),
         # storage
         Output("z_c_ant", "data"),
         # loading
-        Output("spin2", "children"),     # loading status
+        Output("sim_spin2", "children"),  # loading status
         ### Inputs ###
         # modals
-        State("ul_warn", "is_open"),
-        State("ul_done", "is_open"),
+        State("sim_ul_warn", "is_open"),
+        State("sim_ul_done", "is_open"),
         # waypoints
         Input("ul_way", "contents"),
         State("ul_way", "filename"),
@@ -139,7 +139,7 @@ def sim_calls(app, geojson_style):
             return ul_warn, not ul_done, no_update, no_update, no_update
         # ========== ANTENNAS ==================================================================================================================
         elif "ul_ant" in button:
-            if ant_filename.split(".")[-1] == "csv": # assuming user uploaded right file format
+            if ant_filename.split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 ant_decoded = u.upload_encoder(ant_content) # decoding uploaded base64 file
                 with open("assets/antennas/antennas.csv", "w") as file: file.write(ant_decoded) # saving file
                 # getting converted antenna coordinates
@@ -320,7 +320,7 @@ def sim_calls(app, geojson_style):
     def ref_table(name):
         if name: # file is selected
             # list of rows filled with selecet coordinates
-            tr_list = u.ref_tab(name)
+            tr_list = su.ref_tab(name)
             # filling table with rows
             table = dbc.Table(
                 html.Tbody(tr_list),
@@ -367,7 +367,7 @@ def sim_calls(app, geojson_style):
         # store zoom lvl and center point
         Output("z_c_rp_gt", "data"),
         # loading
-        Output("spin3", "children"),      # loading status
+        Output("sim_spin3", "children"),  # loading status
         ### Inputs ###
         # modals
         State("gen_warn", "is_open"),
@@ -491,14 +491,14 @@ def sim_calls(app, geojson_style):
     @app.callback(
         ### Outputs ###
         Output("sim_modal", "is_open"),    # modal
-        Output("gt_select", "options"),    # gt data dropdown
+        Output("sim_gt_select", "options"),    # gt data dropdown
         ### Inputs ###
         # modal
         State("sim_modal", "is_open"),
         # button
         Input("open_sim", "n_clicks")
     )
-    def gt_canvas(
+    def open_sim(
         # modal status
         sim_modal,
         # button
@@ -517,7 +517,7 @@ def sim_calls(app, geojson_style):
         Output("sim_done", "is_open"),   # simulation successful
         Output("sim_data", "data"),      # sim measurements data
         # loading (invisible div)
-        Output("spin4", "children"),     # loading status
+        Output("sim_spin4", "children"), # loading status
         ### Inputs ###
         # modal
         State("sim_warn", "is_open"),
@@ -525,7 +525,7 @@ def sim_calls(app, geojson_style):
         # button
         Input("sim_btn", "n_clicks"),
         # data
-        Input("gt_select", "value"),      # ground truth data from dropdown
+        Input("sim_gt_select", "value"),  # ground truth data from dropdown
         Input("err", "value"),            # error
         Input("ms_freq", "value"),        # measurement frequency
         Input("net_cap", "value"),        # query frequency
@@ -572,9 +572,9 @@ def sim_calls(app, geojson_style):
         Output("exp_done", "is_open"),    # export done status
         Output("exp_warn", "is_open"),    # export warn status
         # download
-        Output("sim_export", "data"),         # export data
+        Output("sim_export", "data"),     # export data
         # loading (invisible div)
-        Output("spin5", "children"),      # loading status
+        Output("sim_spin5", "children"),  # loading status
         ### Inputs ###
         # modal
         State("exp_done", "is_open"),     # done
@@ -582,7 +582,7 @@ def sim_calls(app, geojson_style):
         # leaflet drawings
         Input("edit_control", "geojson"),
         # button
-        Input("sim_exp_btn", "n_clicks"),     # export button click status
+        Input("sim_exp_btn", "n_clicks"), # export button click status
     )
     def export(
         # modal
@@ -600,8 +600,9 @@ def sim_calls(app, geojson_style):
             if len(listdir("assets/exports/gt")) or len(listdir("assets/exports/draw")):
                 # zipping
                 zip_folder = st.make_archive(f"assets/zip/L5IN_export_{datetime.now().strftime('%H_%M_%S')}", 'zip', "assets/exports")
-                # sending email with all data added
-                u.sending_email()
+                # sending email with all data added (if it does not exceed 25MB!)
+                try: u.sending_email()
+                except: pass
                 # downloading
                 download = dcc.send_file(f"assets/zip/{zip_folder[-24:]}", filename=f"L5IN_export_{datetime.now().strftime('%H_%M_%S')}.zip")
                 return not exp_done, exp_warn, download, no_update # export successful
