@@ -247,7 +247,7 @@ def distance(point1: tuple, point2: tuple) -> float:
     '''distance between 2 points'''
     return np.sqrt((point2[0] - point1[0])**2 + (point2[1] - point1[1])**2)
 
-def export_sim(time_stamps: list, positions: list, errors: list, qualities: list):
+def export_sim(time_stamps: list, positions: list, errors: list, qualities: list, name: tuple):
     ant_header = ""
     ants = []
     if len(os.listdir("assets/antennas")):
@@ -264,7 +264,7 @@ def export_sim(time_stamps: list, positions: list, errors: list, qualities: list
                 line += ant[j][i]
             ants.append(line)
 
-    with open(f"assets/exports/sm/simulated_measurements__{datetime.now().strftime('%H-%M-%S')}.csv", "w") as f:
+    with open(f"assets/exports/sm/simulated_measurements__{name[0]}_{name[2]}_{name[2]}.csv", "w") as f:
         lines = [[time_stamps[i], positions[i][0],positions[i][1], errors[i], qualities[i], ants[i]] for i in range(len(time_stamps))]
         output = f"time stamp;x;y;error;quality;{ant_header[:-1]}\n"
         for row in lines:
