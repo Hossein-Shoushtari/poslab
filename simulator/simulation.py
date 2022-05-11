@@ -4,7 +4,6 @@
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
-from datetime import datetime
 import os
 # installed
 from geojson import Point
@@ -264,7 +263,7 @@ def export_sim(time_stamps: list, positions: list, errors: list, qualities: list
                 line += ant[j][i]
             ants.append(line)
 
-    with open(f"assets/exports/sm/simulated_measurements__{name[0]}_{name[2]}_{name[2]}.csv", "w") as f:
+    with open(f"assets/exports/sm/simulated_measurements__{name[0]}_{name[1]}_{name[2]}.csv", "w") as f:
         lines = [[time_stamps[i], positions[i][0],positions[i][1], errors[i], qualities[i], ants[i]] for i in range(len(time_stamps))]
         output = f"time stamp;x;y;error;quality;{ant_header[:-1]}\n"
         for row in lines:
