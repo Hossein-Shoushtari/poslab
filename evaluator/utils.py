@@ -76,6 +76,6 @@ def percentage(plan: "GeoDataFrame", gt: "GeoDataFrame", traj: "GeoDataFrame") -
     gt_amount = np.array([list(gt_within[str(i)]).count(True) for i in range(len(polygons))])
     traj_amount = np.array([list(traj_within[str(i)]).count(True) for i in range(len(polygons))])
     # percentage
-    perc = sum(abs(gt_amount - traj_amount))/traj_amount.shape[0]
+    perc = 1 - sum(abs(gt_amount - traj_amount))/traj_amount.shape[0]
     return perc
 
