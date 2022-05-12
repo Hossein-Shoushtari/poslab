@@ -301,9 +301,9 @@ def sim_calls(app, geojson_style):
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "gt_btn" in button:
-            ref_options = [{"label": name.split(".")[0], "value": name.split(".")[0]} for name in listdir("assets/waypoints")]
-            acc_options = [{"label": name.split(".")[0], "value": name.split(".")[0]} for name in listdir("assets/sensors/acc")]
-            gyr_options = [{"label": name.split(".")[0], "value": name.split(".")[0]} for name in listdir("assets/sensors/gyr")]
+            ref_options = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/waypoints")]
+            acc_options = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/sensors/acc")]
+            gyr_options = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/sensors/gyr")]
             return not gt_cv, ref_options, acc_options, gyr_options     # activate gt offcanvas and filling dropdowns with data
         else: return gt_cv, [], [], []                                  # offcanvas is closed
 
@@ -505,7 +505,7 @@ def sim_calls(app, geojson_style):
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "open_sim" in button:
-            options = [{"label": name.split(".")[0], "value": name.split(".")[0]} for name in listdir("assets/exports/gt")]
+            options = [{"label":name[:-4], "value": name[:-4]} for name in listdir("assets/exports/gt")]
             return not sim_modal, options     # activate gt offcanvas and filling dropdown with data
         else: return sim_modal, []            # offcanvas is closed
     

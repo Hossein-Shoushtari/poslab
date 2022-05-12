@@ -439,6 +439,6 @@ def export_gt(ground_truth):
     for row in lines:
         output += f"{row[0]};{row[1]};{row[2]}\n"
     # for export
-    with open(f"assets/exports/gt/ground_truth_trajectory__{name}.csv", "w") as f: f.write(output)
+    with open(f"assets/exports/gt/gt_traj__{name}.csv", "w") as f: f.write(output)
     # for evaluation
-    with open(f"assets/groundtruth/ground_truth_trajectory__{name}.csv", "w") as f: f.write(output)
+    with open(f"assets/groundtruth/gt_traj__{name}.csv", "w") as f: f.write(output)

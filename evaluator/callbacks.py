@@ -171,9 +171,9 @@ def eval_calls(app, geojson_style):
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "open_cdf" in button:
-            gt_options   = [{"label": name.split(".")[0], "value": name.split(".")[0]} for name in listdir("assets/groundtruth")]
-            traj_options = [{"label": name.split(".")[0], "value": name.split(".")[0]} for name in listdir("assets/trajectories")]
-            map_options = [{"label": name.split(".")[0], "value": name.split(".")[0]} for name in listdir("assets/maps")]
+            gt_options   = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/groundtruth")]
+            traj_options = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/trajectories")]
+            map_options = [{"label": name[:-8], "value": name[:-8]} for name in listdir("assets/maps")]
             return not cdf_modal, gt_options, traj_options, map_options
         else: return cdf_modal, [], [], []
 
@@ -231,7 +231,7 @@ def eval_calls(app, geojson_style):
                     df.append(eu.dataframe4graph(cdf, name))
                 # figure
                 fig = px.line(data_frame=pd.concat(df), x='err', y='cdf', title="CDF", color="trajectory")
-                fig.update_traces(mode='lines')
+                fig.update_traces(mode='markers')
                 return cdf_warn, not cdf_done, fig, no_update     # cdf successful
             else: return not cdf_warn, cdf_done,  {}, no_update   # cdf unsuccessful
         else: return cdf_warn, cdf_done,  {}, no_update       # modals are closed

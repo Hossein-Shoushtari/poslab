@@ -247,6 +247,15 @@ def distance(point1: tuple, point2: tuple) -> float:
     return np.sqrt((point2[0] - point1[0])**2 + (point2[1] - point1[1])**2)
 
 def export_sim(time_stamps: list, positions: list, errors: list, qualities: list, name: tuple):
+    ### as new trajectory
+    with open(f"assets/trajectories/sim_traj__{name[0]}_{name[1]}_{name[2]}.csv", "w") as f:
+        lines = [[time_stamps[i], positions[i][0], positions[i][1]] for i in range(len(time_stamps))]
+        output = ""
+        for row in lines:
+            output += f"{row[0]};{row[1]};{row[2]}\n"
+        f.write(output)
+    ### export
+    # antennas
     if len(os.listdir("assets/antennas")):
         ant_header = ""
         ants = []
@@ -262,14 +271,15 @@ def export_sim(time_stamps: list, positions: list, errors: list, qualities: list
             for j in range(len(ant)):
                 line += ant[j][i]
             ants.append(line)
-        with open(f"assets/exports/sm/simulated_measurements__{name[0]}_{name[1]}_{name[2]}.csv", "w") as f:
+        with open(f"assets/exports/sm/sim_meas__{name[0]}_{name[1]}_{name[2]}.csv", "w") as f:
             lines = [[time_stamps[i], positions[i][0], positions[i][1], errors[i], qualities[i], ants[i]] for i in range(len(time_stamps))]
             output = f"time stamp;x;y;error;quality;{ant_header[:-1]}\n"
             for row in lines:
                 output += f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]};{row[5]}\n"
             f.write(output)
+    # no antennas
     else:
-        with open(f"assets/exports/sm/simulated_measurements__{name[0]}_{name[1]}_{name[2]}.csv", "w") as f:
+        with open(f"assets/exports/sm/sim_meas__{name[0]}_{name[1]}_{name[2]}.csv", "w") as f:
             lines = [[time_stamps[i], positions[i][0], positions[i][1], errors[i], qualities[i]] for i in range(len(time_stamps))]
             output = "time stamp;x;y;error;quality;\n"
             for row in lines:
