@@ -1,8 +1,8 @@
 ##### Evaluator Tab -- Layout
 ###IMPORTS
 # dash
-from dash import html, dcc
 import dash_bootstrap_components as dbc
+from dash import html, dcc
 import dash_leaflet as dl
 # utils (simulator)
 import simulator.utils as su
@@ -87,7 +87,7 @@ def modals():
     # cdf done
     cdf_done = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("DONE")),
-        dbc.ModalBody("Calculation successful! The graph can be viewed by clicking Visual..")],
+        dbc.ModalBody("Calculation successful! The graph can be viewed by clicking Visual.")],
         id="cdf_done",
         is_open=False
     )
@@ -116,7 +116,7 @@ def modals():
                             placeholder="Select Data",
                             clearable=True,
                             optionHeight=35,
-                            multi=False,
+                            multi=True,
                             searchable=True,
                             style={"marginBottom": "15px", "color": "black"}
                         ),

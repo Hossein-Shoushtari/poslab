@@ -1,18 +1,21 @@
 ##### Utils Simulator
 ###IMPORTS
 # dash
-import dash_bootstrap_components as dbc
-import dash_leaflet as dl
-import dash_leaflet.express as dlx
-from dash import html
 from dash_extensions.javascript import arrow_function
+import dash_bootstrap_components as dbc
+import dash_leaflet.express as dlx
+import dash_leaflet as dl
+from dash import html
 # built in
-import numpy as np
 from datetime import datetime
+import numpy as np
 import os
 # installed
-import geopandas as gp
 import shapely.geometry as sh
+import geopandas as gp
+# general utils
+import utils as u
+
 
 
 def export_drawings(data: dict):
@@ -31,7 +34,7 @@ def export_drawings(data: dict):
     old = "'"
     new = """ " """
     # getting the current date and time for unique filename
-    name = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
+    name = u.time()
     # storing data as geojson file
     with open(f"assets/exports/draw/drawings_{name}.geojson", "w") as file:
         # formatting data-string

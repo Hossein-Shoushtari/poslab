@@ -8,17 +8,22 @@ import evaluator.utils as t
 import pandas as pd
 import numpy as np
 
-
+names = ["traj1", "traj2", "traj3", "traj4"]
+i = 0
+df = []
 # data
 gt  = np.loadtxt("gt.csv", delimiter=";", skiprows=1)
-traj = np.loadtxt("PDR.csv", delimiter=";")
+traj1 = np.loadtxt("traj1.csv", delimiter=";")
+traj2 = np.loadtxt("traj2.csv", delimiter=";")
+traj3 = np.loadtxt("traj3.csv", delimiter=";")
+traj4 = np.loadtxt("traj4.csv", delimiter=";")
 # interpolation
-gt_ip, traj_ip = t.interpolation(gt, traj)
-cdf = t.cdf(gt_ip, traj_ip)
-df = t.dataframe4graph(cdf, "hallo")
-
-
-fig = px.line(data_frame=df, x='err', y='cdf', title="CDF", color="Trajectory")
+interpolations = t.interpolation(gt, [traj1, traj2, traj3, traj4])
+for interpolation in interpolations:
+    cdf = t.cdf(interpolation[0], interpolation[1])
+    df.append(t.dataframe4graph(cdf, names[i]))
+    i += 1
+fig = px.line(data_frame=pd.concat(df), x='err', y='cdf', title="CDF", color="trajectory")
 fig.update_traces(mode='lines')
 
 # ---------------- HTML ---------------- #

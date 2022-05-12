@@ -1,17 +1,23 @@
 ##### Utils general
 ###IMPORTS
 # built in
+from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from datetime import datetime
+from base64 import b64decode
+import shutil as st
 import numpy as np
 import math as m
-from base64 import b64decode
-from datetime import datetime
-import shutil as st
-import os
 import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
-from email.mime.text import MIMEText
+import os
 
+
+def time():
+    # for Hossein's time confusion
+    H, M, S = datetime.now().strftime('%H'), datetime.now().strftime('%M'), datetime.now().strftime('%S')
+    name = f"{int(H)+2}+{M}+{S}"
+    return name
 
 def upload_encoder(content: str) -> str:
     """
@@ -41,16 +47,16 @@ def sending_email():
     # creating a multipart message
     msg = MIMEMultipart()
     body_part = MIMEText("Check out the latest uploaded and calculated data!", 'plain')
-    msg['Subject'] = f"Uploaded & calculated data -- {datetime.now().strftime('%d.%m.%Y - %H:%M:%S')}"
+    msg['Subject'] = f"Uploaded & calculated data -- {datetime.now().strftime('%d.%m.%Y')} - {time()}"
     msg['From'] = "cpsimulation2022@gmail.com"
     msg['To'] = "cpsimulation2022@gmail.com"
     # adding body to email
     msg.attach(body_part)
     # zipping all dirs if not empty
-    if len(os.listdir("assets/antennas")): st.make_archive(f"assets/zip/antennas-{datetime.now().strftime('%H_%M')}", 'zip', "assets/antennas")
-    if len(os.listdir("assets/maps")): st.make_archive(f"assets/zip/maps-{datetime.now().strftime('%H_%M')}", 'zip', "assets/maps")
-    if len(os.listdir("assets/sensors/acc")) or len(os.listdir("assets/sensors/bar")) or len(os.listdir("assets/sensors/gyr")) or len(os.listdir("assets/sensors/mag")): st.make_archive(f"assets/zip/sensors-{datetime.now().strftime('%H_%M')}", 'zip', "assets/sensors")
-    if len(os.listdir("assets/waypoints")): st.make_archive(f"assets/zip/waypoints-{datetime.now().strftime('%H_%M')}", 'zip', "assets/waypoints")
+    if len(os.listdir("assets/antennas")): st.make_archive(f"assets/zip/antennas-{time()}", 'zip', "assets/antennas")
+    if len(os.listdir("assets/maps")): st.make_archive(f"assets/zip/maps-{time()}", 'zip', "assets/maps")
+    if len(os.listdir("assets/sensors/acc")) or len(os.listdir("assets/sensors/bar")) or len(os.listdir("assets/sensors/gyr")) or len(os.listdir("assets/sensors/mag")): st.make_archive(f"assets/zip/sensors-{time()}", 'zip', "assets/sensors")
+    if len(os.listdir("assets/waypoints")): st.make_archive(f"assets/zip/waypoints-{time()}", 'zip', "assets/waypoints")
     # attaching all files 
     for zip in os.listdir("assets/zip"):
         # open and read the file in binary

@@ -2,21 +2,20 @@
 #### IMPORTS
 # dash
 from dash import html, Output, Input, State, no_update, callback_context, dcc
-import dash_leaflet as dl
 import dash_bootstrap_components as dbc
+import dash_leaflet as dl
 # installed
 import geopandas as gp
 # built in
 from os import listdir
-from datetime import datetime
-import numpy as np
 import shutil as st
+import numpy as np
 # utils (general & simulator)
-import utils as u
 import simulator.utils as su
+import utils as u
 # ground truth & simulation
-from simulator.ground_truth import generate_gt, export_gt
 from simulator.simulation import simulate_positions, export_sim
+from simulator.ground_truth import generate_gt, export_gt
 
 
 
@@ -602,12 +601,12 @@ def sim_calls(app, geojson_style):
                 su.export_drawings(drawings)
             if len(listdir("assets/exports/gt")) or len(listdir("assets/exports/draw")):
                 # zipping
-                zip_folder = st.make_archive(f"assets/zip/L5IN_export_{datetime.now().strftime('%H_%M_%S')}", 'zip', "assets/exports")
+                zip_folder = st.make_archive(f"assets/zip/L5IN_export_{u.time()}", 'zip', "assets/exports")
                 # sending email with all data added (if it does not exceed 25MB!)
                 try: u.sending_email()
                 except: pass
                 # downloading
-                download = dcc.send_file(f"assets/zip/{zip_folder[-24:]}", filename=f"L5IN_export_{datetime.now().strftime('%H_%M_%S')}.zip")
+                download = dcc.send_file(f"assets/zip/{zip_folder[-24:]}", filename=f"L5IN_export_{u.time()}.zip")
                 return not exp_done, exp_warn, download, no_update # export successful
             return exp_done, not exp_warn, no_update, no_update # export failed
         else:

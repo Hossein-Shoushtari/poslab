@@ -2,16 +2,16 @@
 #### IMPORTS
 # dash
 from dash import html, Output, Input, State, no_update, callback_context, dcc
-import dash_leaflet as dl
 import dash_bootstrap_components as dbc
 import plotly.express as px
+import dash_leaflet as dl
 # installed
 import geopandas as gp
 # built in
 from os import listdir
-from datetime import datetime
-import numpy as np
 import shutil as st
+import pandas as pd
+import numpy as np
 # utils (general & evaluator)
 import utils as u
 import evaluator.utils as eu
@@ -214,20 +214,23 @@ def eval_calls(app, geojson_style):
             if  gt_select and traj_select:
                 # data
                 gt  = np.loadtxt(f"assets/groundtruth/{gt_select}.csv", delimiter=";", skiprows=1)
-                traj = np.loadtxt(f"assets/trajectories/{traj_select}.csv", delimiter=";")
+                trajs = [np.loadtxt(f"assets/trajectories/{traj}.csv", delimiter=";") for traj in traj_select]
+                df = []
                 # interpolation
-                gt_ip, traj_ip = eu.interpolation(gt, traj)
-                # name
-                name = str(traj_select)
-                # percentage
-                if map_select:
-                    perc = eu.percentage(gp.read_file(f"assets/maps/{map_select}.geojson"), gt_ip, traj_ip)*100
-                    name = f"{traj_select} | perc: {perc:.2f}%"
+                interpolations = eu.interpolation(gt, trajs)
                 # cdf
-                cdf = eu.cdf(gt_ip, traj_ip)
-                # graph
-                df = eu.dataframe4graph(cdf, name)
-                fig = px.line(data_frame=df, x='err', y='cdf', title="CDF", color="Trajectory")
+                for i in range(len(traj_select)):
+                    # name
+                    name = str(traj_select[i])
+                    # percentage
+                    if map_select:
+                        perc = eu.percentage(gp.read_file(f"assets/maps/{map_select}.geojson"), interpolations[i][0], interpolations[i][1])*100
+                        name = f"{traj_select[i]} | pip: {perc:.2f}%"
+                    # cdf
+                    cdf = eu.cdf(interpolations[i][0], interpolations[i][1])
+                    df.append(eu.dataframe4graph(cdf, name))
+                # figure
+                fig = px.line(data_frame=pd.concat(df), x='err', y='cdf', title="CDF", color="trajectory")
                 fig.update_traces(mode='lines')
                 return cdf_warn, not cdf_done, fig, no_update     # cdf successful
             else: return not cdf_warn, cdf_done,  {}, no_update   # cdf unsuccessful

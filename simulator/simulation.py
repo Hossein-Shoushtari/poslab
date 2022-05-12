@@ -1,13 +1,13 @@
 ##### Coordinate Simulation class
 ### IMPORTS
 # built in
-import csv
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import csv
 import os
 # installed
-from geojson import Point
 from geopandas import GeoSeries
+from geojson import Point
 
 
 def closest_value(input_list, input_value):
@@ -247,9 +247,9 @@ def distance(point1: tuple, point2: tuple) -> float:
     return np.sqrt((point2[0] - point1[0])**2 + (point2[1] - point1[1])**2)
 
 def export_sim(time_stamps: list, positions: list, errors: list, qualities: list, name: tuple):
-    ant_header = ""
-    ants = []
     if len(os.listdir("assets/antennas")):
+        ant_header = ""
+        ants = []
         antennas = np.loadtxt("assets/antennas/antennas.csv")
         ant = []
         for i in range(antennas.shape[0]):
@@ -262,13 +262,20 @@ def export_sim(time_stamps: list, positions: list, errors: list, qualities: list
             for j in range(len(ant)):
                 line += ant[j][i]
             ants.append(line)
+        with open(f"assets/exports/sm/simulated_measurements__{name[0]}_{name[1]}_{name[2]}.csv", "w") as f:
+            lines = [[time_stamps[i], positions[i][0], positions[i][1], errors[i], qualities[i], ants[i]] for i in range(len(time_stamps))]
+            output = f"time stamp;x;y;error;quality;{ant_header[:-1]}\n"
+            for row in lines:
+                output += f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]};{row[5]}\n"
+            f.write(output)
+    else:
+        with open(f"assets/exports/sm/simulated_measurements__{name[0]}_{name[1]}_{name[2]}.csv", "w") as f:
+            lines = [[time_stamps[i], positions[i][0], positions[i][1], errors[i], qualities[i]] for i in range(len(time_stamps))]
+            output = "time stamp;x;y;error;quality;\n"
+            for row in lines:
+                output += f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]}\n"
+            f.write(output)
 
-    with open(f"assets/exports/sm/simulated_measurements__{name[0]}_{name[1]}_{name[2]}.csv", "w") as f:
-        lines = [[time_stamps[i], positions[i][0],positions[i][1], errors[i], qualities[i], ants[i]] for i in range(len(time_stamps))]
-        output = f"time stamp;x;y;error;quality;{ant_header[:-1]}\n"
-        for row in lines:
-            output += f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]};{row[5]}\n"
-        f.write(output)
 
 
 if __name__ == "__main__":    

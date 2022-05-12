@@ -1,13 +1,14 @@
 ##### Ground Truth Generation class!!!
-
 ### IMPORTS
 # built in
 import numpy as np
-from datetime import datetime
 # installed
-import shapely
 import shapely.geometry as sg
 import scipy.signal as signal
+import shapely
+# general utils
+import utils as u
+
 
 
 def init_parameters_filter(sample_freq, warmup_data, cut_off_freq=2):
@@ -432,9 +433,12 @@ def generate_gt(ref: list, acc: list, gyr: list):
         return None  # something went wrong
 
 def export_gt(ground_truth):
-    with open(f"assets/exports/gt/ground_truth_trajectory__{datetime.now().strftime('%H+%M+%S')}.csv", "w") as f:
-        lines = [[ground_truth[i][0], ground_truth[i][1],ground_truth[i][2]] for i in range(len(ground_truth))]
-        output = "time stamp;x;y\n"
-        for row in lines:
-            output += f"{row[0]};{row[1]};{row[2]}\n"
-        f.write(output)
+    name = u.time()
+    lines = [[ground_truth[i][0], ground_truth[i][1],ground_truth[i][2]] for i in range(len(ground_truth))]
+    output = "time stamp;x;y\n"
+    for row in lines:
+        output += f"{row[0]};{row[1]};{row[2]}\n"
+    # for export
+    with open(f"assets/exports/gt/ground_truth_trajectory__{name}.csv", "w") as f: f.write(output)
+    # for evaluation
+    with open(f"assets/groundtruth/ground_truth_trajectory__{name}.csv", "w") as f: f.write(output)

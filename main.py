@@ -1,16 +1,16 @@
 #### IMPORTS
 # dash
-from dash import Dash, dcc, html
-import dash_bootstrap_components as dbc
 from dash_extensions.javascript import assign
+import dash_bootstrap_components as dbc
+from dash import Dash, dcc, html
 # home
 from home.layout import home_layout
 # simulator
-from simulator.layout import sim_layout
 from simulator.callbacks import sim_calls
+from simulator.layout import sim_layout
 # evaluator
-from evaluator.layout import eval_layout
 from evaluator.callbacks import eval_calls
+from evaluator.layout import eval_layout
 # coming soon
 from coming_soon.layout import com_layout
 

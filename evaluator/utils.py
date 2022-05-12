@@ -8,25 +8,30 @@ import pandas as pd
 import numpy as np
 import math as m
 
-def interpolation(gt: "ndarray", traj: "ndarray") -> list:
+def interpolation(gt: "ndarray", trajectories: list) -> list:
     # data
+    data = []
     t_gt  = gt[:,0]
     x_gt  = gt[:,1]
     y_gt  = gt[:,2]
-    t_pdr = traj[:,0]
-    x_pdr = traj[:,1]
-    y_pdr = traj[:,2]
-    # finding limits for new time stamps T*
-    minimum = min(gt[0][0], traj[0][0])
-    maximum = max(gt[-1][0], traj[-1][0])
-    # creating new time stamps T*
-    T_new = np.arange(minimum, maximum, 500)
-    # interpolation
-    ip_x_gt  = np.interp(T_new, t_gt, x_gt)
-    ip_y_gt  = np.interp(T_new, t_gt, y_gt)
-    ip_x_pdr = np.interp(T_new, t_pdr, x_pdr)
-    ip_y_pdr = np.interp(T_new, t_pdr, y_pdr)
-    return [np.column_stack((ip_x_gt, ip_y_gt)), np.column_stack((ip_x_pdr, ip_y_pdr))]
+    # interpolation for each trajectory
+    for traj in trajectories:
+        t_traj = traj[:,0]
+        x_traj = traj[:,1]
+        y_traj = traj[:,2]
+        # finding limits for new time stamps T*
+        minimum = min(gt[0][0], traj[0][0])
+        maximum = max(gt[-1][0], traj[-1][0])
+        # creating new time stamps T*
+        T_new = np.arange(minimum, maximum, 500)
+        # interpolation
+        ip_x_gt  = np.interp(T_new, t_gt, x_gt)
+        ip_y_gt  = np.interp(T_new, t_gt, y_gt)
+        ip_x_traj = np.interp(T_new, t_traj, x_traj)
+        ip_y_traj = np.interp(T_new, t_traj, y_traj)
+        # storing
+        data.append([np.column_stack((ip_x_gt, ip_y_gt)), np.column_stack((ip_x_traj, ip_y_traj))])
+    return data
 
 def cdf(gt: "ndarray", traj: "ndarray") -> "ndarray":
     # data
@@ -50,7 +55,7 @@ def dataframe4graph(data: "ndarray", name: str) -> "DataFrame":
         err = np.delete(err, np.arange(1, err.shape[0], 2))
         cdf = np.delete(cdf, np.arange(1, cdf.shape[0], 2))
     name = [name for _ in range(err.shape[0])]
-    data_frame = pd.DataFrame(np.column_stack((name, np.column_stack((err, cdf)))), columns=["Trajectory", "err", "cdf"])
+    data_frame = pd.DataFrame(np.column_stack((name, np.column_stack((err, cdf)))), columns=["trajectory", "err", "cdf"])
     data_frame["err"] = data_frame["err"].astype(float, errors = "raise")
     data_frame["cdf"] = data_frame["cdf"].astype(float, errors = "raise")
     return data_frame

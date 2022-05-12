@@ -1,3 +1,6 @@
+##### Home Tab -- Layout
+###IMPORTS
+# dash
 from dash import html, dcc, Dash, Output, Input, State, no_update
 import dash_bootstrap_components as dbc
 
