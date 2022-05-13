@@ -112,13 +112,14 @@ def simulate_positions(groundtruth, error, measurement_freq, query_freq, number_
         #overflow = number_of_users - query_freq
         duration = (number_of_users / query_freq) * 1000
         ts = rows[0][0]
-        print(measurement_freq, 'measurement_freq')
-        print(query_freq, 'query_freq')
-        print(number_of_users, 'number of users')
-        print(duration, 'duration')
+        # print(measurement_freq, 'measurement_freq')
+        # print(query_freq, 'query_freq')
+        # print(number_of_users, 'number of users')
+        # print(duration, 'duration')
+        # print(rows[1][0] - rows[0][0], 'first sequel')
+
         measurement_freq = measurement_freq / 1000
         query_freq = query_freq / 1000
-        print(rows[1][0] - rows[0][0], 'first sequel')
 
         for r in range(len(rows)):
             if r == 0:
@@ -182,6 +183,9 @@ def simulate_positions(groundtruth, error, measurement_freq, query_freq, number_
 
     else:
 
+        measurement_freq = measurement_freq / 1000
+        query_freq = query_freq / 1000
+
         for r in range(len(rows)):
 
             time_stamps.append(rows[r][0])
@@ -229,11 +233,11 @@ def simulate_positions(groundtruth, error, measurement_freq, query_freq, number_
                 x_temp = x_temp + dx
                 y_temp = y_temp + dy
 
-        qualities_list = []
-        for e in error_list:
-            quality = closest_value([error / 5, 2 * error / 5, 3 * error / 5, 4 * error / 5, 5 * error / 5],
-                                    e)
-            qualities_list.append(quality)
+    qualities_list = []
+    for e in error_list:
+        quality = closest_value([error / 5, 2 * error / 5, 3 * error / 5, 4 * error / 5, 5 * error / 5],
+                                e)
+        qualities_list.append(quality)
 
     return time_stamps, positions, error_list, qualities_list
 

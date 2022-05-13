@@ -55,9 +55,9 @@ def dataframe4graph(data: "ndarray", name: str) -> "DataFrame":
         err = np.delete(err, np.arange(1, err.shape[0], 2))
         cdf = np.delete(cdf, np.arange(1, cdf.shape[0], 2))
     name = [name for _ in range(err.shape[0])]
-    data_frame = pd.DataFrame(np.column_stack((name, np.column_stack((err, cdf)))), columns=["trajectory", "err", "cdf"])
-    data_frame["err"] = data_frame["err"].astype(float, errors = "raise")
-    data_frame["cdf"] = data_frame["cdf"].astype(float, errors = "raise")
+    data_frame = pd.DataFrame(np.column_stack((name, np.column_stack((err, cdf)))), columns=["trajectory", "RMSE [m]", "CDF"])
+    data_frame["RMSE [m]"] = data_frame["RMSE [m]"].astype(float, errors = "raise")
+    data_frame["CDF"] = data_frame["CDF"].astype(float, errors = "raise")
     return data_frame
 
 def percentage(plan: "GeoDataFrame", gt: "GeoDataFrame", traj: "GeoDataFrame") -> float:

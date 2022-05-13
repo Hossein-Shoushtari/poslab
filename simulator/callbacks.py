@@ -481,8 +481,8 @@ def sim_calls(app, geojson_style):
     )
     def restore_sim_set_sliders(ss_reset_clicks):
         button = [p["prop_id"] for p in callback_context.triggered][0]
-        if "ss_reset" in button: return [4000, 6000], [1, 6], 2, 500   # restore default values
-        else: return [4000, 6000], [1, 6], 2, 500   # set default values
+        if "ss_reset" in button: return [4, 6], [1, 6], 2, 500   # restore default values
+        else: return [4, 6], [1, 6], 2, 500   # set default values
     
         # ground truth canvas ===============================================================================================================
     
@@ -554,16 +554,13 @@ def sim_calls(app, geojson_style):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "sim_btn" in button:
             if gt_select and err and ms_freq and net_cap and num_user and num_int:
-                if int(num_user) < 500:
-                    # try: # simulate measurement
-                    simulation = simulate_positions(gt_select, float(err), float(ms_freq), float(net_cap), int(num_user), int(num_int), sem_err_rang, int_rang, sem_err)
-                    # formatting and saving simulation data
-                    export_sim(*simulation, (ms_freq, err, num_user))
-                    return sim_warn, not sim_done, True, no_update
-                    # except: # simulation failed, wrong inputs or no ground truth data selected
-                    #     return not sim_warn, sim_done, None, no_update
-                else: # simulation failed, too many users
-                    return not sim_warn, sim_done, None, no_update
+                # try: # simulate measurement
+                simulation = simulate_positions(gt_select, float(err), float(ms_freq), float(net_cap), int(num_user), int(num_int), sem_err_rang, int_rang, sem_err)
+                # formatting and saving simulation data
+                export_sim(*simulation, (ms_freq, err, num_user))
+                return sim_warn, not sim_done, True, no_update
+                # except: # simulation failed, wrong inputs or no ground truth data selected
+                #     return not sim_warn, sim_done, None, no_update
             else: return not sim_warn, sim_done, None, no_update
         else: return sim_warn, sim_done, None, no_update
 

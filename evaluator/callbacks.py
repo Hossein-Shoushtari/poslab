@@ -230,7 +230,7 @@ def eval_calls(app, geojson_style):
                     cdf = eu.cdf(interpolations[i][0], interpolations[i][1])
                     df.append(eu.dataframe4graph(cdf, name))
                 # figure
-                fig = px.line(data_frame=pd.concat(df), x='err', y='cdf', title="CDF", color="trajectory")
+                fig = px.line(data_frame=pd.concat(df), x='RMSE [m]', y='CDF', title="CDF", color="trajectory")
                 fig.update_traces(mode='markers')
                 return cdf_warn, not cdf_done, fig, no_update     # cdf successful
             else: return not cdf_warn, cdf_done,  {}, no_update   # cdf unsuccessful

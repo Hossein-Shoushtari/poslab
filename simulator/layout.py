@@ -463,10 +463,10 @@ def sim_set_canvas():
                     html.Div(dbc.Input(id="num_int", placeholder="Type a number...", type="text", style={"color": "silver", "textAlign": "center"})),
 
                     html.P("Interval range [sec]", style={"text-align": "center", "color": "silver", "marginBottom": "0px", "marginTop": "10px"}),
-                    dcc.RangeSlider(id="int_rang", min=0, max=7000),
+                    dcc.RangeSlider(id="int_rang", min=0, max=30),
                     html.Div(dbc.Row([dbc.Col(html.P(id="int_rang_min")), dbc.Col(html.P(id="int_rang_max", style={"text-align": "right"}))]), style={"margin": "auto", "marginTop": "-25px", "width": "280px"}),
                     
-                    html.P("Semantic error", style={"text-align": "center", "color": "silver", "marginBottom": "0px", "marginTop": "-20px"}),
+                    html.P("Semantic error [m]", style={"text-align": "center", "color": "silver", "marginBottom": "0px", "marginTop": "-20px"}),
                     dcc.RangeSlider(id="sem_err_rang", min=0, max=20),
                     html.Div(dbc.Row([dbc.Col(html.P(id="sem_err_rang_min")), dbc.Col(html.P(id="sem_err_rang_max", style={"text-align": "right"}))]), style={"margin": "auto", "marginTop": "-25px", "width": "280px"}),
                     ],
