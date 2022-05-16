@@ -86,9 +86,7 @@ def simulate_positions(groundtruth, error, measurement_freq, query_freq, number_
         qualities_list : estimated qualities for each measurement (as limits of a error intervall) - array of floats
         """
     # getting selected ground truth data
-    with open(f"assets/exports/gt/{groundtruth}.csv", "r") as f:
-        gt = list(csv.reader(f, delimiter=";"))[1:]
-        gt = np.array(gt).astype(np.float)
+    gt = np.loadtxt(f"assets/exports/gt/{groundtruth}.csv", skiprows=1)
 
     rows = gt
     positions = []
@@ -256,19 +254,19 @@ def export_sim(time_stamps: list, positions: list, errors: list, qualities: list
         lines = [[time_stamps[i], positions[i][0], positions[i][1]] for i in range(len(time_stamps))]
         output = ""
         for row in lines:
-            output += f"{row[0]};{row[1]};{row[2]}\n"
+            output += f"{row[0]} {row[1]} {row[2]}\n"
         f.write(output)
     ### export
     # antennas
     if len(os.listdir("assets/antennas")):
         ant_header = ""
         ants = []
-        antennas = np.loadtxt("assets/antennas/antennas.csv")
+        antennas = np.loadtxt("assets/antennas/antennas.csv", skiprows=1)
         ant = []
         for i in range(antennas.shape[0]):
-            ant_header += f"ant{i+1}_dist;ant{i+1}_azim;"
-            ant_pos = antennas[i][1:]
-            liste = [f"{distance(ant_pos, positions[j])};{azimuth(ant_pos, positions[j])};" for j in range(len(time_stamps))]
+            ant_header += f"ant{i+1}_dist ant{i+1}_azim "
+            ant_pos = antennas[i]
+            liste = [f"{distance(ant_pos, positions[j])} {azimuth(ant_pos, positions[j])} " for j in range(len(time_stamps))]
             ant.append(liste)
         for i in range(len(liste)):
             line = ""
@@ -277,17 +275,17 @@ def export_sim(time_stamps: list, positions: list, errors: list, qualities: list
             ants.append(line)
         with open(f"assets/exports/sm/sim_meas__{name[0]}_{name[1]}_{name[2]}.csv", "w") as f:
             lines = [[time_stamps[i], positions[i][0], positions[i][1], errors[i], qualities[i], ants[i]] for i in range(len(time_stamps))]
-            output = f"time stamp;x;y;error;quality;{ant_header[:-1]}\n"
+            output = f"timestamp x y error quality {ant_header[:-1]}\n"
             for row in lines:
-                output += f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]};{row[5]}\n"
+                output += f"{row[0]} {row[1]} {row[2]} {row[3]} {row[4]} {row[5]}\n"
             f.write(output)
     # no antennas
     else:
         with open(f"assets/exports/sm/sim_meas__{name[0]}_{name[1]}_{name[2]}.csv", "w") as f:
             lines = [[time_stamps[i], positions[i][0], positions[i][1], errors[i], qualities[i]] for i in range(len(time_stamps))]
-            output = "time stamp;x;y;error;quality;\n"
+            output = "timestamp x y error quality \n"
             for row in lines:
-                output += f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]}\n"
+                output += f"{row[0]} {row[1]} {row[2]} {row[3]} {row[4]}\n"
             f.write(output)
 
 
@@ -297,37 +295,49 @@ if __name__ == "__main__":
     """
     check if the simulate_positions function is working
     """
+    error = 0.1
+    measurement_freq = 0.1
+    query_freq = 500
+    number_of_users = 1
+    number_of_intervalls = 2
+    error_range = [1, 6]
+    intervall_range = [4, 6]
+    semantic = True
 
-    filename = 'assets/groundtruth/GroundTruthEight.csv'
+    simulation = simulate_positions("gt_traj__16+47+39", error, measurement_freq, query_freq, number_of_users, number_of_intervalls, error_range, intervall_range, semantic)
+    export_sim(*simulation, (measurement_freq, error, number_of_users))
+    
+    # filename = 'assets/groundtruth/GroundTruthEight.csv'
 
-    with open(filename, newline='') as f:
+    # with open(filename, newline='') as f:
 
-        reader = csv.reader(f)
+    #     reader = csv.reader(f)
 
-        rows = []
+    #     rows = []
 
-        error_list = []
-        for row in reader:
-            rows.append([float(row[0].split(' ')[0]), float(row[0].split(' ')[1]), float(row[0].split(' ')[2])])
-    grundtruth = rows
+    #     error_list = []
+    #     for row in reader:
+    #         rows.append([float(row[0].split(' ')[0]), float(row[0].split(' ')[1]), float(row[0].split(' ')[2])])
+    # grundtruth = rows
 
-    error = 2
-    measurement_freq = 1
-    number_range = [1, 10] # range of number of occurencies for segments with semantic error
-    error_range = [1, 15] # range of possible values for the semantic errors
-    intervall_range = [1 * 1000, 20 * 1000] # range of intervall lengths where semantic errors are generated
-    semantic_is_used = False # set this to True if semantic errors are used
+    # error = 2
+    # measurement_freq = 1
+    # number_range = [1, 10] # range of number of occurencies for segments with semantic error
+    # error_range = [1, 15] # range of possible values for the semantic errors
+    # intervall_range = [1 * 1000, 20 * 1000] # range of intervall lengths where semantic errors are generated
+    # semantic_is_used = False # set this to True if semantic errors are used
 
-    time_stamps, positions, errors, qualities = simulate_positions(grundtruth, error, measurement_freq, 500, 1, 1,[1, 15], [1 * 1000, 20 * 1000],semantic_is_used)
+    # time_stamps, positions, errors, qualities = simulate_positions(grundtruth, error, measurement_freq, 500, 1, 1,[1, 15], [1 * 1000, 20 * 1000],semantic_is_used)
     
 
-    print('qualities',qualities)
-    print('errors', errors)
+    # print('qualities',qualities)
+    # print('errors', errors)
 
-    points_positions = []
-    for p in positions:
-        points_positions.append(Point(p))
+    # points_positions = []
+    # for p in positions:
+    #     points_positions.append(Point(p))
 
-    # print(points_positions)
-    GeoSeries(points_positions).plot(figsize=(10, 10), color='red', markersize=100, label='5G positions')
-    plt.pause(60)
+    # # print(points_positions)
+    # GeoSeries(points_positions).plot(figsize=(10, 10), color='red', markersize=100, label='5G positions')
+    # plt.pause('60)
+

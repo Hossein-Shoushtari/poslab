@@ -148,24 +148,22 @@ def eval_calls(app, geojson_style):
         # this else-section is always activated, when the page refreshes -> no warnings
         else: return ul_warn, ul_done, no_update
 
-        # open simulate measurement =========================================================================================================
-    
     # open cdf =======================================================================================================================
     @app.callback(
         ### Outputs ###
-        Output("cdf_modal", "is_open"),      # modal
+        Output("cdf_cv", "is_open"),         # canvas
         Output("eval_gt_select", "options"), # ground truth dropdown
         Output("traj_select", "options"),    # trajectory dropdown
-        Output("map_select", "options"),    # map dropdown
+        Output("map_select", "options"),     # map dropdown
         ### Inputs ###
         # modal
-        State("cdf_modal", "is_open"),
+        State("cdf_cv", "is_open"),
         # button
         Input("open_cdf", "n_clicks")
     )
     def open_cdf(
-        # modal status
-        cdf_modal,
+        # canvas status
+        cdf_cv,
         # button
         open_cdf
         ):
@@ -174,15 +172,15 @@ def eval_calls(app, geojson_style):
             gt_options   = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/groundtruth")]
             traj_options = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/trajectories")]
             map_options = [{"label": name[:-8], "value": name[:-8]} for name in listdir("assets/maps")]
-            return not cdf_modal, gt_options, traj_options, map_options
-        else: return cdf_modal, [], [], []
+            return not cdf_cv, gt_options, traj_options, map_options
+        else: return cdf_cv, [], [], []
 
     # cdf =======================================================================================================================
     @app.callback(
         ### Outputs ###
         # modals
         Output("cdf_warn", "is_open"),
-        Output("cdf_done", "is_open"),
+        Output("cdf_show", "is_open"),
         # graph
         Output("graph", "figure"),
         # spinner
@@ -190,7 +188,9 @@ def eval_calls(app, geojson_style):
         ### Inputs ###
         # modals
         State("cdf_warn", "is_open"),
-        State("cdf_done", "is_open"),
+        State("cdf_show", "is_open"),
+        # checkboxes
+        Input("percent", "value"),
         # data
         Input("eval_gt_select", "value"),
         Input("traj_select", "value"),
@@ -201,7 +201,9 @@ def eval_calls(app, geojson_style):
     def cdf(
         # modals
         cdf_warn,
-        cdf_done,
+        cdf_show,
+        # checkboxes
+        percent,
         # data
         gt_select,
         traj_select,
@@ -213,8 +215,8 @@ def eval_calls(app, geojson_style):
         if "cdf_btn" in button:
             if  gt_select and traj_select:
                 # data
-                gt  = np.loadtxt(f"assets/groundtruth/{gt_select}.csv", delimiter=";", skiprows=1)
-                trajs = [np.loadtxt(f"assets/trajectories/{traj}.csv", delimiter=";") for traj in traj_select]
+                gt  = np.loadtxt(f"assets/groundtruth/{gt_select}.csv", skiprows=1)
+                trajs = [np.loadtxt(f"assets/trajectories/{traj}.csv", skiprows=1) for traj in traj_select]
                 df = []
                 # interpolation
                 interpolations = eu.interpolation(gt, trajs)
@@ -223,7 +225,7 @@ def eval_calls(app, geojson_style):
                     # name
                     name = str(traj_select[i])
                     # percentage
-                    if map_select:
+                    if map_select and percent[-1]:
                         perc = eu.percentage(gp.read_file(f"assets/maps/{map_select}.geojson"), interpolations[i][0], interpolations[i][1])*100
                         name = f"{traj_select[i]} | pip: {perc:.2f}%"
                     # cdf
@@ -232,27 +234,41 @@ def eval_calls(app, geojson_style):
                 # figure
                 fig = px.line(data_frame=pd.concat(df), x='RMSE [m]', y='CDF', title="CDF", color="trajectory")
                 fig.update_traces(mode='markers')
-                return cdf_warn, not cdf_done, fig, no_update     # cdf successful
-            else: return not cdf_warn, cdf_done,  {}, no_update   # cdf unsuccessful
-        else: return cdf_warn, cdf_done,  {}, no_update       # modals are closed
+                return cdf_warn, not cdf_show, fig, no_update     # cdf successful
+            else: return not cdf_warn, cdf_show, {}, no_update    # cdf unsuccessful
+        else: return cdf_warn, cdf_show, {}, no_update            # modals are closed
 
-    # visual modal =======================================================================================================================
+        # export ============================================================================================================================
+    
+    # export ============================================================================================================================
     @app.callback(
         ### Outputs ###
-        Output("visual_modal", "is_open"),  # modal
-        ### Inputs ###
-        State("visual_modal", "is_open"),   # visual modal
-        Input("open_visual", "n_clicks")    # button
-    )
-    def open_visual(
         # modal
-        visual_modal,
+        Output("eval_exp_done", "is_open"),    # export done status
+        Output("eval_exp_warn", "is_open"),    # export warn status
+        # download
+        Output("eval_export", "data"),         # export data
+        # loading
+        Output("eval_spin3", "children"),      # loading status
+        ### Inputs ###
+        # modal
+        State("eval_exp_done", "is_open"),     # done
+        State("eval_exp_warn", "is_open"),     # warn
         # button
-        open_visual
+        Input("eval_exp_btn", "n_clicks"),     # export button click status
+    )
+    def export(
+        # modal
+        exp_done,
+        exp_warn,
+        # button
+        exp_clicks
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
-        if "open_visual" in button: return not visual_modal # open modal
-        else: return visual_modal # let modal closed
+        if "eval_exp_btn" in button:
+            return exp_done, not exp_warn, no_update, no_update # nothing to export yet
+        else:
+            return exp_done, exp_warn, no_update, no_update # no button clicked
 
     # help canvas =======================================================================================================================
     @app.callback(

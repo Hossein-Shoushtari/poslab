@@ -84,64 +84,6 @@ def modals():
         id="cdf_warn",
         is_open=False
     )
-    # cdf done
-    cdf_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("DONE")),
-        dbc.ModalBody("Calculation successful! The graph can be viewed by clicking Visual.")],
-        id="cdf_done",
-        is_open=False
-    )
-    # cdf - select trajectory
-    cdf_modal = dbc.Modal(
-        [
-            dbc.ModalHeader(dbc.ModalTitle("CDF")),
-            dbc.ModalBody(
-                html.Div(
-                    [
-                        dbc.Label("Ground Truth"),
-                        dcc.Dropdown(
-                            id="eval_gt_select",
-                            options=[],
-                            placeholder="Select Data",
-                            clearable=True,
-                            optionHeight=35,
-                            multi=False,
-                            searchable=True,
-                            style={"marginBottom": "15px", "color": "black"}
-                        ),
-                        dbc.Label("Trajectory"),
-                        dcc.Dropdown(
-                            id="traj_select",
-                            options=[],
-                            placeholder="Select Data",
-                            clearable=True,
-                            optionHeight=35,
-                            multi=True,
-                            searchable=True,
-                            style={"marginBottom": "15px", "color": "black"}
-                        ),
-                        dbc.Label("MAP | optional (calculates percentage of points-in-polygon)"),
-                        dcc.Dropdown(
-                            id="map_select",
-                            options=[],
-                            placeholder="Select Data",
-                            clearable=True,
-                            optionHeight=35,
-                            multi=False,
-                            searchable=True,
-                            style={"marginBottom": "15px", "color": "black"}
-                        )
-                    ]
-                )
-            ),
-            dbc.ModalFooter(
-                dbc.Button("CDF", color="primary", id="cdf_btn")
-            )
-        ],
-        id="cdf_modal",
-        backdrop="static",
-        is_open=False,
-    )
     graph_modal = dbc.Modal(
         [
             dbc.ModalHeader(dbc.ModalTitle("CDF Plot")),
@@ -158,11 +100,26 @@ def modals():
                     className="six columns")
                 )
         ],
-        id="visual_modal",
+        id="cdf_show",
         size="xl",
+        backdrop="static",
         is_open=False
     )
-    return html.Div([ul_warn, ul_done, cdf_warn, cdf_done, cdf_modal, graph_modal])
+    # export warning
+    exp_warn = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
+        dbc.ModalBody("Nothing to export!")],
+        id="eval_exp_warn",
+        is_open=False
+    )
+    # export done
+    exp_done = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalBody("Export successful!")],
+        id="eval_exp_done",
+        is_open=False
+    )
+    return html.Div([ul_warn, ul_done, cdf_warn, graph_modal, exp_warn, exp_done])
 
 def eval_map(geojson_style):
     ### MAP
@@ -218,6 +175,58 @@ def eval_map(geojson_style):
     )
     return _map
 
+def cdf_canvas():
+    ## OFFCANVAS
+    # CDF
+    cdf_canvas = html.Div([
+        dbc.Offcanvas(
+            [
+                html.Div([
+                    html.Div([
+                        dbc.Label("Ground Truth", style={"color": "silver"}),
+                        dcc.Dropdown(
+                            id="eval_gt_select",
+                            options=[],
+                            placeholder="Select Data",
+                            clearable=True,
+                            optionHeight=35,
+                            multi=False,
+                            searchable=True,
+                            style={"marginBottom": "15px", "color": "black"}
+                        ),
+                        dbc.Label("Trajectory", style={"color": "silver"}),
+                        dcc.Dropdown(
+                            id="traj_select",
+                            options=[],
+                            placeholder="Select Data",
+                            clearable=True,
+                            optionHeight=35,
+                            multi=True,
+                            searchable=True,
+                            style={"marginBottom": "15px", "color": "black"}
+                        ),
+                        html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
+                        dbc.Label("MAP (optional ➔ check 'Percentage')", style={"color": "silver"}),
+                        dcc.Dropdown(
+                            id="map_select",
+                            options=[],
+                            placeholder="Select Data",
+                            clearable=True,
+                            optionHeight=35,
+                            multi=False,
+                            searchable=True,
+                            style={"marginBottom": "15px", "color": "black"}
+                        )],
+                        style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "paddingBottom": "5px", "marginBottom": "10px"}),
+                    html.Div(dbc.Button("Show CDF", color="light", outline=True, id="cdf_btn"), style={"textAlign": "right"})])
+            ],
+        id="cdf_cv",
+        scrollable=False,
+        title="CDF",
+        is_open=False)
+    ])
+    return cdf_canvas
+
 def help_canvas():
     ## OFFCANVAS
     # HELP
@@ -232,6 +241,7 @@ def help_canvas():
         is_open=False)
     ])
     return help_canvas
+
 
 def eval_layout(geojson_style):
     ### DOWNLOAD
@@ -317,7 +327,7 @@ def eval_layout(geojson_style):
     }
     H5_style = {
         "textAlign": "center",
-        "color": "grey",
+        "color": "gray",
         "marginTop": "5px"
     }
     first_row = html.Div([dbc.Row(
@@ -353,7 +363,7 @@ def eval_layout(geojson_style):
                                     [
                                         html.Div(html.P("Normalized"),
                                             style={"width": "118px", "height": "29px", "text-align": "center"}),
-                                        html.Div(dbc.Checklist(options=[{"value": 1}], value=[0], id="norm", style={"marginLeft": "50px"}),
+                                        html.Div(dbc.Checklist(options=[{"value": 1, "disabled": True}], value=[1], id="norm", style={"marginLeft": "50px"}),
                                             style={"width": "118px", "height": "29px" }
                                         )
                                     ],
@@ -361,9 +371,9 @@ def eval_layout(geojson_style):
                                 ),
                                 html.Div(
                                     [
-                                        html.Div(html.P("ATE"),
+                                        html.Div(html.P("ATE Table"),
                                             style={"width": "118px", "height": "29px", "text-align": "center"}),
-                                        html.Div(dbc.Checklist(options=[{"value": 1}], value=[0], id="ate", style={"marginLeft": "50px"}),
+                                        html.Div(dbc.Checklist(options=[{"value": 0, "disabled": True}], value=[1], id="ate", style={"marginLeft": "50px"}),
                                             style={"width": "118px", "height": "29px" }
                                         )
                                     ],
@@ -379,7 +389,7 @@ def eval_layout(geojson_style):
                                     [
                                         html.Div(html.P("Histogram"),
                                             style={"width": "118px", "height": "29px", "text-align": "center"}),
-                                        html.Div(dbc.Checklist(options=[{"value": 1}], value=[0], id="histo", style={"marginLeft": "50px"}),
+                                        html.Div(dbc.Checklist(options=[{"value": 0, "disabled": True}], value=[1], id="histo", style={"marginLeft": "50px"}),
                                             style={"width": "118px", "height": "29px" }
                                         )
                                     ],
@@ -418,7 +428,7 @@ def eval_layout(geojson_style):
             dbc.Col(html.Div([
                 html.Div(
                     [
-                        html.H5("Export", style={"textAlign": "center", "color": "grey", "marginTop": "5px"}),
+                        html.H5("Export", style={"textAlign": "center", "color": "gray", "marginTop": "5px"}),
                         html.Hr(style=hr_style),
                         html.Div(
                             [
@@ -453,6 +463,7 @@ def eval_layout(geojson_style):
                     modals(),
                     # canvas
                     help_canvas(),
+                    cdf_canvas(),
                     # card content
                     html.Div(
                         [

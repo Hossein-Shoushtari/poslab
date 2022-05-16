@@ -435,9 +435,9 @@ def generate_gt(ref: list, acc: list, gyr: list):
 def export_gt(ground_truth):
     name = u.time()
     lines = [[ground_truth[i][0], ground_truth[i][1],ground_truth[i][2]] for i in range(len(ground_truth))]
-    output = "time stamp;x;y\n"
+    output = "timestamp x y\n"
     for row in lines:
-        output += f"{row[0]};{row[1]};{row[2]}\n"
+        output += f"{row[0]} {row[1]} {row[2]}\n"
     # for export
     with open(f"assets/exports/gt/gt_traj__{name}.csv", "w") as f: f.write(output)
     # for evaluation

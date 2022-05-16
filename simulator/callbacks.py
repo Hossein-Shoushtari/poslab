@@ -142,7 +142,7 @@ def sim_calls(app, geojson_style):
                 ant_decoded = u.upload_encoder(ant_content) # decoding uploaded base64 file
                 with open("assets/antennas/antennas.csv", "w") as file: file.write(ant_decoded) # saving file
                 # getting converted antenna coordinates
-                ant = np.loadtxt("assets/antennas/antennas.csv")[:, 1:]
+                ant = np.loadtxt("assets/antennas/antennas.csv", skiprows=1)
                 # making layer out of markers
                 markers = su.ant2marker(ant)
                 layer = [dl.Overlay(dl.LayerGroup(markers), name="Antennas", checked=True)]
@@ -424,7 +424,7 @@ def sim_calls(app, geojson_style):
         elif "show_btn" in button:
             if ref_data:
                 # loading data
-                data = np.loadtxt(f"assets/waypoints/{ref_data}.csv")[:, 1:3]
+                data = np.loadtxt(f"assets/waypoints/{ref_data}.csv", skiprows=1)[:, 1:3]
                 # converting crs and making markers
                 markers = su.ref2marker(data, check)
                 # getting zoom lvl and center point
@@ -515,7 +515,7 @@ def sim_calls(app, geojson_style):
         Output("sim_warn", "is_open"),   # freq and or err is missing
         Output("sim_done", "is_open"),   # simulation successful
         Output("sim_data", "data"),      # sim measurements data
-        # loading (invisible div)
+        # loading
         Output("sim_spin4", "children"), # loading status
         ### Inputs ###
         # modal
@@ -568,16 +568,16 @@ def sim_calls(app, geojson_style):
     @app.callback(
         ### Outputs ###
         # modal
-        Output("exp_done", "is_open"),    # export done status
-        Output("exp_warn", "is_open"),    # export warn status
+        Output("sim_exp_done", "is_open"),    # export done status
+        Output("sim_exp_warn", "is_open"),    # export warn status
         # download
-        Output("sim_export", "data"),     # export data
-        # loading (invisible div)
-        Output("sim_spin5", "children"),  # loading status
+        Output("sim_export", "data"),         # export data
+        # loading
+        Output("sim_spin5", "children"),      # loading status
         ### Inputs ###
         # modal
-        State("exp_done", "is_open"),     # done
-        State("exp_warn", "is_open"),     # warn
+        State("sim_exp_done", "is_open"),     # done
+        State("sim_exp_warn", "is_open"),     # warn
         # leaflet drawings
         Input("edit_control", "geojson"),
         # button

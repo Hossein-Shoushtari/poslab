@@ -214,7 +214,7 @@ def ref_tab(name: str) -> list:
     tr_list : list of table rows with number, latitude, longitude and checkbox
     """
     # loading data
-    data = np.loadtxt(f"assets/waypoints/{name}.csv")[:, 1:3]
+    data = np.loadtxt(f"assets/waypoints/{name}.csv", skiprows=1)[:, 1:3]
     # filling list with table-rows
     tr_list = []
     for i in range(1, data.shape[0]-1):
@@ -258,7 +258,7 @@ def ref_checked(name: str, check: tuple) -> list:
     data : ndarray with checked coordinates
     """
     # loading data
-    data = np.loadtxt(f"assets/waypoints/{name}.csv")
+    data = np.loadtxt(f"assets/waypoints/{name}.csv", skiprows=1)
     # creating ndarray to decide whether it is checked or not
     keep = np.ones(data.shape[0], dtype=bool)
     # looping over data and check tuple

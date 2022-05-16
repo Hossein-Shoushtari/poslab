@@ -158,14 +158,14 @@ def modals():
     exp_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
         dbc.ModalBody("Nothing to export!")],
-        id="exp_warn",
+        id="sim_exp_warn",
         is_open=False
     )
     # export done
     exp_done = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("DONE")),
         dbc.ModalBody("Export successful!")],
-        id="exp_done",
+        id="sim_exp_done",
         is_open=False
     )
     # unlock hcu maps
@@ -288,22 +288,22 @@ def help_canvas():
                     # info upload
                     html.H5("UPLOAD", style={"text-align": "center", "color": "#3B5A7F"}),
                     html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
-                    html.P("All 7 buttons are for uploading the data required for the simulation.", style={"color": "gray"}),
+                    html.P("All 7 buttons are for uploading the data required for the simulation. Each file needs the first line as the header. The delimiter is a single space.", style={"color": "gray"}),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Maps:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                        dbc.Col(html.P("Only GeoJSON files of any type are accepted.", style={"color": "gray"}))
+                        dbc.Col(html.P("optional; GeoJSON (any crs)", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Waypoints:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                        dbc.Col(html.P("Only CSV files are accepted.", style={"color": "gray"}))
+                        dbc.Col(html.P("used for ground truth; CSV, UTM", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Antennas:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                        dbc.Col(html.P("Only TXT, CSV or GeoJSON files are accepted.", style={"color": "gray"}))
+                        dbc.Col(html.P("optional; CSV, UTM", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Sensors:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                        dbc.Col(html.P("Only CSV files are accepted.", style={"color": "gray"}))
+                        dbc.Col(html.P("acc&gyr used for ground truth, bar&mag optional; CSV", style={"color": "gray"}))
                     ], className="g-0")],
                 style={"border":"1px solid #3B5A7F", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
                 html.Br(),
@@ -336,7 +336,7 @@ def help_canvas():
                         dbc.Col(html.Div(html.P("Sim. Measm.:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
                         dbc.Col(html.P("Simulate the measurements to complete the calculation.", style={"color": "gray"}))
                     ], className="g-0"),
-                    html.Div(html.P("The ground truth trajectory and the simulated measurements can now be downloaded as two separate CSV files!", style={"color": "gray"}),
+                    html.Div(html.P("The ground truth trajectory, the simulated measurements and the drawings can be downloaded in a ZIP file!", style={"color": "gray"}),
                     style={"borderLeft": "2px solid #36BD8E", "paddingLeft": "5px"})],
                 style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
                 html.Br(),
@@ -349,7 +349,7 @@ def help_canvas():
                 style={"border":"1px solid red", "border-radius": 10, "padding": "10px", "marginBottom": "0px"})
             ],
         id="sim_help_cv",
-        scrollable=True,
+        scrollable=False,
         title="Help",
         is_open=False)
     ])
@@ -438,7 +438,7 @@ def gt_canvas():
             ],
             style={"border":"1px solid silver", "border-radius": 10, "padding": "10px"})],
         id="gt_cv",
-        scrollable=True,
+        scrollable=False,
         title="Ground Truth Generation",
         is_open=False)
     ])
@@ -485,7 +485,7 @@ def sim_set_canvas():
                 style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
             ],
         id="sim_set_cv",
-        scrollable=True,
+        scrollable=False,
         title="Simulation Settings",
         is_open=False)
     ])
@@ -566,7 +566,7 @@ def sim_layout(geojson_style):
     }
     H5_style = {
         "textAlign": "center",
-        "color": "grey",
+        "color": "gray",
         "marginTop": "5px"
     }
     first_row = html.Div([dbc.Row(
@@ -658,7 +658,7 @@ def sim_layout(geojson_style):
             dbc.Col(html.Div([
                 html.Div(
                     [
-                        html.H5("Export", style={"textAlign": "center", "color": "grey", "marginTop": "5px"}),
+                        html.H5("Export", style={"textAlign": "center", "color": "gray", "marginTop": "5px"}),
                         html.Hr(style=hr_style),
                         html.Div(
                             [
