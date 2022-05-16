@@ -402,8 +402,8 @@ def sim_calls(app, geojson_style):
             if ref_data and acc_data and gyr_data:
                 # Loading Data
                 ref = su.ref_checked(ref_data, check)
-                acc = np.loadtxt(f"assets/sensors/acc/{acc_data}.csv")
-                gyr = np.loadtxt(f"assets/sensors/gyr/{gyr_data}.csv")
+                acc = np.loadtxt(f"assets/sensors/acc/{acc_data}.csv", skiprows=1)
+                gyr = np.loadtxt(f"assets/sensors/gyr/{gyr_data}.csv", skiprows=1)
                 # generating ground truth data
                 gt = generate_gt(ref, acc, gyr)
                 if gt is not None: # gt generation went well
