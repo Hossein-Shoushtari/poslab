@@ -267,17 +267,17 @@ def sim_calls(app, geojson_style):
             center = zoom_center_ant[1]    # center
             layers += ant_layer            # adding antenna layer to map
         if rp_layer:
-            zoom = zoom_center_rp_gt[0]   # zoom
-            center = zoom_center_rp_gt[1] # center
-            layers += rp_layer            # adding ref points layer to map
+            zoom = zoom_center_rp_gt[0]    # zoom
+            center = zoom_center_rp_gt[1]  # center
+            layers += rp_layer             # adding ref points layer to map
         if gt_layer:
-            zoom = zoom_center_rp_gt[0]   # zoom
-            center = zoom_center_rp_gt[1] # center
-            layers += gt_layer            # adding gt points layer to map
+            zoom = zoom_center_rp_gt[0]    # zoom
+            center = zoom_center_rp_gt[1]  # center
+            layers += gt_layer             # adding gt points layer to map
         if unlocked:
             zoom = 19
             center = (53.540239664876104, 10.004663417352164) # HCU coordinates
-            layers += su.floorplan2layer(geojson_style)          # adding hcu floorplans to map
+            layers += su.floorplan2layer(geojson_style)       # adding hcu floorplans to map
             style = {"display": "block"}                      # displaying info panel
         if layers: return html.Div(dl.LayersControl(layers)), center, zoom, style
         else: return html.Div(style={"display": "None"}), center, zoom, style
@@ -409,33 +409,30 @@ def sim_calls(app, geojson_style):
                 if gt is not None: # gt generation went well
                     # formatting and saving groundtruth
                     export_gt(gt)
-                    # converting crs and making markers
-                    markers = su.gt2marker(gt[:, 1:3])
                     # getting zoom lvl and center point
                     lon, lat = su.from_32632_to_4326(gt[:,1:3])
                     zoom = u.zoom_lvl(lon, lat)     # zoom lvl
                     center = u.centroid(lon, lat)   # center
-                    # making ground truth layer
-                    layer = [dl.Overlay(dl.LayerGroup(markers), name="GroundTruth", checked=True)]
-                    return gen_warn, not gen_done, sel_warn, no_update, layer, [zoom, center], no_update # successful generator
-                else: return not gen_warn, gen_done, sel_warn, no_update, [], no_update, no_update      # gt generation went wrong
-            else: return gen_warn, gen_done, not sel_warn, no_update, [], no_update, no_update          # no data selected
+                    # making ground truth layers
+                    layers = su.gt2marker()
+                    return gen_warn, not gen_done, sel_warn, no_update, layers, [zoom, center], no_update   # successful generator
+                else: return not gen_warn, gen_done, sel_warn, no_update, no_update, no_update, no_update  # gt generation went wrong
+            else: return gen_warn, gen_done, not sel_warn, no_update, no_update, no_update, no_update      # no data selected
         # ========= REF POINTS  =================================================================================================================
         elif "show_btn" in button:
             if ref_data:
                 # loading data
                 data = np.loadtxt(f"assets/waypoints/{ref_data}.csv", skiprows=1)[:, 1:3]
-                # converting crs and making markers
-                markers = su.ref2marker(data, check)
                 # getting zoom lvl and center point
                 lon, lat = su.from_32632_to_4326(data)
                 zoom = u.zoom_lvl(lon, lat)     # zoom lvl
                 center = u.centroid(lon, lat)   # center
-                # turning ref points into markers
+                # turning ref points into layer of markers
+                markers = su.ref2marker(data, check)
                 layer = [dl.Overlay(dl.LayerGroup(markers), name="Waypoints", checked=True)]
-                return gen_warn, gen_done, sel_warn, layer, no_update, [zoom, center], no_update    # successful
-            else: return gen_warn, gen_done, not sel_warn, [], no_update, no_update, no_update # no data selected
-        else: return gen_warn, gen_done, sel_warn, [], [], no_update, no_update                       # offcanvas is closed
+                return gen_warn, gen_done, sel_warn, layer, no_update, [zoom, center], no_update       # successful
+            else: return gen_warn, gen_done, not sel_warn, [], no_update, no_update, no_update         # no data selected
+        else: return gen_warn, gen_done, sel_warn, no_update, no_update, no_update, no_update          # offcanvas is closed
 
     # simulation settings canvas ========================================================================================================
     @app.callback(

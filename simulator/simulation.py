@@ -10,6 +10,11 @@ from geopandas import GeoSeries
 from geojson import Point
 
 
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return idx, array[idx]
+
 def closest_value(input_list, input_value):
     """
     return the closest value to a given input value from a list of given values
@@ -60,7 +65,7 @@ def semantic_error(number, error_range, intervall_range, time_stamps):
 
     return intervall_lengths, errors, intervall_starts
 
-def simulate_positions(groundtruth, error, measurement_freq, query_freq, number_of_users, number_of_intervalls,
+def simulate_positions(groundtruth, error, measurement_freq, network_capacity, number_of_users, number_of_intervalls,
                        error_range, intervall_range, semantic):
     """
         creating sample data points for 5G measurements
@@ -86,150 +91,93 @@ def simulate_positions(groundtruth, error, measurement_freq, query_freq, number_
         qualities_list : estimated qualities for each measurement (as limits of a error intervall) - array of floats
         """
     # getting selected ground truth data
-    gt = np.loadtxt(f"assets/exports/gt/{groundtruth}.csv", skiprows=1)
-
-    rows = gt
-    positions = []
-    time_stamps = []
-
+    groundtruth = np.loadtxt(f"assets/groundtruth/{groundtruth}.csv", skiprows=1)
     error_list = []
-        # for row in reader:
-            # rows.append([float(row[0].split(' ')[0]), float(row[0].split(' ')[1]), float(row[0].split(' ')[2])])
-    original_time_stamps = [r[0] for r in rows]
-    intervall_lengths, semantic_errors, intervall_starts = semantic_error(number_of_intervalls, error_range,
-                                                                          intervall_range, original_time_stamps)
-
-
-    # current_intervall_start = intervall_starts[0]
-    # current_semantic_error = semantic_errors[0]
-    # current_intervall_length = intervall_lengths[0]
     count = 0
     semantic_active = False
 
-    if number_of_users > query_freq:
-        #overflow = number_of_users - query_freq
-        duration = (number_of_users / query_freq) * 1000
-        ts = rows[0][0]
-        # print(measurement_freq, 'measurement_freq')
-        # print(query_freq, 'query_freq')
-        # print(number_of_users, 'number of users')
-        # print(duration, 'duration')
-        # print(rows[1][0] - rows[0][0], 'first sequel')
 
-        measurement_freq = measurement_freq / 1000
-        query_freq = query_freq / 1000
+    rows = groundtruth
+    ts = rows[0][0]
 
-        for r in range(len(rows)):
-            if r == 0:
-                time_stamps.append(ts)
+    measurement_freq = measurement_freq / 1000  # convert from s to ms
 
-                if semantic == True:
-                    if rows[r][0] >= intervall_starts[count] and rows[r][0] <= intervall_starts[count] + \
-                            intervall_lengths[count]:
-                        current_error = semantic_errors[count]
-                        semantic_active == True
+    gt_time_stamps = [r[0] for r in rows]
 
-                    elif semantic_active == True:
-                        current_error = semantic_errors[count]
-                        count += 1
-                    elif semantic_active == False:
-                        current_error = error
-                else:
-                    current_error = error
-
-                x_error = np.random.normal(0, current_error)
-                y_error = np.random.normal(0, current_error)
-                error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
-                positions.append([rows[r][1] + x_error, rows[r][2] + y_error])
-                ts += duration
-
-            else:
-
-                x_error = np.random.normal(0, current_error)
-                y_error = np.random.normal(0, current_error)
-                error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
-                positions.append([rows[r][1] + x_error, rows[r][2] + y_error])
-
-                ts += duration
-
-            dt = 1 / measurement_freq
-            t1 = rows[r][0]
-            t2 = rows[r][0] + dt
-
-            if r <= len(rows) - 2:
-                dx = ((rows[r + 1][1] - rows[r][1]) / (rows[r + 1][0] - rows[r][0])) * dt
-                dy = ((rows[r + 1][2] - rows[r][2]) / (rows[r + 1][0] - rows[r][0])) * dt
-                # dz = ((rows[r-1][3] - rows[r][3])/(rows[r-1][0] - rows[r][0]))*dt
-
-                x_temp = rows[r][1] + dx
-                y_temp = rows[r][2] + dy
-                # z_temp = rows[r][3] + dz
-
-            while t2 < rows[-1][0] and t2 < rows[r + 1][0]:
-                time_stamps.append(ts)
-                x_error = np.random.normal(0, current_error)
-                y_error = np.random.normal(0, current_error)
-                error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
-                positions.append([x_temp + dx + np.random.uniform(-current_error, current_error, 1)[0],
-                                  y_temp + dy + np.random.uniform(-error, error, 1)[0]])
-                t2 = t2 + dt
-                x_temp = x_temp + dx
-                y_temp = y_temp + dy
-
-                ts += duration
-
-
+    if number_of_users > network_capacity:
+        dt = (number_of_users / network_capacity) * 1000
     else:
+        dt = 1 / measurement_freq
 
-        measurement_freq = measurement_freq / 1000
-        query_freq = query_freq / 1000
 
-        for r in range(len(rows)):
+    positions = []
 
-            time_stamps.append(rows[r][0])
+    simulatd_timestamps = []
+    while ts <= rows[-1][0]:
+        simulatd_timestamps.append(ts)
+        ts += dt
+    # print('simulatd_timestamps',len(simulatd_timestamps))
 
-            if semantic == True:
-                if rows[r][0] >= intervall_starts[count] and rows[r][0] <= intervall_starts[count] + \
-                        intervall_lengths[count]:
-                    current_error = semantic_errors[count]
-                    semantic_active == True
+    intervall_lengths, semantic_errors, intervall_starts = semantic_error(number_of_intervalls, error_range,
+                                                                          intervall_range, simulatd_timestamps)
 
-                elif semantic_active == True:
-                    current_error = semantic_errors[count]
-                    count += 1
-                elif semantic_active == False:
-                    current_error = error
-            else:
+
+    for i,t in enumerate(simulatd_timestamps):
+
+        if semantic == True:
+            if t >= intervall_starts[count] and t <= intervall_starts[count] + \
+                    intervall_lengths[count]:
+                current_error = semantic_errors[count]
+                semantic_active == True
+
+            elif semantic_active == True:
+                current_error = semantic_errors[count]
+                count += 1
+            elif semantic_active == False:
                 current_error = error
+        else:
+            current_error = error
 
-            x_error = np.random.normal(0, current_error)
-            y_error = np.random.normal(0, current_error)
-            error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
-            positions.append([rows[r][1] + x_error, rows[r][2] + y_error])
+        x_error = np.random.normal(0, current_error)
+        y_error = np.random.normal(0, current_error)
+        error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
 
-            dt = 1 / measurement_freq
-            t1 = rows[r][0]
-            t2 = rows[r][0] + dt
+        # closestValue = closest_value(gt_time_stamps, t)
+        id, closest_GT_time =find_nearest(gt_time_stamps, t)
 
-            if r <= len(rows) - 2:
-                dx = ((rows[r + 1][1] - rows[r][1]) / (rows[r + 1][0] - rows[r][0])) * dt
-                dy = ((rows[r + 1][2] - rows[r][2]) / (rows[r + 1][0] - rows[r][0])) * dt
-                # dz = ((rows[r-1][3] - rows[r][3])/(rows[r-1][0] - rows[r][0]))*dt
+        '''if closest_GT_time > t:
 
-                x_temp = rows[r][1] + dx
-                y_temp = rows[r][2] + dy
-                # z_temp = rows[r][3] + dz
+            dx = ((rows[id][1] - rows[id - 1][1]) / (rows[id][0] - rows[id - 1][0])) * dt
+            dy = ((rows[id][2] - rows[id - 1][2]) / (rows[id][0] - rows[id - 1][0])) * dt
+            # dz = ((rows[r-1][3] - rows[r][3])/(rows[r-1][0] - rows[r][0]))*dt
 
-            while t2 < rows[-1][0] and t2 < rows[r + 1][0]:
-                time_stamps.append(t2)
-                x_error = np.random.normal(0, current_error)
-                y_error = np.random.normal(0, current_error)
-                error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
-                positions.append([x_temp + dx + np.random.uniform(-current_error, current_error, 1)[0],
-                                  y_temp + dy + np.random.uniform(-current_error, current_error, 1)[0]])
-                t2 = t2 + dt
-                x_temp = x_temp + dx
-                y_temp = y_temp + dy
+            x_temp = rows[id][1] - dx
+            y_temp = rows[id][2] - dy
+
+
+        elif closest_GT_time < t:
+
+
+            dx = ((rows[id + 1][1] - rows[id][1]) / (rows[id + 1][0] - rows[id][0])) * dt
+            dy = ((rows[id + 1][2] - rows[id][2]) / (rows[id + 1][0] - rows[id][0])) * dt
+            # dz = ((rows[r-1][3] - rows[r][3])/(rows[r-1][0] - rows[r][0]))*dt
+
+            x_temp = rows[id][1] + dx
+            y_temp = rows[id][2] + dy
+
+        elif closest_GT_time == t:'''
+        x_temp = rows[id][1]
+        y_temp = rows[id][2]
+
+        positions.append([x_temp + np.random.uniform(-current_error, current_error, 1)[0],
+                          y_temp + np.random.uniform(-current_error, current_error, 1)[0]])
+
+
+
+
+
+
+
 
     qualities_list = []
     for e in error_list:
@@ -237,6 +185,7 @@ def simulate_positions(groundtruth, error, measurement_freq, query_freq, number_
                                 e)
         qualities_list.append(quality)
 
+    time_stamps = simulatd_timestamps
     return time_stamps, positions, error_list, qualities_list
 
 def azimuth(point1: tuple, point2: tuple) -> float:
@@ -250,9 +199,9 @@ def distance(point1: tuple, point2: tuple) -> float:
 
 def export_sim(time_stamps: list, positions: list, errors: list, qualities: list, name: tuple):
     ### as new trajectory
-    with open(f"assets/trajectories/sim_traj__{name[0]}_{name[1]}_{name[2]}.csv", "w") as f:
+    with open(f"assets/trajectories/sim__freq{name[0]}_err{name[1]}_user{name[2]}.csv", "w") as f:
         lines = [[time_stamps[i], positions[i][0], positions[i][1]] for i in range(len(time_stamps))]
-        output = ""
+        output = "timestamp x y error quality \n"
         for row in lines:
             output += f"{row[0]} {row[1]} {row[2]}\n"
         f.write(output)
@@ -295,16 +244,17 @@ if __name__ == "__main__":
     """
     check if the simulate_positions function is working
     """
-    error = 0.1
-    measurement_freq = 0.1
-    query_freq = 500
+    groundtruth = "gt_traj__17+49+23"
+    error = 1
+    measurement_freq = 1
+    number_range = 1 # range of number of occurencies for segments with semantic error
+    error_range = [1, 15] # range of possible values for the semantic errors
+    intervall_range = [1 * 1000, 20 * 1000] # range of intervall lengths where semantic errors are generated
+    semantic_is_used = False # set this to True if semantic errors are used
+    network_capacity = 500
     number_of_users = 1
-    number_of_intervalls = 2
-    error_range = [1, 6]
-    intervall_range = [4, 6]
-    semantic = True
 
-    simulation = simulate_positions("gt_traj__16+47+39", error, measurement_freq, query_freq, number_of_users, number_of_intervalls, error_range, intervall_range, semantic)
+    simulation = simulate_positions(groundtruth, error, measurement_freq, network_capacity, number_of_users, 1,error_range, intervall_range,semantic_is_used)
     export_sim(*simulation, (measurement_freq, error, number_of_users))
     
     # filename = 'assets/groundtruth/GroundTruthEight.csv'

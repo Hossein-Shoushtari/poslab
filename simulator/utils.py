@@ -135,7 +135,11 @@ def map2layer(geojson_style) -> list:
     RETURN
     layers : list of uploaded layers
     """
+    # showing only last layer
+    num_files = next(os.walk("assets/maps"))[2]        # all existing map files
+    show = [False for _ in range(len(num_files)-1)] + [True]  # all False, but last True -> showing only last layer
     # initializing list to fill it with newly uploaded layers
+    i = 0
     layers = []
     for geojson_file in os.listdir("assets/maps"):
         name = geojson_file.split(".")[0]  # getting name of geojson file
@@ -144,10 +148,11 @@ def map2layer(geojson_style) -> list:
             options=dict(style=geojson_style),  # style each polygon
             hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
             hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""))
-        layers.append(dl.Overlay(geojson, name=name, checked=False))
+        layers.append(dl.Overlay(geojson, name=name, checked=show[i]))
+        i += 1
     return layers
 
-def gt2marker(ground_truth: list) -> list:
+def gt2marker() -> list:
     """
     FUNCTION
     - converts lat and lon from crs32632 (groundtruth) to crs4326
@@ -159,48 +164,63 @@ def gt2marker(ground_truth: list) -> list:
     RETURN
     markers : list of all created markers with converted lat and lon
     """
-    # designing icon (from https://icons8.de/icons/set/marker)
-    icon = {
-        "iconUrl": "https://img.icons8.com/emoji/344/red-circle-emoji.png",
-        "iconSize": [5, 5],  # size of the icon
-        "iconAnchor": [0, 0],  # point of the icon which will correspond to marker"s location
-    }
-    # making points out of ground truth data for converting it (crs:32632 to crs:4326)
-    points = {"GroundTruth": [i for i in range(1, ground_truth.shape[0]+1)], "geometry": [sh.Point(lat, lon) for lat, lon in ground_truth]}
-    converted_points = gp.GeoDataFrame(points, crs=32632).to_crs(4326)
-    # making geojson format for creating markers
-    geojson = dlx.dicts_to_geojson([dict(lat=row[1].y, lon=row[1].x) for _, row in converted_points.iterrows()])
-    # making and designing markers (adding tooltip and popup)
-    markers = []
-    for nr, row in converted_points.iterrows():
-        marker = dl.Marker(
-            position=[row[1].y, row[1].x],
-            icon=icon,
-            children=[
-                dl.Tooltip(nr+1),
-                dl.Popup([
-                    html.H5(nr+1, style={"text-align": "center", "color": "gray", "marginTop": "-5px"}),
-                    dbc.Table(html.Tbody([
-                        html.Tr([
-                            html.Td("Latitude", style={"font-size": "15px", "color": "white"}),
-                            html.Td(f"{row[1].y:.5f}", style={"font-size": "15px", "color": "white"})
+    # icon colors
+    colors = ["red", "orange", "yellow", "purple", "green", "blue", "black", "brown"]
+    # showing only last layer
+    num_files = next(os.walk("assets/groundtruth"))[2]        # all existing ground truth files
+    show = [False for _ in range(len(num_files)-1)] + [True]  # all False, but last True -> showing only last layer
+    # making layers out of all generated ground truth data
+    i = 0
+    layers = []
+    for csv_file in os.listdir("assets/groundtruth"):
+        # layer & data name
+        name = csv_file.split(".")[:-1]
+        # data
+        gt = np.loadtxt(f"assets/groundtruth/{csv_file}", skiprows=1)[:, 1:3]
+        # designing icon (from https://icons8.de/icons/set/marker)
+        icon = {
+            "iconUrl": f"https://img.icons8.com/emoji/344/{colors[i%len(colors)]}-circle-emoji.png",
+            "iconSize": [5, 5],  # size of the icon
+            "iconAnchor": [0, 0],  # point of the icon which will correspond to marker"s location
+        }
+        # making points out of ground truth data for converting it (crs:32632 to crs:4326)
+        points = {"GroundTruth": [i for i in range(1, gt.shape[0]+1)], "geometry": [sh.Point(lat, lon) for lat, lon in gt]}
+        converted_points = gp.GeoDataFrame(points, crs=32632).to_crs(4326)
+        # making geojson format for creating markers
+        geojson = dlx.dicts_to_geojson([dict(lat=row[1].y, lon=row[1].x) for _, row in converted_points.iterrows()])
+        # making and designing markers (adding tooltip and popup)
+        markers = []
+        for nr, row in converted_points.iterrows():
+            marker = dl.Marker(
+                position=[row[1].y, row[1].x],
+                icon=icon,
+                children=[
+                    dl.Tooltip(nr+1),
+                    dl.Popup([
+                        html.H5(nr+1, style={"text-align": "center", "color": "gray", "marginTop": "-5px"}),
+                        dbc.Table(html.Tbody([
+                            html.Tr([
+                                html.Td("Latitude", style={"font-size": "15px", "color": "white"}),
+                                html.Td(f"{row[1].y:.5f}", style={"font-size": "15px", "color": "white"})
+                            ]),
+                            html.Tr([
+                                html.Td("Longitude", style={"font-size": "15px", "color": "white"}),
+                                html.Td(f"{row[1].x:.5f}",style={"font-size": "15px", "color": "white"})
+                            ])
                         ]),
-                        html.Tr([
-                            html.Td("Longitude", style={"font-size": "15px", "color": "white"}),
-                            html.Td(f"{row[1].x:.5f}",style={"font-size": "15px", "color": "white"})
-                        ])
-                    ]),
-                    style={"marginTop": "-8px", "opacity": "0.5"},
-                    size="sm",
-                    bordered=True,
-                    color="secondary",
-                    )
-                ])
-            ]
-        )
-        markers.append(marker)
-        
-    return markers
+                        style={"marginTop": "-8px", "opacity": "0.5"},
+                        size="sm",
+                        bordered=True,
+                        color="secondary",
+                        )
+                    ])
+                ]
+            )
+            markers.append(marker)
+        # making layer out of markers
+        layers.append(dl.Overlay(dl.LayerGroup(markers), name=name, checked=show[i]))
+        i += 1
+    return layers
 
 def ref_tab(name: str) -> list:
     """
