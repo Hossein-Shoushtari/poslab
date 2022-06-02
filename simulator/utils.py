@@ -158,9 +158,6 @@ def gt2marker() -> list:
     - converts lat and lon from crs32632 (groundtruth) to crs4326
     - makes leaflet markers out of coordinates
     -------
-    PARAMETER
-    ground_truth : calculated ground truth data
-    -------
     RETURN
     markers : list of all created markers with converted lat and lon
     """
@@ -191,31 +188,7 @@ def gt2marker() -> list:
         # making and designing markers (adding tooltip and popup)
         markers = []
         for nr, row in converted_points.iterrows():
-            marker = dl.Marker(
-                position=[row[1].y, row[1].x],
-                icon=icon,
-                children=[
-                    dl.Tooltip(nr+1),
-                    dl.Popup([
-                        html.H5(nr+1, style={"text-align": "center", "color": "gray", "marginTop": "-5px"}),
-                        dbc.Table(html.Tbody([
-                            html.Tr([
-                                html.Td("Latitude", style={"font-size": "15px", "color": "white"}),
-                                html.Td(f"{row[1].y:.5f}", style={"font-size": "15px", "color": "white"})
-                            ]),
-                            html.Tr([
-                                html.Td("Longitude", style={"font-size": "15px", "color": "white"}),
-                                html.Td(f"{row[1].x:.5f}",style={"font-size": "15px", "color": "white"})
-                            ])
-                        ]),
-                        style={"marginTop": "-8px", "opacity": "0.5"},
-                        size="sm",
-                        bordered=True,
-                        color="secondary",
-                        )
-                    ])
-                ]
-            )
+            marker = dl.Marker(position=[row[1].y, row[1].x], icon=icon)
             markers.append(marker)
         # making layer out of markers
         layers.append(dl.Overlay(dl.LayerGroup(markers), name=name, checked=show[i]))
@@ -330,7 +303,7 @@ def ref2marker(data: list, check: tuple) -> list:
             )
             markers.append(marker)
 
-    return markers
+    return dl.Overlay(dl.LayerGroup(markers), name="Waypoints", checked=True)
 
 def ant2marker(ant: list) -> list:
     """
@@ -359,7 +332,7 @@ def ant2marker(ant: list) -> list:
         )
         markers.append(marker)
 
-    return markers
+    return dl.Overlay(dl.LayerGroup(markers), name="Antennas", checked=True)
 
 def exctract_coordinates(data: list) -> list:
     """

@@ -265,7 +265,7 @@ def sim_map(geojson_style):
                 html.Div(id="sim_hcu_panel", children=info, style={"display": "None"}),
                 html.Button("🎓", id="sim_hcu_maps", style=btn_style),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
-                html.Div(id="sim_layers", children=html.Div(dl.LayersControl(su.floorplan2layer(geojson_style)), style={"display": "None"})), # is previously filled with invisible floorplans for initialization
+                html.Div(id="sim_div_lc", children=dl.LayersControl(id="sim_lc", children=su.floorplan2layer(geojson_style)), style={"display": "None"}), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
                 dl.FeatureGroup(dl.EditControl(
                                     id="edit_control",

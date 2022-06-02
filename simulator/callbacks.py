@@ -144,8 +144,7 @@ def sim_calls(app, geojson_style):
                 # getting converted antenna coordinates
                 ant = np.loadtxt("assets/antennas/antennas.csv", skiprows=1)
                 # making layer out of markers
-                markers = su.ant2marker(ant)
-                layer = [dl.Overlay(dl.LayerGroup(markers), name="Antennas", checked=True)]
+                layer = su.ant2marker(ant)
                 # zoom and center
                 ant = su.from_32632_to_4326(ant)
                 lon, lat = ant[0], ant[1]
@@ -228,7 +227,8 @@ def sim_calls(app, geojson_style):
     # map display =======================================================================================================================
     @app.callback(
         ### Outputs ###
-        Output("sim_layers", "children"),  # layers
+        Output("sim_div_lc", "style"),  # div layer control
+        Output("sim_lc", "children"),      # layer control        
         Output("sim_map", "center"),       # map center
         Output("sim_map", "zoom"),         # map zoom level
         Output("sim_hcu_panel", "style"),  # hcu info panel
@@ -243,6 +243,7 @@ def sim_calls(app, geojson_style):
         Input("unlocked", "data")        # unlocked status hcu maps
     )
     def display(
+        #lays,
         map_layer,
         zoom_center_map,
         ant_layer,
@@ -252,7 +253,8 @@ def sim_calls(app, geojson_style):
         zoom_center_rp_gt,
         unlocked
         ):
-        style = {"display": "None"}
+        hcu_style = {"display": "None"}
+        ly_style = {"display": "None"}
         # presetting map zoom level and center
         zoom = 4
         center = (49.845359730413186, 9.90578149727622) # center of Europe
@@ -261,26 +263,31 @@ def sim_calls(app, geojson_style):
         if map_layer:
             zoom = zoom_center_map[0]      # zoom for latest uploaded map layer
             center = zoom_center_map[1]    # center of latest uploaded map layer
-            layers += map_layer            # adding newly uploaded map layers to map
+            layers += map_layer            # adding map (all previous + latest) layers to map
+            ly_style = {"display": "block"}
         if ant_layer:
             zoom = zoom_center_ant[0]      # zoom
             center = zoom_center_ant[1]    # center
-            layers += ant_layer            # adding antenna layer to map
+            layers.append(ant_layer)       # adding antenna layer to map
+            ly_style = {"display": "block"}
         if rp_layer:
             zoom = zoom_center_rp_gt[0]    # zoom
             center = zoom_center_rp_gt[1]  # center
-            layers += rp_layer             # adding ref points layer to map
+            layers.append(rp_layer)        # adding ref points layer to map
+            ly_style = {"display": "block"}
         if gt_layer:
             zoom = zoom_center_rp_gt[0]    # zoom
             center = zoom_center_rp_gt[1]  # center
-            layers += gt_layer             # adding gt points layer to map
+            layers += gt_layer             # adding gt points (all previous + latest) layers to map
+            ly_style = {"display": "block"}
         if unlocked:
             zoom = 19
             center = (53.540239664876104, 10.004663417352164) # HCU coordinates
             layers += su.floorplan2layer(geojson_style)       # adding hcu floorplans to map
-            style = {"display": "block"}                      # displaying info panel
-        if layers: return html.Div(dl.LayersControl(layers)), center, zoom, style
-        else: return html.Div(style={"display": "None"}), center, zoom, style
+            hcu_style = {"display": "block"}                  # displaying info panel
+            ly_style = {"display": "block"}
+        if layers: return ly_style, layers, center, zoom, hcu_style
+        else: return ly_style, [], center, zoom, hcu_style
 
     # ground truth canvas ===============================================================================================================
     @app.callback(
@@ -428,8 +435,7 @@ def sim_calls(app, geojson_style):
                 zoom = u.zoom_lvl(lon, lat)     # zoom lvl
                 center = u.centroid(lon, lat)   # center
                 # turning ref points into layer of markers
-                markers = su.ref2marker(data, check)
-                layer = [dl.Overlay(dl.LayerGroup(markers), name="Waypoints", checked=True)]
+                layer = su.ref2marker(data, check)
                 return gen_warn, gen_done, sel_warn, layer, no_update, [zoom, center], no_update       # successful
             else: return gen_warn, gen_done, not sel_warn, [], no_update, no_update, no_update         # no data selected
         else: return gen_warn, gen_done, sel_warn, no_update, no_update, no_update, no_update          # offcanvas is closed
@@ -643,4 +649,3 @@ def sim_calls(app, geojson_style):
         elif feature_1og: return su.hover_info(feature_1og)   # if 1OG is clicked
         elif feature_4og: return su.hover_info(feature_4og)   # if 4OGG is clicked
         else: return su.hover_info()                          # if nothing is clicked
-
