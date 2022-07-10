@@ -27,9 +27,9 @@ def sim_calls(app, geojson_style):
         Output("sim_map_warn", "is_open"), # map upload warn
         Output("sim_map_done", "is_open"), # map upload done
         # layers
-        Output("map_layer", "data"),
+        Output("sim_map_layer", "data"),
         # storage
-        Output("z_c_map", "data"),
+        Output("sim_z_c_map", "data"),
         # loading
         Output("sim_spin1", "children"),   # loading status
         ### Inputs ###
@@ -60,11 +60,11 @@ def sim_calls(app, geojson_style):
                 gp_file = gp.read_file(decoded_content)
                 converted = gp.GeoDataFrame(gp_file, crs=gp_file.crs).to_crs(4326) # converting crs from uploaded file to WGS84
                 converted.to_file(f"assets/maps/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
-            lon, lat = su.exctract_coordinates(gp_file)
+            lon, lat = u.extract_coordinates(gp_file)
             zoom = u.zoom_lvl(lon, lat)               # zoom for latest uploaded map
             center = u.centroid(lon, lat)             # center of latest uploaded map
             # uploaded maps as converted layers
-            layers = su.map2layer(geojson_style)
+            layers = u.map2layer(geojson_style)
             return map_warn, not map_done, layers, [zoom, center], no_update # returning uploaded layers
         # ====== no button clicked =============================================================================================================
         # this else-section is always activated, when the page refreshes -> no warnings
@@ -146,7 +146,7 @@ def sim_calls(app, geojson_style):
                 # making layer out of markers
                 layer = su.ant2marker(ant)
                 # zoom and center
-                ant = su.from_32632_to_4326(ant)
+                ant = u.from_32632_to_4326(ant)
                 lon, lat = ant[0], ant[1]
                 zoom = u.zoom_lvl(lon, lat)
                 center = u.centroid(lon, lat)
@@ -194,11 +194,11 @@ def sim_calls(app, geojson_style):
 
     # hcu canvas ========================================================================================================================
     @app.callback(
-        Output("research", "is_open"),
+        Output("sim_research", "is_open"),
         Input("sim_hcu_maps", "n_clicks"),
-        State("research", "is_open")
+        State("sim_research", "is_open")
     )
-    def hcu(hcu_maps, is_open):
+    def sim_hcu(hcu_maps, is_open):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "sim_hcu_maps" in button:
             return not is_open
@@ -208,17 +208,17 @@ def sim_calls(app, geojson_style):
     @app.callback(
         ### Outputs ###
         # return messages
-        Output("password", "valid"),
-        Output("password", "invalid"),
+        Output("sim_password", "valid"),
+        Output("sim_password", "invalid"),
         # unlock status
-        Output("unlocked", "data"),
+        Output("sim_unlocked", "data"),
         ### Inputs ###
-        Input("unlock", "n_clicks"),
-        Input("password", "value")
+        Input("sim_unlock", "n_clicks"),
+        Input("sim_password", "value")
     )
     def unlock(unlock, password):
         button = [p["prop_id"] for p in callback_context.triggered][0]
-        if "unlock" in button:
+        if "sim_unlock" in button:
             if str(password) == "cpsimulation2022":
                 return True, False, True
             return False, True, None
@@ -227,24 +227,23 @@ def sim_calls(app, geojson_style):
     # map display =======================================================================================================================
     @app.callback(
         ### Outputs ###
-        Output("sim_div_lc", "style"),  # div layer control
+        Output("sim_div_lc", "style"),     # div layer control
         Output("sim_lc", "children"),      # layer control        
         Output("sim_map", "center"),       # map center
         Output("sim_map", "zoom"),         # map zoom level
         Output("sim_hcu_panel", "style"),  # hcu info panel
         ### Inputs ###
-        Input("map_layer", "data"),      # maps
-        Input("z_c_map", "data"),        # zoom and center for latest map
-        Input("ant_layer", "data"),      # antennas
-        Input("z_c_ant", "data"),        # zoom and center for antennas
-        Input("rp_layer", "data"),       # reference points
-        Input("gt_layer", "data"),       # ground truth
-        Input("z_c_rp_gt", "data"),      # zoom and center for rp and gt
-        Input("unlocked", "data")        # unlocked status hcu maps
+        Input("sim_map_layer", "data"),    # maps
+        Input("sim_z_c_map", "data"),      # zoom and center for latest map
+        Input("ant_layer", "data"),        # antennas
+        Input("z_c_ant", "data"),          # zoom and center for antennas
+        Input("rp_layer", "data"),         # reference points
+        Input("sim_gt_layer", "data"),     # ground truth
+        Input("z_c_rp_gt", "data"),        # zoom and center for rp and gt
+        Input("sim_unlocked", "data")      # unlocked status hcu maps
     )
     def display(
-        #lays,
-        map_layer,
+        sim_map_layer,
         zoom_center_map,
         ant_layer,
         zoom_center_ant,
@@ -260,10 +259,10 @@ def sim_calls(app, geojson_style):
         center = (49.845359730413186, 9.90578149727622) # center of Europe
         # getting all different layers
         layers = []
-        if map_layer:
+        if sim_map_layer:
             zoom = zoom_center_map[0]      # zoom for latest uploaded map layer
             center = zoom_center_map[1]    # center of latest uploaded map layer
-            layers += map_layer            # adding map (all previous + latest) layers to map
+            layers += sim_map_layer            # adding map (all previous + latest) layers to map
             ly_style = {"display": "block"}
         if ant_layer:
             zoom = zoom_center_ant[0]      # zoom
@@ -369,7 +368,7 @@ def sim_calls(app, geojson_style):
         # store ref points (layer)
         Output("rp_layer", "data"),
         # store layer of generated gt
-        Output("gt_layer", "data"),
+        Output("sim_gt_layer", "data"),
         # store zoom lvl and center point
         Output("z_c_rp_gt", "data"),
         # loading
@@ -417,11 +416,11 @@ def sim_calls(app, geojson_style):
                     # formatting and saving groundtruth
                     export_gt(gt)
                     # getting zoom lvl and center point
-                    lon, lat = su.from_32632_to_4326(gt[:,1:3])
+                    lon, lat = u.from_32632_to_4326(gt[:,1:3])
                     zoom = u.zoom_lvl(lon, lat)     # zoom lvl
                     center = u.centroid(lon, lat)   # center
                     # making ground truth layers
-                    layers = su.gt2marker()
+                    layers = u.gt2marker()
                     return gen_warn, not gen_done, sel_warn, no_update, layers, [zoom, center], no_update   # successful generator
                 else: return not gen_warn, gen_done, sel_warn, no_update, no_update, no_update, no_update  # gt generation went wrong
             else: return gen_warn, gen_done, not sel_warn, no_update, no_update, no_update, no_update      # no data selected
@@ -431,7 +430,7 @@ def sim_calls(app, geojson_style):
                 # loading data
                 data = np.loadtxt(f"assets/waypoints/{ref_data}.csv", skiprows=1)[:, 1:3]
                 # getting zoom lvl and center point
-                lon, lat = su.from_32632_to_4326(data)
+                lon, lat = u.from_32632_to_4326(data)
                 zoom = u.zoom_lvl(lon, lat)     # zoom lvl
                 center = u.centroid(lon, lat)   # center
                 # turning ref points into layer of markers
@@ -637,15 +636,15 @@ def sim_calls(app, geojson_style):
         ### Outputs ###
         Output("sim_hover_info", "children"),  # info panel
         ### Inputs ###
-        Input("EG", "hover_feature"),      # EG
-        Input("1OG", "hover_feature"),     # 1OG
-        Input("4OG", "hover_feature"),     # 4OG
+        Input("EG_sim", "hover_feature"),      # EG
+        Input("1OG_sim", "hover_feature"),     # 1OG
+        Input("4OG_sim", "hover_feature"),     # 4OG
     )
     def hovering(
         # geojson info of all three layers
         feature_eg, feature_1og, feature_4og
         ):
-        if feature_eg: return su.hover_info(feature_eg)       # if EG is clicked
-        elif feature_1og: return su.hover_info(feature_1og)   # if 1OG is clicked
-        elif feature_4og: return su.hover_info(feature_4og)   # if 4OGG is clicked
-        else: return su.hover_info()                          # if nothing is clicked
+        if feature_eg: return u.hover_info(feature_eg)       # if EG is clicked
+        elif feature_1og: return u.hover_info(feature_1og)   # if 1OG is clicked
+        elif feature_4og: return u.hover_info(feature_4og)   # if 4OGG is clicked
+        else: return u.hover_info()                          # if nothing is clicked

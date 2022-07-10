@@ -2,11 +2,36 @@
 ###IMPORTS
 # dash
 import dash_bootstrap_components as dbc
+import plotly.graph_objects as go
 from dash import html, dcc
 import dash_leaflet as dl
-# utils (simulator)
-import simulator.utils as su
+# utils (general & evaluator)
+import evaluator.utils as eu
+import utils as u
 
+def storage():
+    ### STORAGE
+    # dcc.Store to store and share data between callbacks
+    storage = html.Div([
+        # zoom lvl and center for latest map / gt / traj
+        dcc.Store(id="eval_z_c_map", data=[], storage_type="memory"),
+        dcc.Store(id="z_c_gt", data=[], storage_type="memory"),
+        dcc.Store(id="z_c_tr", data=[], storage_type="memory"),
+        # map layer
+        dcc.Store(id="eval_map_layer", data=[], storage_type="memory"),
+        # password status
+        dcc.Store(id="eval_unlocked1", data=[], storage_type="memory"),
+        dcc.Store(id="eval_unlocked2", data=[], storage_type="memory"),
+        dcc.Store(id="eval_unlocked3", data=[], storage_type="memory"),
+        # trajectory layer
+        dcc.Store(id="traj_layer", data=[], storage_type="memory"),
+        # ground truth layer
+        dcc.Store(id="eval_gt_layer", data=[], storage_type="memory"),
+        # HistoNorm checkboxes
+        dcc.Store(id="norm_status", data=[], storage_type="memory"),
+        dcc.Store(id="histo_status", data=[], storage_type="memory")
+    ])
+    return storage
 
 def tooltips():
     # tooltips for more information
@@ -77,6 +102,20 @@ def modals():
         id="eval_ul_done",
         is_open=False
     )
+    # map warning
+    map_warn = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("WARNING")),
+        dbc.ModalBody("At least one wrong file was meant to be uploaded! Upload denied.")],
+        id="eval_map_warn",
+        is_open=False
+    )
+    # map done
+    map_done = dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalBody("File(s) uploaded and layered successfully!")],
+        id="eval_map_done",
+        is_open=False
+    )
     # cdf warning
     cdf_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
@@ -84,6 +123,7 @@ def modals():
         id="cdf_warn",
         is_open=False
     )
+    # cdf graph
     graph_modal = dbc.Modal(
         [
             dbc.ModalHeader(dbc.ModalTitle("CDF Plot")),
@@ -105,6 +145,8 @@ def modals():
         backdrop="static",
         is_open=False
     )
+    # visual
+    visual = visual_modal()
     # export warning
     exp_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
@@ -119,13 +161,36 @@ def modals():
         id="eval_exp_done",
         is_open=False
     )
-    return html.Div([ul_warn, ul_done, cdf_warn, graph_modal, exp_warn, exp_done])
+    # unlock hcu maps
+    hcu_modal = dbc.Modal(
+        [
+            dbc.ModalHeader(dbc.ModalTitle("Researcher Login")),
+            dbc.ModalBody(
+                html.Div(
+                    [
+                        dbc.Label("Password"),
+                        dbc.Input(id="eval_password", type="password", placeholder="Enter password", style={"color": "white"}),
+                        dbc.FormFeedback("Access granted", type="valid"),
+                        dbc.FormFeedback("Access denied", type="invalid")
+                    ]
+                )
+            ),
+            dbc.ModalFooter(
+                dbc.Button("Unlock", color="primary", id="eval_unlock")
+            ),
+        ],
+    id="eval_research",
+    backdrop="static",
+    is_open=False,
+    )
+
+    return html.Div([visual, ul_warn, ul_done, cdf_warn, graph_modal, map_warn, map_done, exp_warn, exp_done, hcu_modal])
 
 def eval_map(geojson_style):
     ### MAP
     # info panel for hcu maps
     info = html.Div(
-        children=su.hover_info(),
+        children=u.hover_info(),
         id="eval_hover_info",
         style={
             "position": "absolute",
@@ -164,12 +229,10 @@ def eval_map(geojson_style):
                 html.Div(id="eval_hcu_panel", children=info, style={"display": "None"}),
                 html.Button("🎓", id="eval_hcu_maps", style=btn_style),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
-                #html.Div(id="eval_layers", children=html.Div(dl.LayersControl(), style={"display": "None"})), # is previously filled with invisible floorplans for initialization
+                html.Div(id="eval_div_lc", children=dl.LayersControl(id="eval_lc", children=eu.floorplan2layer(geojson_style)), style={"display": "None"}), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
             ],
             style={"width": "100%", "height": "70vh", "margin": "auto", "display": "block"},
-            center=(49.845359730413186, 9.90578149727622),
-            zoom=4,
             id="eval_map"
         )
     )
@@ -227,13 +290,104 @@ def cdf_canvas():
     ])
     return cdf_canvas
 
+def visual_modal():
+    visual_modal= dbc.Modal(
+        [
+            dbc.ModalHeader(dbc.ModalTitle("VISUAL")),
+            dbc.ModalBody([
+                html.Div([
+                    dbc.Row([
+                        dbc.Col([
+                            dbc.Label("Maps", style={"color": "silver"}),
+                            dcc.Dropdown(
+                                id="vis_map_select",
+                                options=[],
+                                placeholder="Select Data",
+                                clearable=True,
+                                optionHeight=35,
+                                multi=True,
+                                searchable=True,
+                                style={"marginBottom": "7px", "color": "black"})
+                        ]),
+                        dbc.Col([
+                            dbc.Label("Ground Truth", style={"color": "silver"}),
+                            dcc.Dropdown(
+                                id="vis_gt_select",
+                                options=[],
+                                placeholder="Select Data",
+                                clearable=True,
+                                optionHeight=35,
+                                multi=True,
+                                searchable=True,
+                                style={"marginBottom": "7px", "color": "black"})
+                        ]),
+                        dbc.Col([
+                            dbc.Label("Trajectories", style={"color": "silver"}),
+                            dcc.Dropdown(
+                                id="vis_traj_select",
+                                options=[],
+                                placeholder="Select Data",
+                                clearable=True,
+                                optionHeight=35,
+                                multi=True,
+                                searchable=True,
+                                style={"marginBottom": "7px", "color": "black"})
+                        ])
+                    ])],
+                    style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}
+                ),
+                dcc.Graph(
+                    figure=go.Figure(data=[go.Scattermapbox()]).update_layout(margin={"r":0,"t":0,"l":0,"b":0},mapbox=go.layout.Mapbox(style="white-bg")),
+                    config={
+                        "staticPlot": False,     # True, False
+                        "scrollZoom": True,      # True, False
+                        "doubleClick": "reset",  # "reset", "autosize" or "reset+autosize", False
+                        "showTips": True,        # True, False
+                        "displayModeBar": True,  # True, False, "hover"
+                        "watermark": True
+                    },
+                    id="vis_map",
+                    className="six columns",
+                    style={"height": "600px"})
+            ])
+        ],
+        id="visual_show",
+        size="xl",
+        backdrop="static",
+        is_open=False
+    )
+    return visual_modal
+
 def help_canvas():
-    ## OFFCANVAS
-    # HELP
     help_canvas = html.Div([
         dbc.Offcanvas(
             [
-                html.Div()
+                html.Div([
+                    # info upload
+                    html.H5("UPLOAD", style={"text-align": "center", "color": "#3B5A7F"}),
+                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
+                    html.P("All buttons are for uploading the data required for the simulation. Each file needs the first line as the header. The delimiter is a single space.", style={"color": "gray"}),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Maps:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.P("optional; GeoJSON (any crs)", style={"color": "gray"}))
+                    ], className="g-0"),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Paths:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.P("temporarily unavailable", style={"color": "gray", "font-style": "italic"}))
+                    ], className="g-0"),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Ground Truth:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.P("optional; CSV, UTM", style={"color": "gray"}))
+                    ], className="g-0"),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Trajectory:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.P("optional; CSV, UTM", style={"color": "gray"}))
+                    ], className="g-0"),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Sensors:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.P("optional; CSV", style={"color": "gray"}))
+                    ], className="g-0")],
+                style={"border":"1px solid #3B5A7F", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
             ],
         id="eval_help_cv",
         scrollable=True,
@@ -363,7 +517,7 @@ def eval_layout(geojson_style):
                                     [
                                         html.Div(html.P("Normalized"),
                                             style={"width": "118px", "height": "29px", "text-align": "center"}),
-                                        html.Div(dbc.Checklist(options=[{"value": 1, "disabled": True}], value=[1], id="norm", style={"marginLeft": "50px"}),
+                                        html.Div(dbc.Checklist(options=[{"value": 1}], value=[1], id="norm_box", style={"marginLeft": "50px"}),
                                             style={"width": "118px", "height": "29px" }
                                         )
                                     ],
@@ -389,7 +543,7 @@ def eval_layout(geojson_style):
                                     [
                                         html.Div(html.P("Histogram"),
                                             style={"width": "118px", "height": "29px", "text-align": "center"}),
-                                        html.Div(dbc.Checklist(options=[{"value": 0, "disabled": True}], value=[1], id="histo", style={"marginLeft": "50px"}),
+                                        html.Div(dbc.Checklist(options=[{"value": 1}], value=[1], id="histo_box", style={"marginLeft": "50px"}),
                                             style={"width": "118px", "height": "29px" }
                                         )
                                     ],
@@ -399,7 +553,7 @@ def eval_layout(geojson_style):
                                     [
                                         html.Div(html.P("Percentage"),
                                             style={"width": "118px", "height": "29px", "text-align": "center"}),
-                                        html.Div(dbc.Checklist(options=[{"value": 1}], value=[0], id="percent", style={"marginLeft": "50px"}),
+                                        html.Div(dbc.Checklist(options=[{"value": 1}], value=[1], id="percent", style={"marginLeft": "50px"}),
                                             style={"width": "118px", "height": "29px" }
                                         )
                                     ],
@@ -457,6 +611,8 @@ def eval_layout(geojson_style):
         [
             dbc.CardBody(
                 [
+                    # storage
+                    storage(),
                     # download
                     export,
                     # modals

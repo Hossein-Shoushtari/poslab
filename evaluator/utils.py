@@ -1,5 +1,8 @@
 ##### Utils Evaluator
 ###IMPORTS
+# dash
+from dash_extensions.javascript import arrow_function
+import dash_leaflet as dl
 # built in
 import shapely.geometry as sh
 from scipy.stats import norm
@@ -7,6 +10,32 @@ import geopandas as gp
 import pandas as pd
 import numpy as np
 import math as m
+
+def floorplan2layer(geojson_style) -> list:
+    """
+    FUNCTION
+    - makes layers out of HCU floorplans (gejson)
+    -------
+    PARAMETER
+    geojson_style : geojson rendering logic in java script (assign)
+    -------
+    RETURN
+    layers : list of layered floorplans
+    """
+    # initializing list to fill it with default layers
+    layers = []
+    # list of all default floorplan names
+    floorplans = ["EG", "1OG", "4OG"]
+    for fp in floorplans:
+        geojson = dl.GeoJSON(
+            url=f"assets/floorplans/{fp}.geojson",  # url to geojson file
+            options=dict(style=geojson_style),  # style each polygon
+            hoverStyle=arrow_function(dict(weight=1, color="orange")),  # style applied on hover
+            hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""),
+            id=f"{fp}_eval")
+        layers.append(dl.Overlay(geojson, name=fp, checked=False))
+
+    return layers
 
 def interpolation(gt: "ndarray", trajectories: list) -> list:
     # data
@@ -33,7 +62,7 @@ def interpolation(gt: "ndarray", trajectories: list) -> list:
         data.append([np.column_stack((ip_x_gt, ip_y_gt)), np.column_stack((ip_x_traj, ip_y_traj))])
     return data
 
-def cdf(gt: "ndarray", traj: "ndarray") -> "ndarray":
+def normCDF(gt: "ndarray", traj: "ndarray") -> "ndarray":
     # data
     gt_x = gt[:,0]
     gt_y = gt[:,1]
@@ -46,6 +75,20 @@ def cdf(gt: "ndarray", traj: "ndarray") -> "ndarray":
     s = np.sqrt(sum([(erri-E)**2 for erri in err])/(len(err)-1))
     cdf = norm.cdf(err, E, s)
     return np.column_stack((err, cdf))
+
+def histoCDF(gt: "ndarray", traj: "ndarray") -> list:
+    # # data
+    gt_x = gt[:,0]
+    gt_y = gt[:,1]
+    traj_x = traj[:,0]
+    traj_y =traj[:,1]
+    # calculating errors (= distances)
+    err = [np.sqrt((traj_x[i]-gt_x[i])**2 + (traj_y[i]-gt_y[i])**2) for i in range(gt_x.shape[0])]
+    # getting cdf
+    E = sum(err)/len(err)
+    s = np.sqrt(sum([(erri-E)**2 for erri in err])/(len(err)-1))
+    cdf = norm.cdf(err, E, s)
+    return [err, cdf]
 
 def dataframe4graph(data: "ndarray", name: str) -> "DataFrame":
     err = data[:,0]
@@ -79,3 +122,23 @@ def percentage(plan: "GeoDataFrame", gt: "GeoDataFrame", traj: "GeoDataFrame") -
     perc = 1 - sum(abs(gt_amount - traj_amount))/traj_amount.shape[0]
     return perc
 
+def csv2geojson(coordinates: list) -> str:
+    # making points out of ground truth data for converting it (crs:32632 to crs:4326)
+    points = {"GroundTruth": [i for i in range(1, coordinates.shape[0]+1)], "geometry": [sh.Point(lat, lon) for lat, lon in coordinates]}
+    converted_points = gp.GeoDataFrame(points, crs=32632).to_crs(4326)
+    # adding all coordinates to geojson
+    features = []
+    for nr, row in converted_points.iterrows():
+        f = {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [row[1].x, row[1].y]
+            }
+        }
+        features.append(f)
+    geojson = {
+        "type": "FeatureCollection",
+        "features": features
+    }
+    return geojson

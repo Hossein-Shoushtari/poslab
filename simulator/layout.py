@@ -4,8 +4,9 @@
 import dash_bootstrap_components as dbc
 from dash import html, dcc
 import dash_leaflet as dl
-# utils (simulator)
+# utils (general & simulator)
 import simulator.utils as su
+import utils as u
 
 
 def storage():
@@ -13,15 +14,15 @@ def storage():
     # dcc.Store to store and share data between callbacks
     storage = html.Div([
         # zoom lvl and center for latest map / antennas / rp & gt
-        dcc.Store(id="z_c_map", data=[], storage_type="memory"),
+        dcc.Store(id="sim_z_c_map", data=[], storage_type="memory"),
         dcc.Store(id="z_c_ant", data=[], storage_type="memory"),
         dcc.Store(id="z_c_rp_gt", data=[], storage_type="memory"),
         # map layer
-        dcc.Store(id="map_layer", data=[], storage_type="memory"),
+        dcc.Store(id="sim_map_layer", data=[], storage_type="memory"),
         # antenna layer
         dcc.Store(id="ant_layer", data=[], storage_type="memory"),
         # password status
-        dcc.Store(id="unlocked", data=[], storage_type="memory"),
+        dcc.Store(id="sim_unlocked", data=[], storage_type="memory"),
         # filename from ref dropdown
         dcc.Store(id="ref_data", data=[], storage_type="memory"),
         # checked boxes
@@ -29,7 +30,7 @@ def storage():
         # reference points layer
         dcc.Store(id="rp_layer", data=[], storage_type="memory"),
         # ground truth layer
-        dcc.Store(id="gt_layer", data=[], storage_type="memory"),
+        dcc.Store(id="sim_gt_layer", data=[], storage_type="memory"),
         # simulated measurements
         dcc.Store(id="sim_data", data=[], storage_type="memory")
     ])
@@ -176,17 +177,17 @@ def modals():
                 html.Div(
                     [
                         dbc.Label("Password"),
-                        dbc.Input(id="password", type="password", placeholder="Enter password", style={"color": "white"}),
+                        dbc.Input(id="sim_password", type="password", placeholder="Enter password", style={"color": "white"}),
                         dbc.FormFeedback("Access granted", type="valid"),
                         dbc.FormFeedback("Access denied", type="invalid")
                     ]
                 )
             ),
             dbc.ModalFooter(
-                dbc.Button("Unlock", color="primary", id="unlock")
+                dbc.Button("Unlock", color="primary", id="sim_unlock")
             ),
         ],
-    id="research",
+    id="sim_research",
     backdrop="static",
     is_open=False,
     )
@@ -226,7 +227,7 @@ def sim_map(geojson_style):
     ### MAP
     # info panel for hcu maps
     info = html.Div(
-        children=su.hover_info(),
+        children=u.hover_info(),
         id="sim_hover_info",
         style={
             "position": "absolute",
@@ -265,7 +266,7 @@ def sim_map(geojson_style):
                 html.Div(id="sim_hcu_panel", children=info, style={"display": "None"}),
                 html.Button("🎓", id="sim_hcu_maps", style=btn_style),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
-                html.Div(id="sim_div_lc", children=dl.LayersControl(id="sim_lc", children=su.floorplan2layer(geojson_style)), style={"display": "None"}), # is previously filled with invisible floorplans for initialization
+                html.Div(id="sim_div_lc", children=dl.LayersControl(id="sim_lc", children=su.floorplan2layer(geojson_style))), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
                 dl.FeatureGroup(dl.EditControl(
                                     id="edit_control",
@@ -288,7 +289,7 @@ def help_canvas():
                     # info upload
                     html.H5("UPLOAD", style={"text-align": "center", "color": "#3B5A7F"}),
                     html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
-                    html.P("All 7 buttons are for uploading the data required for the simulation. Each file needs the first line as the header. The delimiter is a single space.", style={"color": "gray"}),
+                    html.P("All buttons are for uploading the data required for the simulation. Each file needs the first line as the header. The delimiter is a single space.", style={"color": "gray"}),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Maps:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
                         dbc.Col(html.P("optional; GeoJSON (any crs)", style={"color": "gray"}))
