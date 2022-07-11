@@ -131,7 +131,7 @@ def modals():
                 dcc.Graph(figure={}, config={
                     'staticPlot': False,     # True, False
                     'scrollZoom': True,      # True, False
-                    'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
+                    'doubleClick': False,    # 'reset', 'autosize' or 'reset+autosize', False
                     'showTips': True,        # True, False
                     'displayModeBar': True,  # True, False, 'hover'
                     'watermark': True

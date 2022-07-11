@@ -96,7 +96,7 @@ div = html.Div([
                     config={
                         "staticPlot": False,     # True, False
                         "scrollZoom": True,      # True, False
-                        "doubleClick": "reset",  # "reset", "autosize" or "reset+autosize", False
+                        "doubleClick": "autosize",    # "reset", "autosize" or "reset+autosize", False
                         "showTips": True,        # True, False
                         "displayModeBar": True,  # True, False, "hover"
                         "watermark": True
@@ -221,7 +221,7 @@ def update_fig(_maps, gts, trajs):
         )
         return fig
     else:
-        return no_update
+        return go.Figure(data=[go.Scattermapbox()]).update_layout(margin={"r":0,"t":0,"l":0,"b":0},mapbox=go.layout.Mapbox(style="white-bg"))
 
 # pushing the page to the web
 if __name__ == "__main__":
