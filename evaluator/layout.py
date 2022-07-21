@@ -129,12 +129,12 @@ def modals():
             dbc.ModalHeader(dbc.ModalTitle("CDF Plot")),
             dbc.ModalBody(
                 dcc.Graph(figure={}, config={
-                    'staticPlot': False,     # True, False
-                    'scrollZoom': True,      # True, False
-                    'doubleClick': False,    # 'reset', 'autosize' or 'reset+autosize', False
-                    'showTips': True,        # True, False
-                    'displayModeBar': True,  # True, False, 'hover'
-                    'watermark': True
+                    "staticPlot": False,     # True, False
+                    "scrollZoom": True,      # True, False
+                    "doubleClick": False,    # "reset", "autosize" or "reset+autosize", False
+                    "showTips": True,        # True, False
+                    "displayModeBar": True,  # True, False, "hover"
+                    "watermark": True
                     },
                     id="graph",
                     className="six columns")
@@ -291,7 +291,8 @@ def cdf_canvas():
     return cdf_canvas
 
 def visual_modal():
-    visual_modal= dbc.Modal(
+    map_bgs = ["basic", "carto-darkmatter", "carto-positron", "dark", "light", "outdoors", "satellite", "satellite-streets", "stamen-terrain", "stamen-toner", "stamen-watercolor", "streets", "white-bg"]
+    visual_modal = dbc.Modal(
         [
             dbc.ModalHeader(dbc.ModalTitle("VISUAL")),
             dbc.ModalBody([
@@ -332,19 +333,47 @@ def visual_modal():
                                 multi=True,
                                 searchable=True,
                                 style={"marginBottom": "7px", "color": "black"})
+                        ]),
+                        dbc.Col([
+                            dbc.Label("Background", style={"color": "silver"}),
+                            dcc.Dropdown(
+                                id="vis_bg_select",
+                                options=[{"label": bg, "value": bg} for bg in map_bgs],
+                                value="carto-darkmatter",
+                                placeholder="Select Background",
+                                clearable=True,
+                                optionHeight=35,
+                                multi=False,
+                                searchable=True,
+                                style={"marginBottom": "7px", "color": "black"})
                         ])
                     ])],
                     style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}
                 ),
                 dcc.Graph(
-                    figure=go.Figure(data=[go.Scattermapbox()]).update_layout(margin={"r":0,"t":0,"l":0,"b":0},mapbox=go.layout.Mapbox(style="white-bg")),
+                    figure=go.Figure(data=[go.Scattermapbox()]).update_layout(margin={"r":0,"t":0,"l":0,"b":0},mapbox=go.layout.Mapbox()),
                     config={
-                        "staticPlot": False,     # True, False
-                        "scrollZoom": True,      # True, False
-                        "doubleClick": "reset",  # "reset", "autosize" or "reset+autosize", False
-                        "showTips": True,        # True, False
-                        "displayModeBar": True,  # True, False, "hover"
-                        "watermark": True
+                        "staticPlot": False,        # True, False
+                        "scrollZoom": True,         # True, False
+                        "showTips": True,           # True, False
+                        "displayModeBar": "hover",  # True, False, "hover"
+                        "watermark": True,
+                        "editable": True,
+                        "toImageButtonOptions": {
+                            "format": "png",        # one of png, svg, jpeg, webp
+                            "filename": "my_plot",
+                            "height": 700,
+                            "width": 1200,
+                            "scale": 1              # multiply title/legend/axis/canvas sizes by this factor
+                        },
+                        "modeBarButtonsToAdd": [
+                            "drawline",
+                            "drawopenpath",
+                            "drawclosedpath",
+                            "drawcircle",
+                            "drawrect",
+                            "eraseshape"
+                        ]
                     },
                     id="vis_map",
                     className="six columns",
@@ -388,6 +417,17 @@ def help_canvas():
                         dbc.Col(html.P("optional; CSV", style={"color": "gray"}))
                     ], className="g-0")],
                 style={"border":"1px solid #3B5A7F", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
+                html.Br(),
+                html.Div([
+                    # info evaluation
+                    html.H5("EVALUATION", style={"text-align": "center", "color": "silver"}),
+                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
+                    html.P("Instructions for evaluating:", style={"color": "gray"}),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Visual:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.P("Possibility to plot all layers on a selected map background as an image (png). Map colors are chosen randomly. Reload map results in new color.", style={"color": "gray"}))
+                    ], className="g-0")],
+                style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"})
             ],
         id="eval_help_cv",
         scrollable=True,

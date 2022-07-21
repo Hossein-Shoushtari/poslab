@@ -74,7 +74,11 @@ def normCDF(gt: "ndarray", traj: "ndarray") -> "ndarray":
     E = sum(err)/len(err)
     s = np.sqrt(sum([(erri-E)**2 for erri in err])/(len(err)-1))
     cdf = norm.cdf(err, E, s)
-    return np.column_stack((err, cdf))
+    # stack x and y
+    xy = np.column_stack((err, cdf))
+    # sort it
+    xy = xy[xy[:, 0].argsort()]
+    return xy
 
 def histoCDF(gt: "ndarray", traj: "ndarray") -> list:
     # # data
@@ -85,10 +89,10 @@ def histoCDF(gt: "ndarray", traj: "ndarray") -> list:
     # calculating errors (= distances)
     err = [np.sqrt((traj_x[i]-gt_x[i])**2 + (traj_y[i]-gt_y[i])**2) for i in range(gt_x.shape[0])]
     # getting cdf
-    E = sum(err)/len(err)
-    s = np.sqrt(sum([(erri-E)**2 for erri in err])/(len(err)-1))
-    cdf = norm.cdf(err, E, s)
-    return [err, cdf]
+    dens_y, dens_bins = np.histogram(err, density=True, bins = 100)
+    bin_width = dens_bins[1] - dens_bins[0]
+    cdf = np.cumsum(dens_y * bin_width)
+    return np.column_stack((dens_bins[1:], cdf))
 
 def dataframe4graph(data: "ndarray", name: str) -> "DataFrame":
     err = data[:,0]

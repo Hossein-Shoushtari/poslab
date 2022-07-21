@@ -14,6 +14,7 @@ import shapely.geometry as sh
 import json
 from os import listdir
 import utils as u
+import random
 
 def csv2geojson(coordinates: list) -> str:
     # making points out of ground truth data for converting it (crs:32632 to crs:4326)
@@ -43,7 +44,7 @@ app = Dash(__name__, external_stylesheets=ex_ss)
 server = app.server
 # title
 app.title = "Test" 
-
+map_bgs = ["basic", "carto-darkmatter", "carto-positron", "dark", "light", "outdoors", "satellite", "satellite-streets", "stamen-terrain", "stamen-toner", "stamen-watercolor", "streets", "white-bg"]
 div = html.Div([
     html.Button("VISUAL", id="open_visual"),
     dbc.Modal(
@@ -87,6 +88,19 @@ div = html.Div([
                                 multi=True,
                                 searchable=True,
                                 style={"marginBottom": "7px", "color": "black"})
+                        ]),
+                        dbc.Col([
+                            dbc.Label("Background", style={"color": "silver"}),
+                            dcc.Dropdown(
+                                id="vis_bg_select",
+                                options=[{"label": bg, "value": bg} for bg in map_bgs],
+                                value="carto-darkmatter",
+                                placeholder="Select Background",
+                                clearable=True,
+                                optionHeight=35,
+                                multi=False,
+                                searchable=True,
+                                style={"marginBottom": "7px", "color": "black"})
                         ])
                     ])],
                     style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}
@@ -94,12 +108,27 @@ div = html.Div([
                 dcc.Graph(
                     figure=go.Figure(data=[go.Scattermapbox()]).update_layout(margin={"r":0,"t":0,"l":0,"b":0},mapbox=go.layout.Mapbox(style="white-bg")),
                     config={
-                        "staticPlot": False,     # True, False
-                        "scrollZoom": True,      # True, False
-                        "doubleClick": "autosize",    # "reset", "autosize" or "reset+autosize", False
-                        "showTips": True,        # True, False
-                        "displayModeBar": True,  # True, False, "hover"
-                        "watermark": True
+                        "staticPlot": False,        # True, False
+                        "scrollZoom": True,         # True, False
+                        "showTips": True,           # True, False
+                        "displayModeBar": "hover",  # True, False, "hover"
+                        "watermark": True,
+                        "editable": True,
+                        "toImageButtonOptions": {
+                            "format": "png",        # one of png, svg, jpeg, webp
+                            "filename": "my_plot",
+                            "height": 700,
+                            "width": 1200,
+                            "scale": 1              # multiply title/legend/axis/canvas sizes by this factor
+                        },
+                        "modeBarButtonsToAdd": [
+                            "drawline",
+                            "drawopenpath",
+                            "drawclosedpath",
+                            "drawcircle",
+                            "drawrect",
+                            "eraseshape"
+                        ]
                     },
                     id="vis_map",
                     className="six columns",
@@ -153,20 +182,26 @@ def open_cdf(
     ### Inputs ###
     Input("vis_map_select", "value"),
     Input("vis_gt_select", "value"),
-    Input("vis_traj_select", "value")
+    Input("vis_traj_select", "value"),
+    Input("vis_bg_select", "value")
 )
-def update_fig(_maps, gts, trajs):
+def update_fig(_maps, gts, trajs, bg):
+    fig = go.Figure(go.Scattermapbox())
     layers = []
+    zoom = 1
+    center = (0, 0)
+    if not bg: bg = "white-bg"
     if _maps:
         # creating plotly layers
         for _map in _maps:
+            r, g, b = random.randint(0,255), random.randint(0,255), random.randint(0,255)
             with open(f"assets/maps/{_map}.geojson") as json_file:
                 data = json.load(json_file)
             layer = {
                 "sourcetype": "geojson",
                 "source": data,
                 "type": "line",
-                "color": "blue"
+                "color": f"rgb({r}, {g}, {b})"
             }
             layers.append(layer)
         # getting zoom and center
@@ -179,49 +214,51 @@ def update_fig(_maps, gts, trajs):
         # creating plotly layers
         for gt in gts:
             data = np.loadtxt(f"assets/groundtruth/{gt}.csv", skiprows=1)[:, 1:3]
-            geojson = csv2geojson(data)
-            layer = {
-                "sourcetype": "geojson",
-                "source": geojson,
-                "circle": {"radius": 2},
-                "color": "red"
-            }
-            layers.append(layer)
+            lon, lat = u.from_32632_to_4326(data)
+            fig.add_trace(go.Scattermapbox(
+                mode="markers",
+                lon=lon,
+                lat=lat,
+                marker={"size": 4},
+                name=gt))
         # getting zoom and center
-        lon, lat = u.from_32632_to_4326(data)
         zoom = u.zoom_lvl(lon, lat)
         center = u.centroid(lon, lat)
     if trajs:
         # creating plotly layers
         for traj in trajs:
             data = np.loadtxt(f"assets/trajectories/{traj}.csv", skiprows=1)[:, 1:3]
-            geojson = csv2geojson(data)
-            layer = {
-                "sourcetype": "geojson",
-                "source": geojson,
-                "circle": {"radius": 2},
-                "color": "green"
-            }
-            layers.append(layer)
+            lon, lat = u.from_32632_to_4326(data)
+            fig.add_trace(go.Scattermapbox(
+                mode="markers",
+                lon=lon,
+                lat=lat,
+                marker={"size": 4},
+                name=traj))
         # getting zoom and center
-        lon, lat = u.from_32632_to_4326(data)
         zoom = u.zoom_lvl(lon, lat)
         center = u.centroid(lon, lat)
-    if layers:
-        fig = go.Figure(data=[go.Scattermapbox()])
-        fig.update_layout(
-            margin={"r":0,"t":0,"l":0,"b":0},
-            mapbox=go.layout.Mapbox(
-                style="white-bg", 
-                zoom=zoom, 
-                center_lat = center[0],
-                center_lon = center[1],
-                layers=layers
-            )
-        )
-        return fig
-    else:
-        return go.Figure(data=[go.Scattermapbox()]).update_layout(margin={"r":0,"t":0,"l":0,"b":0},mapbox=go.layout.Mapbox(style="white-bg"))
+    # completing figure with a nice layout
+    fig.update_layout(
+        margin={"l":0,"t":0,"b":0,"r":0},
+        mapbox={
+            # token got from https://mapbox.com/
+            # default public token: pk.eyJ1Ijoibml2cm9rMjAwMSIsImEiOiJjbDV0a3A3eGIweWJvM2JuMHhtYXF5aWVlIn0._01sVxeqJ8EQvGq2PclBBw
+            "accesstoken": "pk.eyJ1Ijoibml2cm9rMjAwMSIsImEiOiJjbDV0a3Mwa2gwbXAzM2RteDk0dnoyNnlsIn0.MwHtkUS1sevt4F8PqhbGZQ", # heroku token
+            "center": {"lon": center[1], "lat": center[0]},
+            "style": bg,
+            "zoom": zoom,
+            "layers": layers
+        },
+        legend={
+            "yanchor": "top",
+            "y": 0.99,
+            "xanchor": "left",
+            "x": 0.01
+        },
+        showlegend=True
+    )
+    return fig
 
 # pushing the page to the web
 if __name__ == "__main__":

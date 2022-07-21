@@ -13,6 +13,7 @@ from os import listdir
 import shutil as st
 import pandas as pd
 import numpy as np
+import random
 import json
 # utils (general & evaluator)
 import utils as u
@@ -355,7 +356,7 @@ def eval_calls(app, geojson_style):
         Input("traj_select", "value"),
         Input("map_select", "value"),
         # button
-        Input("cdf_btn", "n_clicks"),
+        Input("cdf_btn", "n_clicks")
     )
     def cdf(
         # modals
@@ -397,15 +398,15 @@ def eval_calls(app, geojson_style):
                         cdf_list.append(eu.dataframe4graph(cdf, name))
                     if histo_box:
                         cdf = eu.histoCDF(interpolations[i][0], interpolations[i][1])   # histogram
-                        cdf_list.append(cdf + [name])
+                        cdf_list.append(eu.dataframe4graph(cdf, name))
 
                 # figure
                 if norm_box:
                     fig = px.line(data_frame=pd.concat(cdf_list), x="RMSE [m]", y="CDF", title="Normalized", color="trajectory")
-                    fig.update_traces(mode='markers')
+                    fig.update_traces(mode='lines')
                 elif histo_box:
-                    fig = go.Figure(data=[go.Histogram(x=err, y=cdf, name=name, showlegend=True, cumulative_enabled=True) for err, cdf, name in cdf_list],
-                    layout={"title": "Histogram", "legend": {"title": "Trajectories"}, "xaxis": {"title": "RMSE [m]"}, "yaxis": {"title": "Counts"}})
+                    fig = px.line(data_frame=pd.concat(cdf_list), x="RMSE [m]", y="CDF", title="Histogram", color="trajectory")
+                    fig.update_traces(mode='lines')
 
                 return no_update, no_update, no_update, no_update, cdf_warn, not cdf_show, fig, no_update     # cdf successful
             else: return no_update, no_update, no_update, no_update, not cdf_warn, cdf_show, {}, no_update    # cdf unsuccessful
@@ -439,7 +440,7 @@ def eval_calls(app, geojson_style):
         Input("open_visual", "n_clicks"),
         # researcher login
         Input("eval_unlocked3", "data")
-        )
+    )
     def open_visual(
         # modal
         visual_show,
@@ -449,7 +450,6 @@ def eval_calls(app, geojson_style):
         unlocked
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
-        
         if "open_visual" in button:
             gt_options   = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/groundtruth")]
             traj_options = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/trajectories")]
@@ -466,20 +466,26 @@ def eval_calls(app, geojson_style):
         ### Inputs ###
         Input("vis_map_select", "value"),
         Input("vis_gt_select", "value"),
-        Input("vis_traj_select", "value")
+        Input("vis_traj_select", "value"),
+        Input("vis_bg_select", "value")
     )
-    def update_fig(_maps, gts, trajs):
+    def update_fig(_maps, gts, trajs, bg):
+        fig = go.Figure(go.Scattermapbox())
         layers = []
+        zoom = 1
+        center = (0, 0)
+        if not bg: bg = "white-bg"
         if _maps:
             # creating plotly layers
             for _map in _maps:
+                r, g, b = random.randint(0,255), random.randint(0,255), random.randint(0,255)
                 with open(f"{_map}.geojson") as json_file:
                     data = json.load(json_file)
                 layer = {
                     "sourcetype": "geojson",
                     "source": data,
                     "type": "line",
-                    "color": "blue"
+                    "color": f"rgb({r}, {g}, {b})"
                 }
                 layers.append(layer)
             # getting zoom and center
@@ -492,49 +498,51 @@ def eval_calls(app, geojson_style):
             # creating plotly layers
             for gt in gts:
                 data = np.loadtxt(f"assets/groundtruth/{gt}.csv", skiprows=1)[:, 1:3]
-                geojson = eu.csv2geojson(data)
-                layer = {
-                    "sourcetype": "geojson",
-                    "source": geojson,
-                    "circle": {"radius": 2},
-                    "color": "red"
-                }
-                layers.append(layer)
+                lon, lat = u.from_32632_to_4326(data)
+                fig.add_trace(go.Scattermapbox(
+                    mode="markers",
+                    lon=lon,
+                    lat=lat,
+                    marker={"size": 4},
+                    name=gt))
             # getting zoom and center
-            lon, lat = u.from_32632_to_4326(data)
             zoom = u.zoom_lvl(lon, lat)
             center = u.centroid(lon, lat)
         if trajs:
             # creating plotly layers
             for traj in trajs:
                 data = np.loadtxt(f"assets/trajectories/{traj}.csv", skiprows=1)[:, 1:3]
-                geojson = eu.csv2geojson(data)
-                layer = {
-                    "sourcetype": "geojson",
-                    "source": geojson,
-                    "circle": {"radius": 2},
-                    "color": "green"
-                }
-                layers.append(layer)
+                lon, lat = u.from_32632_to_4326(data)
+                fig.add_trace(go.Scattermapbox(
+                    mode="markers",
+                    lon=lon,
+                    lat=lat,
+                    marker={"size": 4},
+                    name=traj))
             # getting zoom and center
-            lon, lat = u.from_32632_to_4326(data)
             zoom = u.zoom_lvl(lon, lat)
             center = u.centroid(lon, lat)
-        if layers:
-            fig = go.Figure(data=[go.Scattermapbox()])
-            fig.update_layout(
-                margin={"r":0,"t":0,"l":0,"b":0},
-                mapbox=go.layout.Mapbox(
-                    style="white-bg", 
-                    zoom=zoom, 
-                    center_lat = center[0],
-                    center_lon = center[1],
-                    layers=layers
-                )
-            )
-            return fig
-        else:
-            return go.Figure(data=[go.Scattermapbox()]).update_layout(margin={"r":0,"t":0,"l":0,"b":0},mapbox=go.layout.Mapbox(style="white-bg"))
+        # completing figure with a nice layout
+        fig.update_layout(
+            margin={"l":0,"t":0,"b":0,"r":0},
+            mapbox={
+                # token got from https://mapbox.com/
+                # default public token: pk.eyJ1Ijoibml2cm9rMjAwMSIsImEiOiJjbDV0a3A3eGIweWJvM2JuMHhtYXF5aWVlIn0._01sVxeqJ8EQvGq2PclBBw
+                "accesstoken": "pk.eyJ1Ijoibml2cm9rMjAwMSIsImEiOiJjbDV0a3Mwa2gwbXAzM2RteDk0dnoyNnlsIn0.MwHtkUS1sevt4F8PqhbGZQ", # heroku token
+                "center": {"lon": center[1], "lat": center[0]},
+                "style": bg,
+                "zoom": zoom,
+                "layers": layers
+            },
+            legend={
+                "yanchor": "top",
+                "y": 0.99,
+                "xanchor": "left",
+                "x": 0.01
+            },
+            showlegend=True
+        )
+        return fig
 
     # export ============================================================================================================================
     @app.callback(
