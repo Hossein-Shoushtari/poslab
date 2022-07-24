@@ -13,6 +13,8 @@ from evaluator.callbacks import eval_calls
 from evaluator.layout import eval_layout
 # coming soon
 from coming_soon.layout import com_layout
+# simulator & evaluator map
+from maps import map_display
 
 
 # Geojson rendering logic, must be JavaScript and only initialized once!
@@ -44,6 +46,12 @@ cs_tab = com_layout()
 # putting all together
 app.layout = html.Div(
     [
+        dbc.Modal([
+            dbc.ModalHeader(dbc.ModalTitle("DONE")),
+            dbc.ModalBody("Successful!")],
+            id="display_done",
+            is_open=False
+        ),
         dcc.Tabs(
             value="tab1",
             children=
@@ -86,8 +94,9 @@ app.layout = html.Div(
 )
 
 ### CALLBACKS ###
-sim_calls(app, geojson_style)
-eval_calls(app, geojson_style)
+sim_calls(app)
+eval_calls(app)
+map_display(app, geojson_style)
 
 # pushing the page to the web
 if __name__ == "__main__":

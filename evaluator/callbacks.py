@@ -15,29 +15,26 @@ import pandas as pd
 import numpy as np
 import random
 import json
+import time
 # utils (general & evaluator)
 import utils as u
 import evaluator.utils as eu
 
 
 
-def eval_calls(app, geojson_style):
+def eval_calls(app):
     # upload maps =====================================================================================================================
     @app.callback(
         ### Outputs ###
         # modals
         Output("eval_map_warn", "is_open"), # map upload warn
-        Output("eval_map_done", "is_open"), # map upload done
         # layers
-        Output("eval_map_layer", "data"),
-        # storage
-        Output("eval_z_c_map", "data"),
+        Output("eval_map_layers", "data"),
         # loading
         Output("eval_spin1", "children"),   # loading status
         ### Inputs ###
         # modal
         State("eval_map_warn", "is_open"),
-        State("eval_map_done", "is_open"),
         # maps
         Input("eval_ul_map", "contents"),
         State("eval_ul_map", "filename"),
@@ -45,7 +42,6 @@ def eval_calls(app, geojson_style):
     def upload(
         ## modal
         map_warn,
-        map_done,
         ## upload
         map_contents,
         map_filenames,
@@ -56,7 +52,7 @@ def eval_calls(app, geojson_style):
         #============= MAP =====================================================================================================================
         if "eval_ul_map" in button:
             file_check = [name.split(".")[-1] for name in map_filenames if name.split(".")[-1] not in ["geojson"]] # getting all wrong file formats
-            if len(file_check) > 0: return not map_warn, map_done, no_update, no_update, no_update # activating modal -> warn
+            if len(file_check) > 0: return not map_warn, no_update, no_update # activating modal -> warn
             for i in range(len(map_filenames)): # only right files were uploaded
                 decoded_content = u.upload_encoder(map_contents[i]) # decoding uploaded base64 file
                 gp_file = gp.read_file(decoded_content)
@@ -65,31 +61,30 @@ def eval_calls(app, geojson_style):
             lon, lat = u.extract_coordinates(gp_file)
             zoom = u.zoom_lvl(lon, lat)               # zoom for latest uploaded map
             center = u.centroid(lon, lat)             # center of latest uploaded map
-            # uploaded maps as converted layers
-            layers = u.map2layer(geojson_style)
-            return map_warn, not map_done, layers, [zoom, center], no_update # returning uploaded layers
+            layers = {
+                "layers": True,
+                "zoom": zoom,
+                "center": center,
+                "date": time.time()
+            }
+            return map_warn, layers, no_update # returning uploaded layers
         # ====== no button clicked =============================================================================================================
         # this else-section is always activated, when the page refreshes -> no warnings
-        else: return map_warn, map_done, [], [], no_update
+        else: return map_warn, no_update, no_update
 
     # upload rest =======================================================================================================================
     @app.callback(
         ### Outputs ###
         # modals
         Output("eval_ul_warn", "is_open"),  # rest upload warn
-        Output("eval_ul_done", "is_open"),  # rest upload done
         # layers
-        Output("eval_gt_layer", "data"),
-        Output("traj_layer", "data"),
-        # zoom & center
-        Output("z_c_gt", "data"),
-        Output("z_c_tr", "data"),
+        Output("eval_gt_layers", "data"),
+        Output("eval_traj_layers", "data"),
         # loading
         Output("eval_spin2", "children"),   # loading status
         ### Inputs ###
         # modals
         State("eval_ul_warn", "is_open"),
-        State("eval_ul_done", "is_open"),
         # ground truth
         Input("ul_gt", "contents"),
         State("ul_gt", "filename"),
@@ -112,7 +107,6 @@ def eval_calls(app, geojson_style):
     def upload(
         ## modals
         ul_warn,
-        ul_done,
         ## upload
         gt_contents,   # ground truth
         gt_filenames,
@@ -127,7 +121,7 @@ def eval_calls(app, geojson_style):
         bar_filenames,
         mag_contents,  # magnetometer
         mag_filenames
-        ): 
+        ):
         # getting clicked button
         button = [p["prop_id"] for p in callback_context.triggered][0]
         # UPLOAD
@@ -137,128 +131,78 @@ def eval_calls(app, geojson_style):
                 if gt_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     gt_decoded = u.upload_encoder(gt_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/groundtruth/{gt_filenames[i]}", "w") as file: file.write(gt_decoded) # saving file
-                else: return not ul_warn, ul_done, no_update, no_update, no_update, no_update, no_update # activating modal -> warn
+                else: return not ul_warn, no_update, no_update, no_update # activating modal -> warn
             # getting zoom lvl and center point
             lon, lat = u.from_32632_to_4326(np.loadtxt(f"assets/groundtruth/{gt_filenames[i]}", skiprows=1)[:,1:3])
             zoom = u.zoom_lvl(lon, lat)     # zoom lvl
             center = u.centroid(lon, lat)   # center
-            # making ground truth layers
-            layers = u.gt2marker()
+            layers = {
+                "layers": True,
+                "zoom": zoom,
+                "center": center,
+                "date": time.time()
+            }
             # if everything went fine ...
-            return ul_warn, not ul_done, layers, no_update, [zoom, center], no_update, no_update
+            return ul_warn, layers, no_update, no_update
         # ========== TRAJECTORIES =================================================================================================================
         elif "ul_tra" in button:
             for i in range(len(tra_filenames)):
                 if tra_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(tra_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/trajectories/{tra_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update, no_update, no_update, no_update, no_update # activating modal -> warn
+                else: return not ul_warn, no_update, no_update, no_update # activating modal -> warn
             # getting zoom lvl and center point
             lon, lat = u.from_32632_to_4326(np.loadtxt(f"assets/trajectories/{tra_filenames[i]}", skiprows=1)[:,1:3])
             zoom = u.zoom_lvl(lon, lat)     # zoom lvl
             center = u.centroid(lon, lat)   # center
-            # making ground truth layers
-            layers = u.traj2marker()
+            layers = {
+                "layers": True,
+                "zoom": zoom,
+                "center": center,
+                "date": time.time()
+            }
             # if everything went fine ...
-            return ul_warn, not ul_done, no_update, layers, no_update, [zoom, center], no_update
+            return ul_warn, no_update, layers, no_update
         # ========== GYROSCOPE =================================================================================================================
         elif "eval_ul_gyr" in button:
             for i in range(len(gyr_filenames)):
                 if gyr_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(gyr_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/sensors/gyr/{gyr_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update, no_update, no_update, no_update, no_update # activating modal -> warn
+                else: return not ul_warn, no_update, no_update, no_update # activating modal -> warn
             # if everything went fine ...
-            return ul_warn, not ul_done, no_update, no_update, no_update, no_update, no_update
+            return ul_warn, no_update, no_update, no_update
         # ========= ACCELERATION  ==============================================================================================================
         elif "eval_ul_acc" in button:
             for i in range(len(acc_filenames)):
                 if acc_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(acc_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/sensors/acc/{acc_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update, no_update, no_update, no_update, no_update # activating modal -> warn
+                else: return not ul_warn, no_update, no_update, no_update # activating modal -> warn
             # if everything went fine ...
-            return ul_warn, not ul_done, no_update, no_update, no_update, no_update, no_update, no_update
+            return ul_warn, no_update, no_update, no_update, no_update
         # ========= BAROMETER  =================================================================================================================
         elif "eval_ul_bar" in button:
             for i in range(len(bar_filenames)):
                 if bar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(bar_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/sensors/bar/{bar_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update, no_update, no_update, no_update, no_update # activating modal -> warn
+                else: return not ul_warn, no_update, no_update, no_update # activating modal -> warn
             # if everything went fine ...
-            return ul_warn, not ul_done, no_update, no_update, no_update, no_update, no_update
+            return ul_warn, no_update, no_update, no_update
         # ======== MAGNETOMETER  ===============================================================================================================
         elif "eval_ul_mag" in button:
             for i in range(len(mag_filenames)):
                 if mag_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(mag_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/sensors/mag/{mag_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update, no_update, no_update, no_update, no_update # activating modal -> warn
+                else: return not ul_warn, no_update, no_update, no_update # activating modal -> warn
             # if everything went fine ...
-            return ul_warn, not ul_done, no_update , no_update, no_update, no_update, no_update
+            return ul_warn, no_update , no_update, no_update
         # ====== no button clicked =============================================================================================================
         # this else-section is always activated, when the page refreshes -> no warnings
-        else: return ul_warn, ul_done, no_update, no_update, no_update, no_update, no_update
-
-    # map display =======================================================================================================================
-    @app.callback(
-        ### Outputs ###
-        Output("eval_div_lc", "style"),     # div layer control
-        Output("eval_lc", "children"),      # layer control        
-        Output("eval_map", "center"),       # map center
-        Output("eval_map", "zoom"),         # map zoom level
-        Output("eval_hcu_panel", "style"),  # hcu info panel
-        ### Inputs ###
-        Input("eval_map_layer", "data"),    # maps
-        Input("eval_z_c_map", "data"),      # zoom and center for latest map
-        Input("traj_layer", "data"),        # trajectory
-        Input("z_c_tr", "data"),            # zoom and center for traj
-        Input("eval_gt_layer", "data"),     # ground truth
-        Input("z_c_gt", "data"),            # zoom and center for rp and gt
-        Input("eval_unlocked1", "data")     # unlocked status hcu maps
-    )
-    def display(
-        #lays,
-        map_layer,
-        z_c_map,
-        traj_layer,
-        z_c_traj,
-        gt_layer,
-        z_c_gt,
-        unlocked
-        ):
-        hcu_style = {"display": "None"}
-        ly_style = {"display": "None"}
-        # presetting map zoom level and center
-        zoom = 4
-        center = (49.845359730413186, 9.90578149727622) # center of Europe
-        # getting all different layers
-        layers = []
-        if map_layer:
-            zoom = z_c_map[0]               # zoom for latest uploaded map layer
-            center = z_c_map[1]             # center of latest uploaded map layer
-            layers += map_layer             # adding map (all previous + latest) layers to map
-            ly_style = {"display": "block"}
-        if traj_layer:
-            zoom = z_c_traj[0]              # zoom
-            center = z_c_traj[1]            # center
-            layers += traj_layer            # adding trajectory layer to map
-            ly_style = {"display": "block"}
-        if gt_layer:
-            zoom = z_c_gt[0]                # zoom
-            center = z_c_gt[1]              # center
-            layers += gt_layer              # adding gt points (all previous + latest) layers to map
-            ly_style = {"display": "block"}
-        if unlocked:
-            zoom = 19
-            center = (53.540239664876104, 10.004663417352164) # HCU coordinates
-            layers += eu.floorplan2layer(geojson_style)       # adding hcu floorplans to map
-            hcu_style = {"display": "block"}                  # displaying info panel
-            ly_style = {"display": "block"}
-        if layers: return ly_style, layers, center, zoom, hcu_style
-        else: return ly_style, [], center, zoom, hcu_style
-    
+        else: return ul_warn, no_update, no_update, no_update
+   
     # hcu canvas ========================================================================================================================
     @app.callback(
         Output("eval_research", "is_open"),
@@ -278,9 +222,9 @@ def eval_calls(app, geojson_style):
         Output("eval_password", "valid"),
         Output("eval_password", "invalid"),
         # unlock status
-        Output("eval_unlocked1", "data"),
         Output("eval_unlocked2", "data"),
         Output("eval_unlocked3", "data"),
+        Output("eval_unlocked5", "data"),
         ### Inputs ###
         Input("eval_unlock", "n_clicks"),
         Input("eval_password", "value")
@@ -306,7 +250,8 @@ def eval_calls(app, geojson_style):
         # button
         Input("open_cdf", "n_clicks"),
         # researcher login
-        Input("eval_unlocked2", "data")
+        Input("eval_unlocked1", "data"),
+        Input("eval_unlocked2", "data"),
     )
     def open_cdf(
         # canvas status
@@ -314,14 +259,15 @@ def eval_calls(app, geojson_style):
         # button
         open_cdf,
         # unlocked
-        unlocked
+        unlocked1,
+        unlocked2
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "open_cdf" in button:
             gt_options   = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/groundtruth")]
             traj_options = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/trajectories")]
             map_options = [{"label": name[:-8], "value": f"assets/maps/{name[:-8]}"} for name in listdir("assets/maps")]
-            if unlocked:
+            if unlocked1 or unlocked2:
                 map_options += [{"label": name[:-8], "value": f"assets/floorplans/{name[:-8]}"} for name in listdir("assets/floorplans")]
             return not cdf_cv, gt_options, traj_options, map_options
         else: return cdf_cv, [], [], []
@@ -439,7 +385,8 @@ def eval_calls(app, geojson_style):
         # button
         Input("open_visual", "n_clicks"),
         # researcher login
-        Input("eval_unlocked3", "data")
+        Input("eval_unlocked3", "data"),
+        Input("eval_unlocked4", "data")
     )
     def open_visual(
         # modal
@@ -447,14 +394,15 @@ def eval_calls(app, geojson_style):
         # button
         open_visual,
         # unlocked
-        unlocked
+        unlocked1,
+        unlocked2
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "open_visual" in button:
             gt_options   = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/groundtruth")]
             traj_options = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/trajectories")]
             map_options = [{"label": name[:-8], "value": f"assets/maps/{name[:-8]}"} for name in listdir("assets/maps")]
-            if unlocked:
+            if unlocked1 or unlocked2:
                 map_options += [{"label": name[:-8], "value": f"assets/floorplans/{name[:-8]}"} for name in listdir("assets/floorplans")]
             return not visual_show, map_options, gt_options, traj_options
         else: return visual_show, [], [], []

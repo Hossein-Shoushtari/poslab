@@ -13,20 +13,16 @@ def storage():
     ### STORAGE
     # dcc.Store to store and share data between callbacks
     storage = html.Div([
-        # zoom lvl and center for latest map / gt / traj
-        dcc.Store(id="eval_z_c_map", data=[], storage_type="memory"),
-        dcc.Store(id="z_c_gt", data=[], storage_type="memory"),
-        dcc.Store(id="z_c_tr", data=[], storage_type="memory"),
-        # map layer
-        dcc.Store(id="eval_map_layer", data=[], storage_type="memory"),
+        # layers
+        dcc.Store(id="eval_map_layers", data={"layers": None, "zoom": 0, "center": 0, "date": 0}, storage_type="memory"),
+        dcc.Store(id="eval_gt_layers", data={"layers": None, "zoom": 0, "center": 0, "date": 0}, storage_type="memory"),
+        dcc.Store(id="eval_traj_layers", data={"layers": None, "zoom": 0, "center": 0, "date": 0}, storage_type="memory"),
         # password status
         dcc.Store(id="eval_unlocked1", data=[], storage_type="memory"),
         dcc.Store(id="eval_unlocked2", data=[], storage_type="memory"),
         dcc.Store(id="eval_unlocked3", data=[], storage_type="memory"),
-        # trajectory layer
-        dcc.Store(id="traj_layer", data=[], storage_type="memory"),
-        # ground truth layer
-        dcc.Store(id="eval_gt_layer", data=[], storage_type="memory"),
+        dcc.Store(id="eval_unlocked4", data=[], storage_type="memory"),
+        dcc.Store(id="eval_unlocked5", data=[], storage_type="memory"),
         # HistoNorm checkboxes
         dcc.Store(id="norm_status", data=[], storage_type="memory"),
         dcc.Store(id="histo_status", data=[], storage_type="memory")
@@ -43,7 +39,8 @@ def tooltips():
         dbc.Tooltip("gyroscope | csv",      target="eval_ul_gyr",        placement="top"),
         dbc.Tooltip("accelerator | csv",    target="eval_ul_acc",        placement="bottom"),
         dbc.Tooltip("barometer | csv",      target="eval_ul_bar",        placement="top"),
-        dbc.Tooltip("magnetometer | csv",   target="eval_ul_mag",        placement="bottom")
+        dbc.Tooltip("magnetometer | csv",   target="eval_ul_mag",        placement="bottom"),
+        dbc.Tooltip("focus",                target="eval_zoom",         placement="right")
     ])
     return tooltips
 
@@ -78,7 +75,7 @@ def spinners():
         spinnerClassName="spinner"
     )
     spin5 = dbc.Spinner(
-        children=[html.Div(id="eval_spin5", style={"display": "none"})],
+        children=[html.Div(id="map_spin", style={"display": "none"})],
         type=None,
         fullscreen=True,
         fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
@@ -91,7 +88,7 @@ def modals():
     # upload warning
     ul_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("WARNING")),
-        dbc.ModalBody("At least one wrong file was meant to be uploaded! Upload denied.")],
+        dbc.ModalBody("Wrong file format detected! Upload denied.")],
         id="eval_ul_warn",
         is_open=False
     )
@@ -105,15 +102,15 @@ def modals():
     # map warning
     map_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("WARNING")),
-        dbc.ModalBody("At least one wrong file was meant to be uploaded! Upload denied.")],
+        dbc.ModalBody("Wrong file format detected! Upload denied.")],
         id="eval_map_warn",
         is_open=False
     )
-    # map done
-    map_done = dbc.Modal([
+    # map display done
+    display_done = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("DONE")),
-        dbc.ModalBody("File(s) uploaded and layered successfully!")],
-        id="eval_map_done",
+        dbc.ModalBody("Successful!")],
+        id="eval_display",
         is_open=False
     )
     # cdf warning
@@ -184,7 +181,7 @@ def modals():
     is_open=False,
     )
 
-    return html.Div([visual, ul_warn, ul_done, cdf_warn, graph_modal, map_warn, map_done, exp_warn, exp_done, hcu_modal])
+    return html.Div([visual, ul_warn, ul_done, display_done, cdf_warn, graph_modal, map_warn, exp_warn, exp_done, hcu_modal])
 
 def eval_map(geojson_style):
     ### MAP
@@ -207,9 +204,21 @@ def eval_map(geojson_style):
         }
     )
     # unlock hcu maps button
-    btn_style = {
+    btn_style1 = {
         "position": "absolute",
         "top": "110px",
+        "left": "10px",
+        "z-index": "500",
+        "backgroundColor": "white",
+        "border": "2px solid #B2AFAC",
+        "border-radius": 4,
+        "width": "34px",
+        "height": "34px"
+    }
+    # zoom botton
+    btn_style2 = {
+        "position": "absolute",
+        "top": "155px",
         "left": "10px",
         "z-index": "500",
         "backgroundColor": "white",
@@ -227,7 +236,8 @@ def eval_map(geojson_style):
         dl.Map(
             [   
                 html.Div(id="eval_hcu_panel", children=info, style={"display": "None"}),
-                html.Button("🎓", id="eval_hcu_maps", style=btn_style),
+                html.Button("🎓", id="eval_hcu_maps", style=btn_style1),
+                html.Button("🔍", id="eval_zoom", style=btn_style2),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
                 html.Div(id="eval_div_lc", children=dl.LayersControl(id="eval_lc", children=eu.floorplan2layer(geojson_style)), style={"display": "None"}), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen

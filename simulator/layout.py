@@ -13,26 +13,18 @@ def storage():
     ### STORAGE
     # dcc.Store to store and share data between callbacks
     storage = html.Div([
-        # zoom lvl and center for latest map / antennas / rp & gt
-        dcc.Store(id="sim_z_c_map", data=[], storage_type="memory"),
-        dcc.Store(id="z_c_ant", data=[], storage_type="memory"),
-        dcc.Store(id="z_c_rp_gt", data=[], storage_type="memory"),
-        # map layer
-        dcc.Store(id="sim_map_layer", data=[], storage_type="memory"),
-        # antenna layer
-        dcc.Store(id="ant_layer", data=[], storage_type="memory"),
+        # layers
+        dcc.Store(id="sim_map_layers", data={"layers": None, "zoom": 0, "center": 0, "date": 0}, storage_type="memory"),
+        dcc.Store(id="sim_ref_layers", data={"layers": None, "zoom": 0, "center": 0, "date": 0}, storage_type="memory"),
+        dcc.Store(id="sim_ant_layers", data={"layers": None, "zoom": 0, "center": 0, "date": 0}, storage_type="memory"),
+        dcc.Store(id="sim_gt_layers", data={"layers": None, "zoom": 0, "center": 0, "date": 0}, storage_type="memory"),
+        dcc.Store(id="sim_traj_layers", data={"layers": None, "zoom": 0, "center": 0, "date": 0}, storage_type="memory"),
         # password status
         dcc.Store(id="sim_unlocked", data=[], storage_type="memory"),
         # filename from ref dropdown
         dcc.Store(id="ref_data", data=[], storage_type="memory"),
         # checked boxes
-        dcc.Store(id="checked_boxes", data=[], storage_type="memory"),
-        # reference points layer
-        dcc.Store(id="rp_layer", data=[], storage_type="memory"),
-        # ground truth layer
-        dcc.Store(id="sim_gt_layer", data=[], storage_type="memory"),
-        # simulated measurements
-        dcc.Store(id="sim_data", data=[], storage_type="memory")
+        dcc.Store(id="checked_boxes", data=[], storage_type="memory")
     ])
     return storage
 
@@ -47,7 +39,8 @@ def tooltips():
         dbc.Tooltip("barometer | csv",      target="sim_ul_bar",       placement="top"),
         dbc.Tooltip("magnetometer | csv",   target="sim_ul_mag",       placement="bottom"),
         dbc.Tooltip("reset",                target="ss_reset",         placement="right"),
-        dbc.Tooltip("settings",             target="sim_set",          placement="right")
+        dbc.Tooltip("settings",             target="sim_set",          placement="right"),
+        dbc.Tooltip("focus",                target="sim_zoom",         placement="right")
     ])
     return tooltips
 
@@ -113,11 +106,11 @@ def modals():
         id="sim_map_warn",
         is_open=False
     )
-    # map done
-    map_done = dbc.Modal([
+    # map display done
+    display_done = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("DONE")),
-        dbc.ModalBody("File(s) uploaded and layered successfully!")],
-        id="sim_map_done",
+        dbc.ModalBody("Successful!")],
+        id="sim_display",
         is_open=False
     )
     # data selection warning
@@ -146,13 +139,6 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
         dbc.ModalBody("Please select data first, as well as enter values for all required inputs!")],
         id="sim_warn",
-        is_open=False
-    )
-    # simulation done
-    sim_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("DONE")),
-        dbc.ModalBody("Simulation successful!")],
-        id="sim_done",
         is_open=False
     )
     # export warning
@@ -221,7 +207,7 @@ def modals():
         backdrop="static",
         is_open=False,
     )
-    return html.Div([ul_warn, ul_done, map_warn, map_done, gen_warn, gen_done, sel_warn, exp_warn, exp_done, sim_done, sim_warn, hcu_modal, sim_modal])
+    return html.Div([ul_warn, ul_done, map_warn, display_done, gen_warn, gen_done, sel_warn, exp_warn, exp_done, sim_warn, hcu_modal, sim_modal])
 
 def sim_map(geojson_style):
     ### MAP
@@ -244,9 +230,21 @@ def sim_map(geojson_style):
         }
     )
     # unlock hcu maps button
-    btn_style = {
+    btn_style1 = {
         "position": "absolute",
         "top": "325px",
+        "left": "10px",
+        "z-index": "500",
+        "backgroundColor": "white",
+        "border": "2px solid #B2AFAC",
+        "border-radius": 4,
+        "width": "34px",
+        "height": "34px"
+    }
+    # zoom botton
+    btn_style2 = {
+        "position": "absolute",
+        "top": "370px",
         "left": "10px",
         "z-index": "500",
         "backgroundColor": "white",
@@ -264,7 +262,8 @@ def sim_map(geojson_style):
         dl.Map(
             [   
                 html.Div(id="sim_hcu_panel", children=info, style={"display": "None"}),
-                html.Button("🎓", id="sim_hcu_maps", style=btn_style),
+                html.Button("🎓", id="sim_hcu_maps", style=btn_style1),
+                html.Button("🔍", id="sim_zoom", style=btn_style2),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
                 html.Div(id="sim_div_lc", children=dl.LayersControl(id="sim_lc", children=su.floorplan2layer(geojson_style))), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen

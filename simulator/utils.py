@@ -177,7 +177,7 @@ def ref2marker(data: list, check: tuple) -> list:
 
     return dl.Overlay(dl.LayerGroup(markers), name="Waypoints", checked=True)
 
-def ant2marker(ant: list) -> list:
+def ant2marker() -> list:
     """
     FUNCTION
     - converts lat and lon from crs32632 (reference points) to crs4326
@@ -186,6 +186,8 @@ def ant2marker(ant: list) -> list:
     RETURN
     markers : list of all created markers with converted lat and lon
     """
+    # data
+    ant = np.loadtxt("assets/antennas/antennas.csv", skiprows=1)
     # designing icon (from https://icons8.de/icons/set/marker)
     icon = {
         "iconUrl": "https://img.icons8.com/ios-filled/50/000000/radio-tower.png",

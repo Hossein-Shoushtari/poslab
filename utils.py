@@ -278,9 +278,9 @@ def gt2marker() -> list:
     num_files = next(os.walk("assets/groundtruth"))[2]        # all existing ground truth files
     show = [False for _ in range(len(num_files)-1)] + [True]  # all False, but last True -> showing only last layer
     # getting list of all files only in the given directory
-    list_of_files = filter( lambda x: os.path.isfile(os.path.join("assets/groundtruth", x)), os.listdir("assets/groundtruth") )
+    list_of_files = filter(lambda x: os.path.isfile(os.path.join("assets/groundtruth", x)), os.listdir("assets/groundtruth"))
     # sorting list of files based on last modification time in ascending order
-    list_of_files = sorted( list_of_files, key = lambda x: os.path.getmtime(os.path.join("assets/groundtruth", x)))
+    list_of_files = sorted(list_of_files, key = lambda x: os.path.getmtime(os.path.join("assets/groundtruth", x)))
     # making layers out of all generated ground truth data
     i = 0
     layers = []
@@ -292,7 +292,7 @@ def gt2marker() -> list:
         # designing icon (from https://icons8.de/icons/set/marker)
         icon = {
             "iconUrl": f"https://img.icons8.com/emoji/344/{colors[i%len(colors)]}-circle-emoji.png",
-            "iconSize": [5, 5],  # size of the icon
+            "iconSize": [5, 5],    # size of the icon
             "iconAnchor": [0, 0],  # point of the icon which will correspond to marker"s location
         }
         # making points out of ground truth data for converting it (crs:32632 to crs:4326)
@@ -313,21 +313,21 @@ def gt2marker() -> list:
 def traj2marker() -> list:
     """
     FUNCTION
-    - converts lat and lon from crs32632 (groundtruth) to crs4326
+    - converts lat and lon from crs32632 (trajectories) to crs4326
     - makes leaflet markers out of coordinates
     -------
     RETURN
     markers : list of all created markers with converted lat and lon
     """
     # icon colors
-    colors = ["red", "orange", "yellow", "purple", "green", "blue", "black", "brown"]
+    colors = ["purple", "green", "blue", "red", "orange", "yellow","black", "brown"]
     # showing only last layer
-    num_files = next(os.walk("assets/trajectories"))[2]        # all existing ground truth files
+    num_files = next(os.walk("assets/trajectories"))[2]       # all existing ground truth files
     show = [False for _ in range(len(num_files)-1)] + [True]  # all False, but last True -> showing only last layer
     # getting list of all files only in the given directory
-    list_of_files = filter( lambda x: os.path.isfile(os.path.join("assets/trajectories", x)), os.listdir("assets/trajectories") )
+    list_of_files = filter(lambda x: os.path.isfile(os.path.join("assets/trajectories", x)), os.listdir("assets/trajectories"))
     # sorting list of files based on last modification time in ascending order
-    list_of_files = sorted( list_of_files, key = lambda x: os.path.getmtime(os.path.join("assets/trajectories", x)))
+    list_of_files = sorted(list_of_files, key = lambda x: os.path.getmtime(os.path.join("assets/trajectories", x)))
     # making layers out of all generated trajectory data
     i = 0
     layers = []
@@ -339,7 +339,7 @@ def traj2marker() -> list:
         # designing icon (from https://icons8.de/icons/set/marker)
         icon = {
             "iconUrl": f"https://img.icons8.com/emoji/344/{colors[i%len(colors)]}-circle-emoji.png",
-            "iconSize": [5, 5],  # size of the icon
+            "iconSize": [5, 5],    # size of the icon
             "iconAnchor": [0, 0],  # point of the icon which will correspond to marker"s location
         }
         # making points out of ground truth data for converting it (crs:32632 to crs:4326)
@@ -393,4 +393,4 @@ def dummy():
 
 if __name__ == "__main__":
     deleter()
-    #dummy()
+    dummy()

@@ -10,6 +10,7 @@ import geopandas as gp
 from os import listdir
 import shutil as st
 import numpy as np
+import time
 # utils (general & simulator)
 import simulator.utils as su
 import utils as u
@@ -19,23 +20,19 @@ from simulator.ground_truth import generate_gt, export_gt
 
 
 
-def sim_calls(app, geojson_style):
+def sim_calls(app):
     # upload maps =====================================================================================================================
     @app.callback(
         ### Outputs ###
         # modals
         Output("sim_map_warn", "is_open"), # map upload warn
-        Output("sim_map_done", "is_open"), # map upload done
         # layers
-        Output("sim_map_layer", "data"),
-        # storage
-        Output("sim_z_c_map", "data"),
+        Output("sim_map_layers", "data"),
         # loading
         Output("sim_spin1", "children"),   # loading status
         ### Inputs ###
         # modal
         State("sim_map_warn", "is_open"),
-        State("sim_map_done", "is_open"),
         # maps
         Input("sim_ul_map", "contents"),
         State("sim_ul_map", "filename"),
@@ -43,7 +40,6 @@ def sim_calls(app, geojson_style):
     def upload(
         ## modal
         map_warn,
-        map_done,
         ## upload
         map_contents,
         map_filenames,
@@ -54,7 +50,7 @@ def sim_calls(app, geojson_style):
         #============= MAP =====================================================================================================================
         if "sim_ul_map" in button:
             file_check = [name.split(".")[-1] for name in map_filenames if name.split(".")[-1] not in ["geojson"]] # getting all wrong file formats
-            if len(file_check) > 0: return not map_warn, map_done, no_update, no_update, no_update # activating modal -> warn
+            if len(file_check) > 0: return not map_warn, no_update, no_update # activating modal -> warn
             for i in range(len(map_filenames)): # only right files were uploaded
                 decoded_content = u.upload_encoder(map_contents[i]) # decoding uploaded base64 file
                 gp_file = gp.read_file(decoded_content)
@@ -63,12 +59,16 @@ def sim_calls(app, geojson_style):
             lon, lat = u.extract_coordinates(gp_file)
             zoom = u.zoom_lvl(lon, lat)               # zoom for latest uploaded map
             center = u.centroid(lon, lat)             # center of latest uploaded map
-            # uploaded maps as converted layers
-            layers = u.map2layer(geojson_style)
-            return map_warn, not map_done, layers, [zoom, center], no_update # returning uploaded layers
+            layers = {
+                "layers": True,
+                "zoom": zoom,
+                "center": center,
+                "date": time.time()
+            }
+            return map_warn, layers, no_update # returning uploaded layers
         # ====== no button clicked =============================================================================================================
         # this else-section is always activated, when the page refreshes -> no warnings
-        else: return map_warn, map_done, no_update, no_update, no_update
+        else: return map_warn, no_update, no_update
 
     # upload rest =======================================================================================================================
     @app.callback(
@@ -77,9 +77,7 @@ def sim_calls(app, geojson_style):
         Output("sim_ul_warn", "is_open"), # rest upload warn
         Output("sim_ul_done", "is_open"), # rest upload done
         # antenna layer
-        Output("ant_layer", "data"),
-        # storage
-        Output("z_c_ant", "data"),
+        Output("sim_ant_layers", "data"),
         # loading
         Output("sim_spin2", "children"),  # loading status
         ### Inputs ###
@@ -133,64 +131,65 @@ def sim_calls(app, geojson_style):
                 if way_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(way_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/waypoints/{way_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
+                else: return not ul_warn, ul_done, no_update, no_update # activating modal -> warn
             # if everything went fine ...
-            return ul_warn, not ul_done, no_update, no_update, no_update
+            return ul_warn, not ul_done, no_update, no_update
         # ========== ANTENNAS ==================================================================================================================
         elif "ul_ant" in button:
             if ant_filename.split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                 ant_decoded = u.upload_encoder(ant_content) # decoding uploaded base64 file
                 with open("assets/antennas/antennas.csv", "w") as file: file.write(ant_decoded) # saving file
-                # getting converted antenna coordinates
-                ant = np.loadtxt("assets/antennas/antennas.csv", skiprows=1)
-                # making layer out of markers
-                layer = su.ant2marker(ant)
-                # zoom and center
-                ant = u.from_32632_to_4326(ant)
-                lon, lat = ant[0], ant[1]
-                zoom = u.zoom_lvl(lon, lat)
-                center = u.centroid(lon, lat)
-                return ul_warn, not ul_done, layer, [zoom, center], no_update # if everything went fine ...
-            else: return not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
+                # getting zoom lvl and center point
+                lon, lat = u.from_32632_to_4326(np.loadtxt("assets/antennas/antennas.csv", skiprows=1))
+                zoom = u.zoom_lvl(lon, lat)     # zoom lvl
+                center = u.centroid(lon, lat)   # center
+                layers = {
+                    "layers": True,
+                    "zoom": zoom,
+                    "center": center,
+                    "date": time.time()
+                }
+                return ul_warn, ul_done, layers, no_update # if everything went fine ...
+            else: return not ul_warn, ul_done, no_update, no_update # activating modal -> warn
         # ========== GYROSCOPE =================================================================================================================
         elif "sim_ul_gyr" in button:
             for i in range(len(gyr_filenames)):
                 if gyr_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(gyr_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/sensors/gyr/{gyr_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
+                else: return not ul_warn, ul_done, no_update, no_update # activating modal -> warn
             # if everything went fine ...
-            return ul_warn, not ul_done, no_update, no_update, no_update
+            return ul_warn, not ul_done, no_update, no_update
         # ========= ACCELERATION  ==============================================================================================================
         elif "sim_ul_acc" in button:
             for i in range(len(acc_filenames)):
                 if acc_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(acc_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/sensors/acc/{acc_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
+                else: return not ul_warn, ul_done, no_update, no_update # activating modal -> warn
             # if everything went fine ...
-            return ul_warn, not ul_done, no_update, no_update, no_update
+            return ul_warn, not ul_done, no_update, no_update
         # ========= BAROMETER  =================================================================================================================
         elif "sim_ul_bar" in button:
             for i in range(len(bar_filenames)):
                 if bar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(bar_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/sensors/bar/{bar_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
+                else: return not ul_warn, ul_done, no_update, no_update # activating modal -> warn
             # if everything went fine ...
-            return ul_warn, not ul_done, no_update, no_update, no_update
+            return ul_warn, not ul_done, no_update, no_update
         # ======== MAGNETOMETER  ===============================================================================================================
         elif "sim_ul_mag" in button:
             for i in range(len(mag_filenames)):
                 if mag_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                     decoded_content = u.upload_encoder(mag_contents[i]) # decoding uploaded base64 file
                     with open(f"assets/sensors/mag/{mag_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
+                else: return not ul_warn, ul_done, no_update, no_update # activating modal -> warn
             # if everything went fine ...
-            return ul_warn, not ul_done, no_update, no_update, no_update  
+            return ul_warn, not ul_done, no_update, no_update  
         # ====== no button clicked =============================================================================================================
         # this else-section is always activated, when the page refreshes -> no warnings
-        else: return ul_warn, ul_done, no_update, no_update, no_update
+        else: return ul_warn, ul_done, no_update, no_update
 
     # hcu canvas ========================================================================================================================
     @app.callback(
@@ -212,6 +211,8 @@ def sim_calls(app, geojson_style):
         Output("sim_password", "invalid"),
         # unlock status
         Output("sim_unlocked", "data"),
+        Output("eval_unlocked1", "data"),
+        Output("eval_unlocked4", "data"),
         ### Inputs ###
         Input("sim_unlock", "n_clicks"),
         Input("sim_password", "value")
@@ -220,73 +221,9 @@ def sim_calls(app, geojson_style):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "sim_unlock" in button:
             if str(password) == "cpsimulation2022":
-                return True, False, True
-            return False, True, None
-        return no_update, no_update, no_update
-
-    # map display =======================================================================================================================
-    @app.callback(
-        ### Outputs ###
-        Output("sim_div_lc", "style"),     # div layer control
-        Output("sim_lc", "children"),      # layer control        
-        Output("sim_map", "center"),       # map center
-        Output("sim_map", "zoom"),         # map zoom level
-        Output("sim_hcu_panel", "style"),  # hcu info panel
-        ### Inputs ###
-        Input("sim_map_layer", "data"),    # maps
-        Input("sim_z_c_map", "data"),      # zoom and center for latest map
-        Input("ant_layer", "data"),        # antennas
-        Input("z_c_ant", "data"),          # zoom and center for antennas
-        Input("rp_layer", "data"),         # reference points
-        Input("sim_gt_layer", "data"),     # ground truth
-        Input("z_c_rp_gt", "data"),        # zoom and center for rp and gt
-        Input("sim_unlocked", "data")      # unlocked status hcu maps
-    )
-    def display(
-        sim_map_layer,
-        zoom_center_map,
-        ant_layer,
-        zoom_center_ant,
-        rp_layer,
-        gt_layer,
-        zoom_center_rp_gt,
-        unlocked
-        ):
-        hcu_style = {"display": "None"}
-        ly_style = {"display": "None"}
-        # presetting map zoom level and center
-        zoom = 4
-        center = (49.845359730413186, 9.90578149727622) # center of Europe
-        # getting all different layers
-        layers = []
-        if sim_map_layer:
-            zoom = zoom_center_map[0]      # zoom for latest uploaded map layer
-            center = zoom_center_map[1]    # center of latest uploaded map layer
-            layers += sim_map_layer            # adding map (all previous + latest) layers to map
-            ly_style = {"display": "block"}
-        if ant_layer:
-            zoom = zoom_center_ant[0]      # zoom
-            center = zoom_center_ant[1]    # center
-            layers.append(ant_layer)       # adding antenna layer to map
-            ly_style = {"display": "block"}
-        if rp_layer:
-            zoom = zoom_center_rp_gt[0]    # zoom
-            center = zoom_center_rp_gt[1]  # center
-            layers.append(rp_layer)        # adding ref points layer to map
-            ly_style = {"display": "block"}
-        if gt_layer:
-            zoom = zoom_center_rp_gt[0]    # zoom
-            center = zoom_center_rp_gt[1]  # center
-            layers += gt_layer             # adding gt points (all previous + latest) layers to map
-            ly_style = {"display": "block"}
-        if unlocked:
-            zoom = 19
-            center = (53.540239664876104, 10.004663417352164) # HCU coordinates
-            layers += su.floorplan2layer(geojson_style)       # adding hcu floorplans to map
-            hcu_style = {"display": "block"}                  # displaying info panel
-            ly_style = {"display": "block"}
-        if layers: return ly_style, layers, center, zoom, hcu_style
-        else: return ly_style, [], center, zoom, hcu_style
+                return True, False, True, True, True
+            return False, True, None, None, None
+        return no_update, no_update, no_update, no_update, no_update
 
     # ground truth canvas ===============================================================================================================
     @app.callback(
@@ -363,14 +300,11 @@ def sim_calls(app, geojson_style):
         ### Outputs ###
         # modals
         Output("gen_warn", "is_open"),    # gt generator warn
-        Output("gen_done", "is_open"),    # gt generator done
         Output("sel_warn", "is_open"),    # show ref points warn
         # store ref points (layer)
-        Output("rp_layer", "data"),
+        Output("sim_ref_layers", "data"),
         # store layer of generated gt
-        Output("sim_gt_layer", "data"),
-        # store zoom lvl and center point
-        Output("z_c_rp_gt", "data"),
+        Output("sim_gt_layers", "data"),
         # loading
         Output("sim_spin3", "children"),  # loading status
         ### Inputs ###
@@ -419,11 +353,15 @@ def sim_calls(app, geojson_style):
                     lon, lat = u.from_32632_to_4326(gt[:,1:3])
                     zoom = u.zoom_lvl(lon, lat)     # zoom lvl
                     center = u.centroid(lon, lat)   # center
-                    # making ground truth layers
-                    layers = u.gt2marker()
-                    return gen_warn, not gen_done, sel_warn, no_update, layers, [zoom, center], no_update   # successful generator
-                else: return not gen_warn, gen_done, sel_warn, no_update, no_update, no_update, no_update  # gt generation went wrong
-            else: return gen_warn, gen_done, not sel_warn, no_update, no_update, no_update, no_update      # no data selected
+                    layers = {
+                        "layers": True,
+                        "zoom": zoom,
+                        "center": center,
+                        "date": time.time()
+                    }
+                    return gen_warn, sel_warn, no_update, layers, no_update           # successful generator
+                else: return not gen_warn, sel_warn, no_update, no_update, no_update  # gt generation went wrong
+            else: return gen_warn, not sel_warn, no_update, no_update, no_update      # no data selected
         # ========= REF POINTS  =================================================================================================================
         elif "show_btn" in button:
             if ref_data:
@@ -434,10 +372,15 @@ def sim_calls(app, geojson_style):
                 zoom = u.zoom_lvl(lon, lat)     # zoom lvl
                 center = u.centroid(lon, lat)   # center
                 # turning ref points into layer of markers
-                layer = su.ref2marker(data, check)
-                return gen_warn, gen_done, sel_warn, layer, no_update, [zoom, center], no_update       # successful
-            else: return gen_warn, gen_done, not sel_warn, [], no_update, no_update, no_update         # no data selected
-        else: return gen_warn, gen_done, sel_warn, no_update, no_update, no_update, no_update          # offcanvas is closed
+                layer = {
+                    "layers": su.ref2marker(data, check),
+                    "zoom": zoom,
+                    "center": center,
+                    "date": time.time()
+                }
+                return gen_warn, sel_warn, layer, no_update, no_update             # successful
+            else: return gen_warn, not sel_warn, no_update, no_update, no_update   # no data selected
+        else: return gen_warn, sel_warn, no_update, no_update, no_update           # offcanvas is closed
 
     # simulation settings canvas ========================================================================================================
     @app.callback(
@@ -514,15 +457,12 @@ def sim_calls(app, geojson_style):
     # simulate measurement ==============================================================================================================
     @app.callback(
         ### Outputs ###
-        Output("sim_warn", "is_open"),   # freq and or err is missing
-        Output("sim_done", "is_open"),   # simulation successful
-        Output("sim_data", "data"),      # sim measurements data
-        # loading
-        Output("sim_spin4", "children"), # loading status
+        Output("sim_warn", "is_open"),     # inputs are missing
+        Output("sim_traj_layers", "data"),
+        Output("sim_spin4", "children"),   # loading status
         ### Inputs ###
         # modal
         State("sim_warn", "is_open"),
-        State("sim_done", "is_open"),
         # button
         Input("sim_btn", "n_clicks"),
         # data
@@ -539,7 +479,6 @@ def sim_calls(app, geojson_style):
     def simulation(
         # canvas status
         sim_warn,
-        sim_done,
         # button
         sim_btn,
         # data
@@ -556,15 +495,22 @@ def sim_calls(app, geojson_style):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "sim_btn" in button:
             if gt_select and err and ms_freq and net_cap and num_user and num_int:
-                # try: # simulate measurement
                 simulation = simulate_positions(gt_select, float(err), float(ms_freq), float(net_cap), int(num_user), int(num_int), sem_err_rang, int_rang, sem_err)
                 # formatting and saving simulation data
                 export_sim(*simulation, (ms_freq, err, num_user))
-                return sim_warn, not sim_done, True, no_update
-                # except: # simulation failed, wrong inputs or no ground truth data selected
-                #     return not sim_warn, sim_done, None, no_update
-            else: return not sim_warn, sim_done, None, no_update
-        else: return sim_warn, sim_done, None, no_update
+                # getting zoom lvl and center point
+                lon, lat = u.from_32632_to_4326(np.loadtxt(f"assets/trajectories/sim__freq{ms_freq}_err{err}_user{num_user}.csv", skiprows=1)[:,1:3])
+                zoom = u.zoom_lvl(lon, lat)     # zoom lvl
+                center = u.centroid(lon, lat)   # center
+                layers = {
+                    "layers": True,
+                    "zoom": zoom,
+                    "center": center,
+                    "date": time.time()
+                }
+                return sim_warn, layers, no_update
+            else: return not sim_warn, no_update, no_update
+        else: return sim_warn, no_update, no_update
 
     # export ============================================================================================================================
     @app.callback(
