@@ -202,40 +202,6 @@ def eval_calls(app):
         # ====== no button clicked =============================================================================================================
         # this else-section is always activated, when the page refreshes -> no warnings
         else: return ul_warn, no_update, no_update, no_update
-   
-    # hcu canvas ========================================================================================================================
-    @app.callback(
-        Output("eval_research", "is_open"),
-        Input("eval_hcu_maps", "n_clicks"),
-        State("eval_research", "is_open")
-    )
-    def sim_hcu(hcu_maps, is_open):
-        button = [p["prop_id"] for p in callback_context.triggered][0]
-        if "eval_hcu_maps" in button:
-            return not is_open
-        return is_open
-        
-    # unlock hcu maps ===================================================================================================================
-    @app.callback(
-        ### Outputs ###
-        # return messages
-        Output("eval_password", "valid"),
-        Output("eval_password", "invalid"),
-        # unlock status
-        Output("eval_unlocked2", "data"),
-        Output("eval_unlocked3", "data"),
-        Output("eval_unlocked5", "data"),
-        ### Inputs ###
-        Input("eval_unlock", "n_clicks"),
-        Input("eval_password", "value")
-    )
-    def unlock(unlock, password):
-        button = [p["prop_id"] for p in callback_context.triggered][0]
-        if "eval_unlock" in button:
-            if str(password) == "cpsimulation2022":
-                return True, False, True, True, True
-            return False, True, None, None, None
-        return no_update, no_update, no_update, no_update, no_update
 
     # open cdf =======================================================================================================================
     @app.callback(

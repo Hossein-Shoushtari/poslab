@@ -158,30 +158,7 @@ def modals():
         id="eval_exp_done",
         is_open=False
     )
-    # unlock hcu maps
-    hcu_modal = dbc.Modal(
-        [
-            dbc.ModalHeader(dbc.ModalTitle("Researcher Login")),
-            dbc.ModalBody(
-                html.Div(
-                    [
-                        dbc.Label("Password"),
-                        dbc.Input(id="eval_password", type="password", placeholder="Enter password", style={"color": "white"}),
-                        dbc.FormFeedback("Access granted", type="valid"),
-                        dbc.FormFeedback("Access denied", type="invalid")
-                    ]
-                )
-            ),
-            dbc.ModalFooter(
-                dbc.Button("Unlock", color="primary", id="eval_unlock")
-            ),
-        ],
-    id="eval_research",
-    backdrop="static",
-    is_open=False,
-    )
-
-    return html.Div([visual, ul_warn, ul_done, display_done, cdf_warn, graph_modal, map_warn, exp_warn, exp_done, hcu_modal])
+    return html.Div([visual, ul_warn, ul_done, display_done, cdf_warn, graph_modal, map_warn, exp_warn, exp_done])
 
 def eval_map(geojson_style):
     ### MAP

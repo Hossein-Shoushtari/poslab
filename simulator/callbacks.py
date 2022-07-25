@@ -191,40 +191,6 @@ def sim_calls(app):
         # this else-section is always activated, when the page refreshes -> no warnings
         else: return ul_warn, ul_done, no_update, no_update
 
-    # hcu canvas ========================================================================================================================
-    @app.callback(
-        Output("sim_research", "is_open"),
-        Input("sim_hcu_maps", "n_clicks"),
-        State("sim_research", "is_open")
-    )
-    def sim_hcu(hcu_maps, is_open):
-        button = [p["prop_id"] for p in callback_context.triggered][0]
-        if "sim_hcu_maps" in button:
-            return not is_open
-        return is_open
-
-    # unlock hcu maps ===================================================================================================================
-    @app.callback(
-        ### Outputs ###
-        # return messages
-        Output("sim_password", "valid"),
-        Output("sim_password", "invalid"),
-        # unlock status
-        Output("sim_unlocked", "data"),
-        Output("eval_unlocked1", "data"),
-        Output("eval_unlocked4", "data"),
-        ### Inputs ###
-        Input("sim_unlock", "n_clicks"),
-        Input("sim_password", "value")
-    )
-    def unlock(unlock, password):
-        button = [p["prop_id"] for p in callback_context.triggered][0]
-        if "sim_unlock" in button:
-            if str(password) == "cpsimulation2022":
-                return True, False, True, True, True
-            return False, True, None, None, None
-        return no_update, no_update, no_update, no_update, no_update
-
     # ground truth canvas ===============================================================================================================
     @app.callback(
         ### Outputs ###

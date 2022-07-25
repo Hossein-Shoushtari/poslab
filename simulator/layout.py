@@ -155,29 +155,6 @@ def modals():
         id="sim_exp_done",
         is_open=False
     )
-    # unlock hcu maps
-    hcu_modal = dbc.Modal(
-        [
-            dbc.ModalHeader(dbc.ModalTitle("Researcher Login")),
-            dbc.ModalBody(
-                html.Div(
-                    [
-                        dbc.Label("Password"),
-                        dbc.Input(id="sim_password", type="password", placeholder="Enter password", style={"color": "white"}),
-                        dbc.FormFeedback("Access granted", type="valid"),
-                        dbc.FormFeedback("Access denied", type="invalid")
-                    ]
-                )
-            ),
-            dbc.ModalFooter(
-                dbc.Button("Unlock", color="primary", id="sim_unlock")
-            ),
-        ],
-    id="sim_research",
-    backdrop="static",
-    is_open=False,
-    )
-
     # simulate measurements - select ground truth
     sim_modal = dbc.Modal(
         [
@@ -207,7 +184,7 @@ def modals():
         backdrop="static",
         is_open=False,
     )
-    return html.Div([ul_warn, ul_done, map_warn, display_done, gen_warn, gen_done, sel_warn, exp_warn, exp_done, sim_warn, hcu_modal, sim_modal])
+    return html.Div([ul_warn, ul_done, map_warn, display_done, gen_warn, gen_done, sel_warn, exp_warn, exp_done, sim_warn, sim_modal])
 
 def sim_map(geojson_style):
     ### MAP

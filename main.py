@@ -46,12 +46,36 @@ cs_tab = com_layout()
 # putting all together
 app.layout = html.Div(
     [
+        # upload and map display done
         dbc.Modal([
             dbc.ModalHeader(dbc.ModalTitle("DONE")),
             dbc.ModalBody("Successful!")],
             id="display_done",
             is_open=False
         ),
+        # unlock hcu maps
+        dbc.Modal(
+            [
+                dbc.ModalHeader(dbc.ModalTitle("Researcher Login")),
+                dbc.ModalBody(
+                    html.Div(
+                        [
+                            dbc.Label("Password"),
+                            dbc.Input(id="password", type="password", placeholder="Enter password", style={"color": "white"}),
+                            dbc.FormFeedback("Access granted", type="valid"),
+                            dbc.FormFeedback("Access denied", type="invalid")
+                        ]
+                    )
+                ),
+                dbc.ModalFooter(
+                    dbc.Button("Unlock", color="primary", id="unlock")
+                ),
+            ],
+        id="research",
+        backdrop="static",
+        is_open=False,
+        ),
+        # Tabs
         dcc.Tabs(
             value="tab1",
             children=

@@ -1,21 +1,7 @@
 ##### Callbacks Map display
 #### IMPORTS
 # dash
-from dash import html, Output, Input, State, no_update, callback_context, dcc
-import dash_bootstrap_components as dbc
-import plotly.graph_objects as go
-import plotly.express as px
-import dash_leaflet as dl
-# installed
-import geopandas as gp
-# built in
-from os import listdir
-import shutil as st
-import pandas as pd
-import numpy as np
-import random
-import json
-import time
+from dash import Output, Input, State, no_update, callback_context
 # utils
 import utils as u
 import simulator.utils as su
@@ -23,6 +9,44 @@ import evaluator.utils as eu
 
 
 def map_display(app, geojson_style):
+    # open researcher login ==============================================================================================================
+    @app.callback(
+        Output("research", "is_open"),
+        Input("sim_hcu_maps", "n_clicks"),
+        Input("eval_hcu_maps", "n_clicks"),
+        State("research", "is_open")
+    )
+    def sim_hcu(sim, eval, is_open):
+        button = [p["prop_id"] for p in callback_context.triggered][0]
+        if "sim_hcu_maps" in button or "eval_hcu_maps" in button:
+            return not is_open
+        return is_open
+
+    # unlock hcu maps ===================================================================================================================
+    @app.callback(
+        ### Outputs ###
+        # return messages
+        Output("password", "valid"),
+        Output("password", "invalid"),
+        # unlock status
+        Output("sim_unlocked", "data"),
+        Output("eval_unlocked1", "data"),
+        Output("eval_unlocked2", "data"),
+        Output("eval_unlocked3", "data"),
+        Output("eval_unlocked4", "data"),
+        Output("eval_unlocked5", "data"),
+        ### Inputs ###
+        Input("unlock", "n_clicks"),
+        Input("password", "value")
+    )
+    def unlock(unlock, password):
+        button = [p["prop_id"] for p in callback_context.triggered][0]
+        if "unlock" in button:
+            if str(password) == "cpsimulation2022":
+                return True, False, True, True, True, True, True, True
+            return False, True, None, None, None, None, None, None
+        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
+
     # map display =======================================================================================================================
     @app.callback(
         # modal #
@@ -76,7 +100,7 @@ def map_display(app, geojson_style):
         eval_gt_layers,
         eval_traj_layers,
         eval_unlocked,
-        # buttons
+        ## buttons
         sim_zoom,
         eval_zoom
         ):
