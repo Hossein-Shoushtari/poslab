@@ -1,4 +1,4 @@
-# Simulation ⟷  Evaluation
+# INDOOR NAVIGATION 5G  |  Simulation ⟷  Evaluation
 
 ### official website: https://simulation2evaluation.herokuapp.com/
 
@@ -26,8 +26,8 @@
 > Simulator tab with all its required python scripts
 
 ### FILES
-> **main.py** : self-explanatory :) 
-> **maps.py** : all logic code related to the two maps in Simulator & Evaluator (unlock HCU maps, show all uploaded/generated, zoom, center etc.)
+> **main.py** : self-explanatory :)   
+> **maps.py** : all logic code related to the two maps in Simulator & Evaluator (unlock HCU maps, show all uploaded/generated, zoom, center etc.)   
 > **dashExtensions_default.js** : GeoJSON rendering logic. Must be in Java Script. It's used for dash-leaflet. It's only initialized once in the beginning.  
 > **spinner_styling.css** : CSS styling of the blue spinner/loading sign  
 > **tabs.css** : CSS styling of the four tabs   

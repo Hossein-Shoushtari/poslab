@@ -81,7 +81,14 @@ def spinners():
         fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
         spinnerClassName="spinner"
     )
-    return html.Div([spin1, spin2, spin3, spin4, spin5])
+    spin6 = dbc.Spinner(
+        children=[html.Div(id="eval_spin6", style={"display": "none"})],
+        type=None,
+        fullscreen=True,
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
+        spinnerClassName="spinner"
+    )
+    return html.Div([spin1, spin2, spin3, spin4, spin5, spin6])
 
 def modals():
     ### MODALs
@@ -286,9 +293,35 @@ def visual_modal():
                 html.Div([
                     dbc.Row([
                         dbc.Col([
-                            dbc.Label("Maps", style={"color": "silver"}),
+                            dbc.Label("Background", style={"color": "silver"}),
                             dcc.Dropdown(
-                                id="vis_map_select",
+                                id="vis_bg_select",
+                                options=[{"label": bg, "value": bg} for bg in map_bgs],
+                                value="carto-darkmatter",
+                                placeholder="Select Background",
+                                clearable=True,
+                                optionHeight=35,
+                                multi=False,
+                                searchable=True,
+                                style={"marginBottom": "7px", "color": "black"})
+                        ]),
+                        dbc.Col([
+                            dbc.Label("Plot Format [2000x1000]", style={"color": "silver"}),
+                            dcc.Dropdown(
+                                id="vis_format_select",
+                                options=[{"label": f, "value": f} for f in ["png", "svg", "jpeg", "webp"]],
+                                value="png",
+                                placeholder="Select Format",
+                                clearable=True,
+                                optionHeight=35,
+                                multi=False,
+                                searchable=True,
+                                style={"marginBottom": "7px", "color": "black"})
+                        ]),
+                        dbc.Col([
+                            dbc.Label("Waypoints", style={"color": "silver"}),
+                            dcc.Dropdown(
+                                id="vis_ref_select",
                                 options=[],
                                 placeholder="Select Data",
                                 clearable=True,
@@ -322,15 +355,26 @@ def visual_modal():
                                 style={"marginBottom": "7px", "color": "black"})
                         ]),
                         dbc.Col([
-                            dbc.Label("Background", style={"color": "silver"}),
+                            dbc.Label("Antennas", style={"color": "silver"}),
                             dcc.Dropdown(
-                                id="vis_bg_select",
-                                options=[{"label": bg, "value": bg} for bg in map_bgs],
-                                value="carto-darkmatter",
-                                placeholder="Select Background",
+                                id="vis_ant_select",
+                                options=[],
+                                placeholder="Select Data",
                                 clearable=True,
                                 optionHeight=35,
                                 multi=False,
+                                searchable=True,
+                                style={"marginBottom": "7px", "color": "black"})
+                        ]),
+                        dbc.Col([
+                            dbc.Label("Maps", style={"color": "silver"}),
+                            dcc.Dropdown(
+                                id="vis_map_select",
+                                options=[],
+                                placeholder="Select Data",
+                                clearable=True,
+                                optionHeight=35,
+                                multi=True,
                                 searchable=True,
                                 style={"marginBottom": "7px", "color": "black"})
                         ])
@@ -338,37 +382,13 @@ def visual_modal():
                     style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}
                 ),
                 dcc.Graph(
-                    figure=go.Figure(data=[go.Scattermapbox()]).update_layout(margin={"r":0,"t":0,"l":0,"b":0},mapbox=go.layout.Mapbox()),
-                    config={
-                        "staticPlot": False,        # True, False
-                        "scrollZoom": True,         # True, False
-                        "showTips": True,           # True, False
-                        "displayModeBar": "hover",  # True, False, "hover"
-                        "watermark": True,
-                        "editable": True,
-                        "toImageButtonOptions": {
-                            "format": "png",        # one of png, svg, jpeg, webp
-                            "filename": "my_plot",
-                            "height": 700,
-                            "width": 1200,
-                            "scale": 1              # multiply title/legend/axis/canvas sizes by this factor
-                        },
-                        "modeBarButtonsToAdd": [
-                            "drawline",
-                            "drawopenpath",
-                            "drawclosedpath",
-                            "drawcircle",
-                            "drawrect",
-                            "eraseshape"
-                        ]
-                    },
                     id="vis_map",
                     className="six columns",
-                    style={"height": "600px"})
+                    style={"height": "80vh"})
             ])
         ],
         id="visual_show",
-        size="xl",
+        fullscreen=True,
         backdrop="static",
         is_open=False
     )

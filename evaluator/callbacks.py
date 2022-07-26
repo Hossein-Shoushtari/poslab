@@ -343,8 +343,10 @@ def eval_calls(app):
         ### Outputs ###
         Output("visual_show", "is_open"),
         Output("vis_map_select", "options"),
+        Output("vis_ref_select", "options"),
         Output("vis_gt_select", "options"),
         Output("vis_traj_select", "options"),
+        Output("vis_ant_select", "options"),
         ### Inputs ###
         # modal
         State("visual_show", "is_open"),
@@ -365,47 +367,71 @@ def eval_calls(app):
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "open_visual" in button:
+            map_options  = [{"label": name[:-8], "value": f"maps/{name[:-8]}"} for name in listdir("assets/maps")]
+            ref_options  = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/waypoints")]
             gt_options   = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/groundtruth")]
             traj_options = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/trajectories")]
-            map_options = [{"label": name[:-8], "value": f"assets/maps/{name[:-8]}"} for name in listdir("assets/maps")]
+            ant_options  = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/antennas")]
             if unlocked1 or unlocked2:
-                map_options += [{"label": name[:-8], "value": f"assets/floorplans/{name[:-8]}"} for name in listdir("assets/floorplans")]
-            return not visual_show, map_options, gt_options, traj_options
-        else: return visual_show, [], [], []
+                map_options += [{"label": name[:-8], "value": f"floorplans/{name[:-8]}"} for name in listdir("assets/floorplans")]
+            return not visual_show, map_options, ref_options, gt_options, traj_options, ant_options
+        else: return visual_show, [], [], [], [], []
 
     # visual map =======================================================================================================================
     @app.callback(
         ### Outputs ###
         Output("vis_map", "figure"),
+        Output("vis_map", "config"),
+        Output("eval_spin6", "children"),    # loading status
         ### Inputs ###
         Input("vis_map_select", "value"),
+        Input("vis_ref_select", "value"),
         Input("vis_gt_select", "value"),
         Input("vis_traj_select", "value"),
-        Input("vis_bg_select", "value")
+        Input("vis_ant_select", "value"),
+        Input("vis_bg_select", "value"),
+        Input("vis_format_select", "value"),
     )
-    def update_fig(_maps, gts, trajs, bg):
+    def update_fig(_maps, refs, gts, trajs, ant, bg, _format):
         fig = go.Figure(go.Scattermapbox())
         layers = []
         zoom = 1
         center = (0, 0)
         if not bg: bg = "white-bg"
+        if not _format: _format = "png"
         if _maps:
             # creating plotly layers
             for _map in _maps:
                 r, g, b = random.randint(0,255), random.randint(0,255), random.randint(0,255)
-                with open(f"{_map}.geojson") as json_file:
+                with open(f"assets/{_map}.geojson") as json_file:
                     data = json.load(json_file)
                 layer = {
                     "sourcetype": "geojson",
                     "source": data,
                     "type": "line",
-                    "color": f"rgb({r}, {g}, {b})"
+                    "color": "blue"
                 }
                 layers.append(layer)
             # getting zoom and center
-            with open(f"{_map}.geojson", "r") as file:
+            with open(f"assets/{_map}.geojson", "r") as file:
                 data = file.read()
             lon, lat = u.extract_coordinates(gp.read_file(data))
+            zoom = u.zoom_lvl(lon, lat)
+            center = u.centroid(lon, lat)
+        if refs:
+            # creating plotly layers
+            for ref in refs:
+                data = np.loadtxt(f"assets/waypoints/{ref}.csv", skiprows=1)[:, 1:3]
+                lon, lat = u.from_32632_to_4326(data)
+                fig.add_trace(go.Scattermapbox(
+                    mode="markers",
+                    lon=lon,
+                    lat=lat,
+                    marker={"size": 12},
+                    legendgrouptitle={"text": "Waypoints"},
+                    legendgroup="Waypoints",
+                    name=ref))
+            # getting zoom and center
             zoom = u.zoom_lvl(lon, lat)
             center = u.centroid(lon, lat)
         if gts:
@@ -417,7 +443,9 @@ def eval_calls(app):
                     mode="markers",
                     lon=lon,
                     lat=lat,
-                    marker={"size": 4},
+                    marker={"size": 6},
+                    legendgrouptitle={"text": "Ground Truth"},
+                    legendgroup="Ground Truth",
                     name=gt))
             # getting zoom and center
             zoom = u.zoom_lvl(lon, lat)
@@ -431,8 +459,25 @@ def eval_calls(app):
                     mode="markers",
                     lon=lon,
                     lat=lat,
-                    marker={"size": 4},
+                    marker={"size": 6},
+                    legendgrouptitle={"text": "Trajectories"},
+                    legendgroup="Trajectories",
                     name=traj))
+            # getting zoom and center
+            zoom = u.zoom_lvl(lon, lat)
+            center = u.centroid(lon, lat)
+        if ant:
+            # creating plotly layers
+            data = np.loadtxt(f"assets/antennas/{ant}.csv", skiprows=1)
+            lon, lat = u.from_32632_to_4326(data)
+            fig.add_trace(go.Scattermapbox(
+                mode="markers",
+                lon=lon,
+                lat=lat,
+                marker={"size": 14},
+                legendgrouptitle={"text": "Antennas"},
+                legendgroup="Antennas",
+                name=ant))
             # getting zoom and center
             zoom = u.zoom_lvl(lon, lat)
             center = u.centroid(lon, lat)
@@ -456,7 +501,31 @@ def eval_calls(app):
             },
             showlegend=True
         )
-        return fig
+        # refreshing configurations
+        config={
+            "staticPlot": False,        # True, False
+            "scrollZoom": True,         # True, False
+            "showTips": True,           # True, False
+            "displayModeBar": "hover",  # True, False, "hover"
+            "watermark": True,
+            "editable": True,
+            "toImageButtonOptions": {
+                "format": _format,      # one of png, svg, jpeg, webp
+                "filename": "my_plot",
+                "height": 1000,
+                "width": 2000,
+                "scale": 1              # multiply title/legend/axis/canvas sizes by this factor
+            },
+            "modeBarButtonsToAdd": [
+                "drawline",
+                "drawopenpath",
+                "drawclosedpath",
+                "drawcircle",
+                "drawrect",
+                "eraseshape"
+            ]
+        }
+        return fig, config, no_update
 
     # export ============================================================================================================================
     @app.callback(
