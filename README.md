@@ -22,7 +22,7 @@
 > Evaluator tab with all its required python scripts
 #### home
 > Home tab with all its required python scripts
-#### Simulator
+#### simulator
 > Simulator tab with all its required python scripts
 
 ### FILES

@@ -336,25 +336,27 @@ def traj2marker() -> list:
         name = csv_file.split(".")[:-1]
         # data
         traj = np.loadtxt(f"assets/trajectories/{csv_file}", skiprows=1)[:, 1:3]
-        # designing icon (from https://icons8.de/icons/set/marker)
-        icon = {
-            "iconUrl": f"https://img.icons8.com/emoji/344/{colors[i%len(colors)]}-circle-emoji.png",
-            "iconSize": [5, 5],    # size of the icon
-            "iconAnchor": [0, 0],  # point of the icon which will correspond to marker"s location
-        }
-        # making points out of ground truth data for converting it (crs:32632 to crs:4326)
-        points = {"Trajectory": [i for i in range(1, traj.shape[0]+1)], "geometry": [sh.Point(lat, lon) for lat, lon in traj]}
-        converted_points = gp.GeoDataFrame(points, crs=32632).to_crs(4326)
-        # making geojson format for creating markers
-        geojson = dlx.dicts_to_geojson([dict(lat=row[1].y, lon=row[1].x) for _, row in converted_points.iterrows()])
-        # making and designing markers (adding tooltip and popup)
-        markers = []
-        for nr, row in converted_points.iterrows():
-            marker = dl.Marker(position=[row[1].y, row[1].x], icon=icon)
-            markers.append(marker)
-        # making layer out of markers
-        layers.append(dl.Overlay(dl.LayerGroup(markers), name=name, checked=show[i]))
-        i += 1
+        # displaying only trajectories with maximum 100 markers
+        if traj.shape[0] <= 1000:
+            # designing icon (from https://icons8.de/icons/set/marker)
+            icon = {
+                "iconUrl": f"https://img.icons8.com/emoji/344/{colors[i%len(colors)]}-circle-emoji.png",
+                "iconSize": [5, 5],    # size of the icon
+                "iconAnchor": [0, 0],  # point of the icon which will correspond to marker"s location
+            }
+            # making points out of ground truth data for converting it (crs:32632 to crs:4326)
+            points = {"Trajectory": [i for i in range(1, traj.shape[0]+1)], "geometry": [sh.Point(lat, lon) for lat, lon in traj]}
+            converted_points = gp.GeoDataFrame(points, crs=32632).to_crs(4326)
+            # making geojson format for creating markers
+            geojson = dlx.dicts_to_geojson([dict(lat=row[1].y, lon=row[1].x) for _, row in converted_points.iterrows()])
+            # making and designing markers (adding tooltip and popup)
+            markers = []
+            for nr, row in converted_points.iterrows():
+                marker = dl.Marker(position=[row[1].y, row[1].x], icon=icon)
+                markers.append(marker)
+            # making layer out of markers
+            layers.append(dl.Overlay(dl.LayerGroup(markers), name=name, checked=show[i]))
+            i += 1
     return layers
 
 def deleter():

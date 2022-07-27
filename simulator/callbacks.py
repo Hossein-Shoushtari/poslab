@@ -416,7 +416,7 @@ def sim_calls(app):
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "open_sim" in button:
-            options = [{"label":name[:-4], "value": name[:-4]} for name in listdir("assets/exports/gt")]
+            options = [{"label":name[:-4], "value": name[:-4]} for name in listdir("assets/groundtruth")]
             return not sim_modal, options     # activate gt offcanvas and filling dropdown with data
         else: return sim_modal, []            # offcanvas is closed
     

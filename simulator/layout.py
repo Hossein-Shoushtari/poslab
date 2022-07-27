@@ -287,7 +287,15 @@ def help_canvas():
                 html.Div([
                     # info simulation
                     html.H5("SIMULATION", style={"text-align": "center", "color": "silver"}),
-                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
+                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "15px"}),
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/warning_sign.svg"), style={"marginRight": "10px"}),
+                            "Due to performance reasons, trajectories of only up to a 1000 points are shown on the map.",
+                        ],
+                        className="d-flex align-items-center",
+                        style={"height": "90px", "color": "#303030", "background": "#774E06"}
+                    ),
                     html.P("Instructions for simulating measurements:", style={"color": "gray"}),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Ground Truth:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
@@ -313,15 +321,15 @@ def help_canvas():
                         dbc.Col(html.Div(html.P("Sim. Measm.:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
                         dbc.Col(html.P("Simulate the measurements to complete the calculation.", style={"color": "gray"}))
                     ], className="g-0"),
-                    html.Div(html.P("The ground truth trajectory, the simulated measurements and the drawings can be downloaded in a ZIP file!", style={"color": "gray"}),
+                    html.Div(html.P("Ground truth trajectories, simulated measurements and drawings can be downloaded in a ZIP file!", style={"color": "gray"}),
                     style={"borderLeft": "2px solid #36BD8E", "paddingLeft": "5px"})],
                 style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
                 html.Br(),
                 html.Div([
                     # bug info upload
-                    html.H5("🐞", style={"text-align": "center"}),
-                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
-                    html.P("After uploading new layers sometimes the layer names in the layer control as well as some tooltips are messed up.", style={"color": "gray"}),
+                    html.Div(html.Img(src="assets/images/bug_sign.svg"), style={"text-align": "center", "margin-bottom": "5px"}),
+                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "5px"}),
+                    html.P("After uploading new layers sometimes the layer names in the layer control are messed up.", style={"color": "gray"}),
                     html.P("Changing tabs will automatically update the names.", style={"color": "gray", "marginTop": "-10px"})],
                 style={"border":"1px solid red", "border-radius": 10, "padding": "10px", "marginBottom": "0px"})
             ],
