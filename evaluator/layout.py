@@ -202,7 +202,7 @@ def eval_map(geojson_style):
     # zoom botton
     btn_style2 = {
         "position": "absolute",
-        "top": "155px",
+        "top": "150px",
         "left": "10px",
         "z-index": "500",
         "backgroundColor": "white",
@@ -220,8 +220,8 @@ def eval_map(geojson_style):
         dl.Map(
             [   
                 html.Div(id="eval_hcu_panel", children=info, style={"display": "None"}),
-                html.Button("🎓", id="eval_hcu_maps", style=btn_style1),
-                html.Button("🔍", id="eval_zoom", style=btn_style2),
+                html.Button(html.Img(src="assets/images/research_sign.svg"), id="eval_hcu_maps", style=btn_style1),
+                html.Button(html.Img(src="assets/images/focus_sign2.svg"), id="eval_zoom", style=btn_style2),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
                 html.Div(id="eval_div_lc", children=dl.LayersControl(id="eval_lc", children=eu.floorplan2layer(geojson_style)), style={"display": "None"}), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
@@ -306,7 +306,7 @@ def visual_modal():
                                 style={"marginBottom": "7px", "color": "black"})
                         ]),
                         dbc.Col([
-                            dbc.Label("Plot Format [2000x1000]", style={"color": "silver"}),
+                            dbc.Label("Format [2000x1000]", style={"color": "silver"}),
                             dcc.Dropdown(
                                 id="vis_format_select",
                                 options=[{"label": f, "value": f} for f in ["png", "svg", "jpeg", "webp"]],
@@ -398,41 +398,60 @@ def help_canvas():
     help_canvas = html.Div([
         dbc.Offcanvas(
             [
+                dbc.Alert(
+                    [
+                        html.Div(html.Img(src="assets/images/focus_sign1.svg"), style={"marginRight": "10px"}),
+                        "Use the focus tool on the map to restore the last view!"
+                    ],
+                    className="d-flex align-items-center",
+                    style={"height": "75px", "color": "silver", "background": "#4598DB", "border-radius": 10}
+                ),
+                dbc.Alert(
+                    [
+                        html.Div(html.Img(src="assets/images/bug_sign.svg"), style={"marginRight": "10px"}),
+                        "Are the layer names mixed up? Just switch tabs and come back!"
+                    ],
+                    className="d-flex align-items-center",
+                    style={"height": "75px", "color": "silver", "background": "#70251B", "border-radius": 10}
+                ),
                 html.Div([
                     # info upload
                     html.H5("UPLOAD", style={"text-align": "center", "color": "#3B5A7F"}),
                     html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
                     html.P("All buttons are for uploading the data required for the simulation. Each file needs the first line as the header. The delimiter is a single space.", style={"color": "gray"}),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Maps:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                        dbc.Col(html.P("optional; GeoJSON (any crs)", style={"color": "gray"}))
+                        dbc.Col(html.Div(html.P("Maps", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.P("optional; GeoJSON (any CRS)", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Paths:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.Div(html.P("Paths", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
                         dbc.Col(html.P("temporarily unavailable", style={"color": "gray", "font-style": "italic"}))
                     ], className="g-0"),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Ground Truth:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.Div(html.P("Ground Truth", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
                         dbc.Col(html.P("optional; CSV, UTM", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Trajectory:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.Div(html.P("Trajectory", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
                         dbc.Col(html.P("optional; CSV, UTM", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Sensors:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.Div(html.P("Sensors", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
                         dbc.Col(html.P("optional; CSV", style={"color": "gray"}))
                     ], className="g-0")],
-                style={"border":"1px solid #3B5A7F", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
-                html.Br(),
+                style={"border":"1px solid #3B5A7F", "border-radius": 10, "padding": "10px", "marginBottom": "16px"}),
                 html.Div([
                     # info evaluation
                     html.H5("EVALUATION", style={"text-align": "center", "color": "silver"}),
                     html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
                     html.P("Instructions for evaluating:", style={"color": "gray"}),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Visual:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=4),
-                        dbc.Col(html.P("Possibility to plot all layers on a selected map background as an image (png). Map colors are chosen randomly. Reload map results in new color.", style={"color": "gray"}))
+                        dbc.Col(html.Div(html.P("CDF", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.P("graph either normalized or histogrammed cumulative distribution function", style={"color": "gray"}))
+                    ], className="g-0"),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("Visual", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.P("view all layers on a selected map background and plot it as an image", style={"color": "gray"}))
                     ], className="g-0")],
                 style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"})
             ],
@@ -458,13 +477,13 @@ def eval_layout(geojson_style):
                     dcc.Upload(
                         id="eval_ul_map",
                         children=html.Div(dbc.Button("Maps", id="eval_maps_upload", color="info", outline=True, style={"width": "72px"})),
-                        style={"marginTop": "8px", "marginBottom": "0px"},
+                        style={"marginTop": "8px", "marginBottom": "0px", "width": 75},
                         multiple=True)),
                 dbc.Col(
                     dcc.Upload(
                         id="ul_paths",
                         children=html.Div(dbc.Button("Paths", id="paths_upload", color="info", outline=True, style={"width": "73px"})),
-                        style={"marginTop": "8px", "marginBottom": "0px"},
+                        style={"marginTop": "8px", "marginBottom": "0px", "width": 75},
                         multiple=True))
             ],
             className="g-0"

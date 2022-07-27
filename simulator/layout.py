@@ -239,8 +239,8 @@ def sim_map(geojson_style):
         dl.Map(
             [   
                 html.Div(id="sim_hcu_panel", children=info, style={"display": "None"}),
-                html.Button("🎓", id="sim_hcu_maps", style=btn_style1),
-                html.Button("🔍", id="sim_zoom", style=btn_style2),
+                html.Button(html.Img(src="assets/images/research_sign.svg"), id="sim_hcu_maps", style=btn_style1),
+                html.Button(html.Img(src="assets/images/focus_sign2.svg"), id="sim_zoom", style=btn_style2),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
                 html.Div(id="sim_div_lc", children=dl.LayersControl(id="sim_lc", children=su.floorplan2layer(geojson_style))), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
@@ -261,29 +261,44 @@ def help_canvas():
     help_canvas = html.Div([
         dbc.Offcanvas(
             [   
+                dbc.Alert(
+                    [
+                        html.Div(html.Img(src="assets/images/focus_sign1.svg"), style={"marginRight": "10px"}),
+                        "Use the focus tool on the map to restore the last view!"
+                    ],
+                    className="d-flex align-items-center",
+                    style={"height": "75px", "color": "silver", "background": "#4598DB", "border-radius": 10}
+                ),
+                dbc.Alert(
+                    [
+                        html.Div(html.Img(src="assets/images/bug_sign.svg"), style={"marginRight": "10px"}),
+                        "Are the layer names mixed up? Just switch tabs and come back!"
+                    ],
+                    className="d-flex align-items-center",
+                    style={"height": "75px", "color": "silver", "background": "#70251B", "border-radius": 10}
+                ),
                 html.Div([
                     # info upload
                     html.H5("UPLOAD", style={"text-align": "center", "color": "#3B5A7F"}),
                     html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
                     html.P("All buttons are for uploading the data required for the simulation. Each file needs the first line as the header. The delimiter is a single space.", style={"color": "gray"}),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Maps:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                        dbc.Col(html.P("optional; GeoJSON (any crs)", style={"color": "gray"}))
+                        dbc.Col(html.Div(html.P("Maps", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.P("optional; GeoJSON (any CRS)", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Waypoints:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.Div(html.P("Waypoints", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
                         dbc.Col(html.P("used for ground truth; CSV, UTM", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Antennas:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.Div(html.P("Antennas", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
                         dbc.Col(html.P("optional; CSV, UTM", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Sensors:", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
+                        dbc.Col(html.Div(html.P("Sensors", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
                         dbc.Col(html.P("acc&gyr used for ground truth, bar&mag optional; CSV", style={"color": "gray"}))
                     ], className="g-0")],
-                style={"border":"1px solid #3B5A7F", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
-                html.Br(),
+                style={"border":"1px solid #3B5A7F", "border-radius": 10, "padding": "10px", "marginBottom": "16px"}),
                 html.Div([
                     # info simulation
                     html.H5("SIMULATION", style={"text-align": "center", "color": "silver"}),
@@ -291,47 +306,43 @@ def help_canvas():
                     dbc.Alert(
                         [
                             html.Div(html.Img(src="assets/images/warning_sign.svg"), style={"marginRight": "10px"}),
-                            "Due to performance reasons, trajectories of only up to a 1000 points are shown on the map.",
+                            "For performance reasons, only trajectories up to 1000 points are displayed on the map.",
                         ],
                         className="d-flex align-items-center",
                         style={"height": "90px", "color": "#303030", "background": "#774E06"}
                     ),
                     html.P("Instructions for simulating measurements:", style={"color": "gray"}),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Ground Truth:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
-                        dbc.Col(html.P("Select data and generate a ground truth trajectory. Note: acc and gyr data is needed!", style={"color": "gray"}))
+                        dbc.Col(html.Div(html.P("Ground Truth", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
+                        dbc.Col(html.P("select data to generate ground truth trajectories", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("⚙", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
-                        dbc.Col(html.P("Change presets to customize the simulation.", style={"color": "gray"}))
+                        dbc.Col(html.Div(html.P("Settings", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
+                        dbc.Col(html.P("change presets and customize the simulation", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Frequency:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
-                        dbc.Col(html.P("Accepts float values.", style={"color": "gray"}))
+                        dbc.Col(html.Div(html.P("Frequency", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
+                        dbc.Col(html.P("accepts float values", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Error:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
-                        dbc.Col(html.P("Accepts float values.", style={"color": "gray"}))
+                        dbc.Col(html.Div(html.P("Error", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
+                        dbc.Col(html.P("accepts float values", style={"color": "gray"}))
+                    ], className="g-0"),
+                    dbc.Row([
+                        dbc.Col(html.Div(html.P("User", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
+                        dbc.Col(html.P("accepts int values", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Semantic Error", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
-                        dbc.Col(html.P("Check or uncheck.", style={"color": "gray"}))
+                        dbc.Col(html.P("check or uncheck", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
-                        dbc.Col(html.Div(html.P("Sim. Measm.:", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
-                        dbc.Col(html.P("Simulate the measurements to complete the calculation.", style={"color": "gray"}))
+                        dbc.Col(html.Div(html.P("Simulate", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=5),
+                        dbc.Col(html.P("simulate measurements to complete the calculation", style={"color": "gray"}))
                     ], className="g-0"),
                     html.Div(html.P("Ground truth trajectories, simulated measurements and drawings can be downloaded in a ZIP file!", style={"color": "gray"}),
                     style={"borderLeft": "2px solid #36BD8E", "paddingLeft": "5px"})],
-                style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
-                html.Br(),
-                html.Div([
-                    # bug info upload
-                    html.Div(html.Img(src="assets/images/bug_sign.svg"), style={"text-align": "center", "margin-bottom": "5px"}),
-                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "5px"}),
-                    html.P("After uploading new layers sometimes the layer names in the layer control are messed up.", style={"color": "gray"}),
-                    html.P("Changing tabs will automatically update the names.", style={"color": "gray", "marginTop": "-10px"})],
-                style={"border":"1px solid red", "border-radius": 10, "padding": "10px", "marginBottom": "0px"})
+                style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"})
             ],
         id="sim_help_cv",
         scrollable=False,
@@ -439,7 +450,7 @@ def sim_set_canvas():
                     [
                     # Semantic Errors
                     html.H5("Semantic Errors", style={"text-align": "left", "color": "silver"}),
-                    html.Div(dbc.Button("↺", id="ss_reset", color="light", outline=True, style={"border": "0px"}),
+                    html.Div(dbc.Button(html.Img(src="assets/images/reset_sign.svg"), id="ss_reset", color="light", outline=True, style={"border": "0px"}),
                         style={"text-align": "right","marginTop": "-39px", "marginRight": "-5px"}),
                     html.Hr(style={"margin": "auto", "width": "100%", "color": "silver", "height": "3px", "marginBottom": "-10px"}),
                     html.Br(),
@@ -569,7 +580,7 @@ def sim_layout(geojson_style):
                 html.Div(
                     [
                         html.H5("Simulation", style=H5_style),
-                        html.Div(dbc.Button("⚙", id="sim_set", color="light", outline=True, style={"border": "0px"}),
+                        html.Div(dbc.Button(html.Img(src="assets/images/settings_sign.svg"), id="sim_set", color="light", outline=True, style={"border": "0px"}),
                             style={"text-align": "right","marginTop": "-35px", "marginRight": "3px"})
                     ]
                 ),
