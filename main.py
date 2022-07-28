@@ -48,7 +48,7 @@ app.layout = html.Div(
     [
         # upload and map display done
         dbc.Modal([
-            dbc.ModalHeader(dbc.ModalTitle("DONE")),
+            dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
             dbc.ModalBody("Successful!")],
             id="display_done",
             is_open=False

@@ -353,8 +353,7 @@ def eval_calls(app):
         # button
         Input("open_visual", "n_clicks"),
         # researcher login
-        Input("eval_unlocked3", "data"),
-        Input("eval_unlocked4", "data")
+        Input("eval_unlocked3", "data")
     )
     def open_visual(
         # modal
@@ -362,8 +361,7 @@ def eval_calls(app):
         # button
         open_visual,
         # unlocked
-        unlocked1,
-        unlocked2
+        unlocked
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "open_visual" in button:
@@ -372,7 +370,7 @@ def eval_calls(app):
             gt_options   = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/groundtruth")]
             traj_options = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/trajectories")]
             ant_options  = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/antennas")]
-            if unlocked1 or unlocked2:
+            if unlocked:
                 map_options += [{"label": name[:-8], "value": f"floorplans/{name[:-8]}"} for name in listdir("assets/floorplans")]
             return not visual_show, map_options, ref_options, gt_options, traj_options, ant_options
         else: return visual_show, [], [], [], [], []
@@ -486,8 +484,8 @@ def eval_calls(app):
             margin={"l":0,"t":0,"b":0,"r":0},
             mapbox={
                 # token got from https://mapbox.com/
-                # default public token: pk.eyJ1Ijoibml2cm9rMjAwMSIsImEiOiJjbDV0a3A3eGIweWJvM2JuMHhtYXF5aWVlIn0._01sVxeqJ8EQvGq2PclBBw
-                "accesstoken": "pk.eyJ1Ijoibml2cm9rMjAwMSIsImEiOiJjbDV0a3Mwa2gwbXAzM2RteDk0dnoyNnlsIn0.MwHtkUS1sevt4F8PqhbGZQ", # heroku token
+                # heroku token: pk.eyJ1Ijoibml2cm9rMjAwMSIsImEiOiJjbDV0a3Mwa2gwbXAzM2RteDk0dnoyNnlsIn0.MwHtkUS1sevt4F8PqhbGZQ
+                "accesstoken": "pk.eyJ1Ijoibml2cm9rMjAwMSIsImEiOiJjbDV0a3A3eGIweWJvM2JuMHhtYXF5aWVlIn0._01sVxeqJ8EQvGq2PclBBw", # default public token
                 "center": {"lon": center[1], "lat": center[0]},
                 "style": bg,
                 "zoom": zoom,

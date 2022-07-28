@@ -2,10 +2,12 @@
 #### IMPORTS
 # dash
 from dash import Output, Input, State, no_update, callback_context
+# built in
+import time
 # utils
-import utils as u
 import simulator.utils as su
 import evaluator.utils as eu
+import utils as u
 
 
 def map_display(app, geojson_style):
@@ -43,8 +45,8 @@ def map_display(app, geojson_style):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "unlock" in button:
             if str(password) == "cpsimulation2022":
-                return True, False, True, True, True, True, True, True
-            return False, True, None, None, None, None, None, None
+                return True, False, True, True, True, True, time.time(), True
+            return False, True, None, None, None, None, no_update, None
         return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
 
     # map display =======================================================================================================================
@@ -83,6 +85,8 @@ def map_display(app, geojson_style):
         ## buttons ##
         Input("sim_zoom", "n_clicks"),
         Input("eval_zoom", "n_clicks"),
+        # only unlock hcu,
+        Input("eval_unlocked4", "data")
     )
     def display(
         ## modal
@@ -102,7 +106,9 @@ def map_display(app, geojson_style):
         eval_unlocked,
         ## buttons
         sim_zoom,
-        eval_zoom
+        eval_zoom,
+        # unlock
+        unlocked
         ):
         # presetting styles / zoom / center
         hcu_style = {"display": "None"}
@@ -141,8 +147,9 @@ def map_display(app, geojson_style):
                 center = (53.540239664876104, 10.004663417352164)
             return display_done, no_update, no_update, no_update, center, zoom, no_update, no_update, no_update, center, zoom, no_update
         # ============================================================================================================================================================== #
+        if time.time() - unlocked > 5: onlyHCU = False
+        else: onlyHCU = True
         # getting all different layers
-        onlyHCU = False
         sim_layers = []
         eval_layers = []
                         # maps
@@ -183,7 +190,6 @@ def map_display(app, geojson_style):
             eval_layers += eu.floorplan2layer(geojson_style)
             hcu_style = {"display": "block"}
             ly_style = {"display": "block"}
-            if len(sim_layers) == 3 : onlyHCU = True
         if onlyHCU: return display_done, no_update, ly_style, sim_layers, center, zoom, hcu_style, ly_style, eval_layers, center, zoom, hcu_style
         elif sim_layers: return not display_done, no_update, ly_style, sim_layers, center, zoom, hcu_style, ly_style, eval_layers, center, zoom, hcu_style
         else: return display_done, no_update, ly_style, [], center, zoom, hcu_style, ly_style, [], center, zoom, hcu_style

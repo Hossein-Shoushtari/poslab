@@ -87,70 +87,70 @@ def modals():
     ### MODALs
     # upload warning
     ul_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("WARNING")),
-        dbc.ModalBody("At least one wrong file was meant to be uploaded! Upload denied.")],
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
+        dbc.ModalBody("Wrong file format! Upload denied.")],
         id="sim_ul_warn",
         is_open=False
     )
     # upload done
     ul_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("DONE")),
-        dbc.ModalBody("File(s) uploaded successfully!")],
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
+        dbc.ModalBody("Upload successful!")],
         id="sim_ul_done",
         is_open=False
     )
     # map warning
     map_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("WARNING")),
-        dbc.ModalBody("At least one wrong file was meant to be uploaded! Upload denied.")],
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
+        dbc.ModalBody("Wrong file format! Upload denied.")],
         id="sim_map_warn",
         is_open=False
     )
     # map display done
     display_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
         dbc.ModalBody("Successful!")],
         id="sim_display",
         is_open=False
     )
     # data selection warning
     sel_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
         dbc.ModalBody("Please select data first!")],
         id="sel_warn",
         is_open=False
     )
     # gt calculation warning
     gen_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
         dbc.ModalBody("Apparently acc and gyr are missing. Please upload them first!")],
         id="gen_warn",
         is_open=False
     )
     # gt calculation done
     gen_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
         dbc.ModalBody("Generation successful!")],
         id="gen_done",
         is_open=False
     )
     # simulation warning
     sim_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
-        dbc.ModalBody("Please select data first, as well as enter values for all required inputs!")],
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
+        dbc.ModalBody("Please select data first!")],
         id="sim_warn",
         is_open=False
     )
     # export warning
     exp_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
         dbc.ModalBody("Nothing to export!")],
         id="sim_exp_warn",
         is_open=False
     )
     # export done
     exp_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
         dbc.ModalBody("Export successful!")],
         id="sim_exp_done",
         is_open=False
@@ -272,7 +272,12 @@ def help_canvas():
                 dbc.Alert(
                     [
                         html.Div(html.Img(src="assets/images/bug_sign.svg"), style={"marginRight": "10px"}),
-                        "Are the layer names mixed up? Just switch tabs and come back!"
+                        html.Div(
+                            [
+                                html.P("Are the layer names mixed up?", style={"marginBottom": "0px"}),
+                                html.P("Just switch tabs and come back!", style={"marginBottom": "0px"}),
+                            ]
+                        ),
                     ],
                     className="d-flex align-items-center",
                     style={"height": "75px", "color": "silver", "background": "#70251B", "border-radius": 10}
@@ -356,17 +361,29 @@ def gt_canvas():
     gt_canvas = html.Div([
         dbc.Offcanvas([
             # steps
-            html.Div([
-                html.H5("Procedure", style={"color": "silver", "text-indent": "15px"}),
-                html.P("🢖 Select all data needed", style={"color": "gray", "marginBottom": "-5px", "text-indent": "10px"}),
-                html.P("🢖 Show Waypoints on the map, if you like", style={"color": "gray", "marginBottom": "-5px", "text-indent": "10px"}),
-                html.P("🢖 Check or uncheck Waypoints you want", style={"color": "gray", "marginBottom": "-5px", "text-indent": "10px"}),
-                html.P("🢖 Generate Ground Truth Trajectory", style={"color": "gray", "marginBottom": "3px", "text-indent": "10px"}),
-                html.P("⚠️ Please note:", style={"color": "gray", "marginBottom": "-7px"}),
-                html.P(" The first and last point are always selected.", style={"color": "gray", "text-indent": "26px"}),
-            ],
-            style={"border": "1px solid #E45E07", "border-radius": 10, "padding": "10px", "marginBottom": "15px", "height": "180px"}),
-
+            dbc.Alert(
+                [
+                    html.Div(html.Img(src="assets/images/list_sign.svg"), style={"marginRight": "30px"}),
+                    html.Div(
+                        [
+                            html.P("select all data needed", style={"marginBottom": "0px"}),
+                            html.P("show waypoints on the map", style={"marginBottom": "0px"}),
+                            html.P("select required waypoints", style={"marginBottom": "0px"}),
+                            html.P("generate ground truth", style={"marginBottom": "0px"}),
+                        ]
+                    ),
+                ],
+                className="d-flex align-items-center",
+                style={"height": "115px", "color": "silver", "background": "#3B5A7F", "border-radius": 10}
+            ),
+            dbc.Alert(
+                [
+                    html.Div(html.Img(src="assets/images/warning_sign.svg"), style={"marginRight": "30px"}),
+                    "The first and last points should be always selected.",
+                ],
+                className="d-flex align-items-center",
+                style={"height": "75px", "color": "#303030", "background": "#774E06", "border-radius": 10}
+            ),
             html.Div([
                 # buttons
                 html.Div(dbc.Row([

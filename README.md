@@ -10,7 +10,7 @@
 > **exports** : generated ground truth and simulated measurements data  
 > **floorplans** : already converted HCU floorplans (EG, 1OG, 4OG)  
 > **groundturth** : uploaded ground truth for evaluation    
-> **images** : images for the website  
+> **images** : images and icons for the website  
 > **maps** : all uploaded map data  
 > **sensors** : all uploaded sensor data (acc, bar, gyr, mag)  
 > **trajectories** : uploaded trajectories for evaluation    

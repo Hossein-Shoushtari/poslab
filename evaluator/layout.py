@@ -21,7 +21,7 @@ def storage():
         dcc.Store(id="eval_unlocked1", data=[], storage_type="memory"),
         dcc.Store(id="eval_unlocked2", data=[], storage_type="memory"),
         dcc.Store(id="eval_unlocked3", data=[], storage_type="memory"),
-        dcc.Store(id="eval_unlocked4", data=[], storage_type="memory"),
+        dcc.Store(id="eval_unlocked4", data=0, storage_type="memory"),
         dcc.Store(id="eval_unlocked5", data=[], storage_type="memory"),
         # HistoNorm checkboxes
         dcc.Store(id="norm_status", data=[], storage_type="memory"),
@@ -94,35 +94,35 @@ def modals():
     ### MODALs
     # upload warning
     ul_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("WARNING")),
-        dbc.ModalBody("Wrong file format detected! Upload denied.")],
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
+        dbc.ModalBody("Wrong file format! Upload denied.")],
         id="eval_ul_warn",
         is_open=False
     )
     # upload done
     ul_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("DONE")),
-        dbc.ModalBody("File(s) uploaded successfully!")],
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
+        dbc.ModalBody("Upload successful!")],
         id="eval_ul_done",
         is_open=False
     )
     # map warning
     map_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("WARNING")),
-        dbc.ModalBody("Wrong file format detected! Upload denied.")],
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
+        dbc.ModalBody("Wrong file format! Upload denied.")],
         id="eval_map_warn",
         is_open=False
     )
     # map display done
     display_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
         dbc.ModalBody("Successful!")],
         id="eval_display",
         is_open=False
     )
     # cdf warning
     cdf_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
         dbc.ModalBody("Select data first!")],
         id="cdf_warn",
         is_open=False
@@ -153,14 +153,14 @@ def modals():
     visual = visual_modal()
     # export warning
     exp_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("CAUTION")),
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
         dbc.ModalBody("Nothing to export!")],
         id="eval_exp_warn",
         is_open=False
     )
     # export done
     exp_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("DONE")),
+        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
         dbc.ModalBody("Export successful!")],
         id="eval_exp_done",
         is_open=False
@@ -409,7 +409,12 @@ def help_canvas():
                 dbc.Alert(
                     [
                         html.Div(html.Img(src="assets/images/bug_sign.svg"), style={"marginRight": "10px"}),
-                        "Are the layer names mixed up? Just switch tabs and come back!"
+                        html.Div(
+                            [
+                                html.P("Are the layer names mixed up?", style={"marginBottom": "0px"}),
+                                html.P("Just switch tabs and come back!", style={"marginBottom": "0px"}),
+                            ]
+                        ),
                     ],
                     className="d-flex align-items-center",
                     style={"height": "75px", "color": "silver", "background": "#70251B", "border-radius": 10}
