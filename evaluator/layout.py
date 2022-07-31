@@ -123,7 +123,7 @@ def modals():
     # cdf warning
     cdf_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
-        dbc.ModalBody("Select data first!")],
+        dbc.ModalBody("Please select data first!")],
         id="cdf_warn",
         is_open=False
     )
@@ -226,7 +226,7 @@ def eval_map(geojson_style):
                 html.Div(id="eval_div_lc", children=dl.LayersControl(id="eval_lc", children=eu.floorplan2layer(geojson_style)), style={"display": "None"}), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
             ],
-            style={"width": "100%", "height": "70vh", "margin": "auto", "display": "block"},
+            style={"width": "100%", "height": "70vh", "margin": "auto", "display": "block", "border-radius": 10},
             id="eval_map"
         )
     )
@@ -384,12 +384,14 @@ def visual_modal():
                 dcc.Graph(
                     id="vis_map",
                     className="six columns",
-                    style={"height": "80vh"})
-            ])
+                    style={"height": "660px"})
+            ]),
+            dbc.ModalFooter(html.Div("Copyright © 2022 Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center", "width": "100%"}))
         ],
         id="visual_show",
         fullscreen=True,
         backdrop="static",
+        scrollable=True,
         is_open=False
     )
     return visual_modal
@@ -564,7 +566,7 @@ def eval_layout(geojson_style):
                     dbc.Col(html.Div(html.Div(ul_buttons1), style={"marginLeft": "40px"})),
                     dbc.Col(html.Div(html.Div(ul_buttons2)))],
                 className="g-0")],
-            style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "marginBottom": "4px"})),
+            style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "marginBottom": "4px", "display": "inline-block"})),
 
             dbc.Col(html.Div([
                 html.H5("Evaluation", style=H5_style),
@@ -647,7 +649,7 @@ def eval_layout(geojson_style):
                     ],
                 className="g-0")
                 ],
-                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "marginBottom": "4px"}
+                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "marginBottom": "4px", "display": "inline-block"}
             )),
 
             dbc.Col(html.Div([
@@ -672,10 +674,10 @@ def eval_layout(geojson_style):
                 ),
                 html.Div([
                     html.Div(dbc.Button("Help", id="eval_help_btn", color="warning", outline=False, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "19px"})],
-                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "76px", "width": "435px", "marginTop": "4px", "marginBottom": "4px"})]))
+                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "76px", "width": "435px", "marginTop": "4px", "marginBottom": "4px"})], style={"display": "inline-block"}))
         ],
         className="g-0")
-    ])
+    ], style={"text-align": "center"})
 
     ### returning filled Card
     return dbc.Card(

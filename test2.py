@@ -67,7 +67,7 @@ div = html.Div([
                                 style={"marginBottom": "7px", "color": "black"})
                         ]),
                         dbc.Col([
-                            dbc.Label("Plot Format [800x2000]", style={"color": "silver"}),
+                            dbc.Label("Format [2000x1000]", style={"color": "silver"}),
                             dcc.Dropdown(
                                 id="vis_format_select",
                                 options=[{"label": f, "value": f} for f in ["png", "svg", "jpeg", "webp"]],
@@ -145,7 +145,7 @@ div = html.Div([
                 dcc.Graph(
                     id="vis_map",
                     className="six columns",
-                    style={"height": "80vh"})
+                    style={"height": "660px"})
             ])
         ],
         id="visual_show",
@@ -192,7 +192,6 @@ def open_cdf(
         return not visual_show, map_options, ref_options, gt_options, traj_options, ant_options
     else: return visual_show, [], [], [], [], []
 
-
 @app.callback(
     ### Outputs ###
     Output("vis_map", "figure"),
@@ -207,6 +206,7 @@ def open_cdf(
     Input("vis_format_select", "value"),
 )
 def update_fig(_maps, refs, gts, trajs, ant, bg, _format):
+    
     fig = go.Figure(go.Scattermapbox())
     layers = []
     zoom = 1
@@ -216,7 +216,6 @@ def update_fig(_maps, refs, gts, trajs, ant, bg, _format):
     if _maps:
         # creating plotly layers
         for _map in _maps:
-            r, g, b = random.randint(0,255), random.randint(0,255), random.randint(0,255)
             with open(f"assets/maps/{_map}.geojson") as json_file:
                 data = json.load(json_file)
             layer = {
@@ -304,8 +303,8 @@ def update_fig(_maps, refs, gts, trajs, ant, bg, _format):
             "accesstoken": "pk.eyJ1Ijoibml2cm9rMjAwMSIsImEiOiJjbDV0a3A3eGIweWJvM2JuMHhtYXF5aWVlIn0._01sVxeqJ8EQvGq2PclBBw", # heroku token
             "center": {"lon": center[1], "lat": center[0]},
             "style": bg,
-            "zoom": zoom,
-            "layers": layers
+            "layers": layers,
+            "zoom": zoom
         },
         legend={
             "yanchor": "top",

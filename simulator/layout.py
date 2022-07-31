@@ -249,7 +249,7 @@ def sim_map(geojson_style):
                                     draw=dict(rectangle=False, circle=False), # possibility to draw/edit data
                                     position="topleft")),
             ],
-            style={"width": "100%", "height": "70vh", "margin": "auto", "display": "block"},
+            style={"width": "100%", "height": "70vh", "margin": "auto", "display": "block", "border-radius": 10},
             id="sim_map"
         )
     )
@@ -379,7 +379,7 @@ def gt_canvas():
             dbc.Alert(
                 [
                     html.Div(html.Img(src="assets/images/warning_sign.svg"), style={"marginRight": "30px"}),
-                    "The first and last points should be always selected.",
+                    "The first and the last waypoint should always be selected.",
                 ],
                 className="d-flex align-items-center",
                 style={"height": "75px", "color": "#303030", "background": "#774E06", "border-radius": 10}
@@ -591,7 +591,7 @@ def sim_layout(geojson_style):
                     dbc.Col(html.Div(html.Div(ul_buttons1), style={"marginLeft": "40px"})),
                     dbc.Col(html.Div(html.Div(ul_buttons2)))],
                 className="g-0")],
-            style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "marginBottom": "4px"})),
+            style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "marginBottom": "4px", "display": "inline-block"})),
 
             dbc.Col(html.Div([
                 html.Div(
@@ -665,7 +665,7 @@ def sim_layout(geojson_style):
                         )
                     ],
                 className="g-0")],
-                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "marginBottom": "4px"}
+                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "marginBottom": "4px", "display": "inline-block"}
             )),
 
             dbc.Col(html.Div([
@@ -690,10 +690,10 @@ def sim_layout(geojson_style):
                 ),
                 html.Div([
                     html.Div(dbc.Button("Help", id="sim_help_btn", color="warning", outline=False, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "19px"})],
-                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "76px", "width": "435px", "marginTop": "4px", "marginBottom": "4px"})]))
+                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "76px", "width": "435px", "marginTop": "4px", "marginBottom": "4px"})], style={"display": "inline-block"}))
         ],
         className="g-0")
-    ])
+    ], style={"text-align": "center"})
 
     ### returning filled Card
     return dbc.Card(
