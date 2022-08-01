@@ -40,7 +40,8 @@ def tooltips():
         dbc.Tooltip("magnetometer | csv",   target="sim_ul_mag",       placement="bottom"),
         dbc.Tooltip("reset",                target="ss_reset",         placement="right"),
         dbc.Tooltip("settings",             target="sim_set",          placement="right"),
-        dbc.Tooltip("focus",                target="sim_zoom",         placement="right")
+        dbc.Tooltip("focus",                target="sim_zoom",         placement="right"),
+        dbc.Tooltip("focus",                target="sim_zoom2",        placement="right")
     ])
     return tooltips
 
@@ -90,6 +91,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
         dbc.ModalBody("Wrong file format! Upload denied.")],
         id="sim_ul_warn",
+        size="sm",
         is_open=False
     )
     # upload done
@@ -97,6 +99,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
         dbc.ModalBody("Upload successful!")],
         id="sim_ul_done",
+        size="sm",
         is_open=False
     )
     # map warning
@@ -104,6 +107,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
         dbc.ModalBody("Wrong file format! Upload denied.")],
         id="sim_map_warn",
+        size="sm",
         is_open=False
     )
     # map display done
@@ -111,6 +115,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
         dbc.ModalBody("Successful!")],
         id="sim_display",
+        size="sm",
         is_open=False
     )
     # data selection warning
@@ -118,6 +123,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
         dbc.ModalBody("Please select data first!")],
         id="sel_warn",
+        size="sm",
         is_open=False
     )
     # gt calculation warning
@@ -125,6 +131,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
         dbc.ModalBody("Apparently acc and gyr are missing. Please upload them first!")],
         id="gen_warn",
+        size="sm",
         is_open=False
     )
     # gt calculation done
@@ -132,6 +139,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
         dbc.ModalBody("Generation successful!")],
         id="gen_done",
+        size="sm",
         is_open=False
     )
     # simulation warning
@@ -139,6 +147,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
         dbc.ModalBody("Please select data first!")],
         id="sim_warn",
+        size="sm",
         is_open=False
     )
     # export warning
@@ -146,6 +155,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
         dbc.ModalBody("Nothing to export!")],
         id="sim_exp_warn",
+        size="sm",
         is_open=False
     )
     # export done
@@ -153,6 +163,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
         dbc.ModalBody("Export successful!")],
         id="sim_exp_done",
+        size="sm",
         is_open=False
     )
     # simulate measurements - select ground truth
@@ -240,7 +251,7 @@ def sim_map(geojson_style):
             [   
                 html.Div(id="sim_hcu_panel", children=info, style={"display": "None"}),
                 html.Button(html.Img(src="assets/images/research_sign.svg"), id="sim_hcu_maps", style=btn_style1),
-                html.Button(html.Img(src="assets/images/focus_sign2.svg"), id="sim_zoom", style=btn_style2),
+                html.Button(html.Img(src="assets/images/focus_sign2.svg", id="sim_zoom2"), id="sim_zoom", style=btn_style2),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
                 html.Div(id="sim_div_lc", children=dl.LayersControl(id="sim_lc", children=su.floorplan2layer(geojson_style))), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen

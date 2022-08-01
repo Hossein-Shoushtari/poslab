@@ -14,6 +14,7 @@ import shapely.geometry as sh
 import json
 from os import listdir
 import utils as u
+import evaluator.utils as eu
 import random
 
 def csv2geojson(coordinates: list) -> str:
@@ -135,7 +136,7 @@ div = html.Div([
                                 placeholder="Select Data",
                                 clearable=True,
                                 optionHeight=35,
-                                multi=True,
+                                multi=False,
                                 searchable=True,
                                 style={"marginBottom": "7px", "color": "black"})
                         ])
@@ -205,26 +206,54 @@ def open_cdf(
     Input("vis_bg_select", "value"),
     Input("vis_format_select", "value"),
 )
-def update_fig(_maps, refs, gts, trajs, ant, bg, _format):
-    
+def update_fig(_map, refs, gts, trajs, ant, bg, _format):
     fig = go.Figure(go.Scattermapbox())
     layers = []
     zoom = 1
     center = (0, 0)
     if not bg: bg = "white-bg"
     if not _format: _format = "png"
-    if _maps:
-        # creating plotly layers
-        for _map in _maps:
-            with open(f"assets/maps/{_map}.geojson") as json_file:
-                data = json.load(json_file)
-            layer = {
-                "sourcetype": "geojson",
-                "source": data,
-                "type": "line",
-                "color": "blue"
-            }
-            layers.append(layer)
+    if _map:
+        ## creating plotly layer
+        # data
+        polygons, markers = eu.plotly_map_traces(f"maps/{_map}")
+        # markers
+        if markers:
+            if polygons: showlegend = False
+            else: showlegend = True
+            fig.add_trace(go.Scattermapbox(
+                mode="markers",
+                lon=markers[0],
+                lat=markers[1],
+                marker={"size": 12, "color": "blue"},
+                legendgrouptitle={"text": "Markers"},
+                legendgroup="Markers",
+                showlegend=showlegend,
+                name="Marker"))
+        # polygons
+        i = len(polygons) - 1
+        for polygon in polygons:
+            if i:
+                fig.add_trace(go.Scattermapbox(
+                    mode="lines",
+                    lon=polygon[0],
+                    lat=polygon[1],
+                    line={"color": "blue"},
+                    legendgrouptitle={"text": "Maps"},
+                    legendgroup="Maps",
+                    showlegend=False,
+                    name=_map))
+            else:
+                fig.add_trace(go.Scattermapbox(
+                    mode="lines",
+                    lon=polygon[0],
+                    lat=polygon[1],
+                    line={"color": "blue"},
+                    legendgrouptitle={"text": "Maps"},
+                    legendgroup="Maps",
+                    showlegend=True,
+                    name=_map))
+            i -= 1
         # getting zoom and center
         with open(f"assets/maps/{_map}.geojson", "r") as file:
             data = file.read()
@@ -325,7 +354,7 @@ def update_fig(_maps, refs, gts, trajs, ant, bg, _format):
         "toImageButtonOptions": {
             "format": _format,      # one of png, svg, jpeg, webp
             "filename": "my_plot",
-            "height": 800,
+            "height": 1000,
             "width": 2000,
             "scale": 1              # multiply title/legend/axis/canvas sizes by this factor
         },

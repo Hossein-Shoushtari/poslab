@@ -40,7 +40,8 @@ def tooltips():
         dbc.Tooltip("accelerator | csv",    target="eval_ul_acc",        placement="bottom"),
         dbc.Tooltip("barometer | csv",      target="eval_ul_bar",        placement="top"),
         dbc.Tooltip("magnetometer | csv",   target="eval_ul_mag",        placement="bottom"),
-        dbc.Tooltip("focus",                target="eval_zoom",         placement="right")
+        dbc.Tooltip("focus",                target="eval_zoom",          placement="right"),
+        dbc.Tooltip("focus",                target="eval_zoom2",         placement="right")
     ])
     return tooltips
 
@@ -97,6 +98,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
         dbc.ModalBody("Wrong file format! Upload denied.")],
         id="eval_ul_warn",
+        size="sm",
         is_open=False
     )
     # upload done
@@ -104,6 +106,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
         dbc.ModalBody("Upload successful!")],
         id="eval_ul_done",
+        size="sm",
         is_open=False
     )
     # map warning
@@ -111,6 +114,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
         dbc.ModalBody("Wrong file format! Upload denied.")],
         id="eval_map_warn",
+        size="sm",
         is_open=False
     )
     # map display done
@@ -118,6 +122,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
         dbc.ModalBody("Successful!")],
         id="eval_display",
+        size="sm",
         is_open=False
     )
     # cdf warning
@@ -125,6 +130,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
         dbc.ModalBody("Please select data first!")],
         id="cdf_warn",
+        size="sm",
         is_open=False
     )
     # cdf graph
@@ -156,6 +162,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
         dbc.ModalBody("Nothing to export!")],
         id="eval_exp_warn",
+        size="sm",
         is_open=False
     )
     # export done
@@ -163,6 +170,7 @@ def modals():
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
         dbc.ModalBody("Export successful!")],
         id="eval_exp_done",
+        size="sm",
         is_open=False
     )
     return html.Div([visual, ul_warn, ul_done, display_done, cdf_warn, graph_modal, map_warn, exp_warn, exp_done])
@@ -221,7 +229,7 @@ def eval_map(geojson_style):
             [   
                 html.Div(id="eval_hcu_panel", children=info, style={"display": "None"}),
                 html.Button(html.Img(src="assets/images/research_sign.svg"), id="eval_hcu_maps", style=btn_style1),
-                html.Button(html.Img(src="assets/images/focus_sign2.svg"), id="eval_zoom", style=btn_style2),
+                html.Button(html.Img(src="assets/images/focus_sign2.svg", id="eval_zoom2"), id="eval_zoom", style=btn_style2),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
                 html.Div(id="eval_div_lc", children=dl.LayersControl(id="eval_lc", children=eu.floorplan2layer(geojson_style)), style={"display": "None"}), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
@@ -374,7 +382,7 @@ def visual_modal():
                                 placeholder="Select Data",
                                 clearable=True,
                                 optionHeight=35,
-                                multi=True,
+                                multi=False,
                                 searchable=True,
                                 style={"marginBottom": "7px", "color": "black"})
                         ])

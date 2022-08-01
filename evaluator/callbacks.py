@@ -13,7 +13,6 @@ from os import listdir
 import shutil as st
 import pandas as pd
 import numpy as np
-import random
 import json
 import time
 # utils (general & evaluator)
@@ -390,26 +389,33 @@ def eval_calls(app):
         Input("vis_bg_select", "value"),
         Input("vis_format_select", "value"),
     )
-    def update_fig(_maps, refs, gts, trajs, ant, bg, _format):
+    def update_fig(_map, refs, gts, trajs, ant, bg, _format):
         fig = go.Figure(go.Scattermapbox())
         layers = []
         zoom = 1
         center = (0, 0)
         if not bg: bg = "white-bg"
         if not _format: _format = "png"
-        if _maps:
+        if _map:
+            # creating one dummy line for legend
+            fig.add_trace(go.Scattermapbox(
+                mode="lines",
+                lon=[0,0],
+                lat=[0,0],
+                line={"color": "blue"},
+                legendgrouptitle={"text": "Maps"},
+                legendgroup="Maps",
+                name=_map.split("/")[1]))
             # creating plotly layers
-            for _map in _maps:
-                r, g, b = random.randint(0,255), random.randint(0,255), random.randint(0,255)
-                with open(f"assets/{_map}.geojson") as json_file:
-                    data = json.load(json_file)
-                layer = {
-                    "sourcetype": "geojson",
-                    "source": data,
-                    "type": "line",
-                    "color": "blue"
-                }
-                layers.append(layer)
+            with open(f"assets/{_map}.geojson") as json_file:
+                data = json.load(json_file)
+            layer = {
+                "sourcetype": "geojson",
+                "source": data,
+                "type": "line",
+                "color": "blue"
+            }
+            layers.append(layer)
             # getting zoom and center
             with open(f"assets/{_map}.geojson", "r") as file:
                 data = file.read()
@@ -488,8 +494,8 @@ def eval_calls(app):
                 "accesstoken": "pk.eyJ1Ijoibml2cm9rMjAwMSIsImEiOiJjbDV0a3A3eGIweWJvM2JuMHhtYXF5aWVlIn0._01sVxeqJ8EQvGq2PclBBw", # default public token
                 "center": {"lon": center[1], "lat": center[0]},
                 "style": bg,
-                "zoom": zoom,
-                "layers": layers
+                "layers": layers,
+                "zoom": zoom
             },
             legend={
                 "yanchor": "top",

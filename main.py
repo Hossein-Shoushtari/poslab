@@ -46,11 +46,14 @@ cs_tab = com_layout()
 # putting all together
 app.layout = html.Div(
     [
+        # tab storage
+        dcc.Store(id="tabs_status", data="tab1", storage_type="memory"),
         # upload and map display done
         dbc.Modal([
             dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
             dbc.ModalBody("Successful!")],
             id="display_done",
+            size="sm",
             is_open=False
         ),
         # unlock hcu maps
@@ -77,6 +80,7 @@ app.layout = html.Div(
         ),
         # Tabs
         dcc.Tabs(
+            id="tabs",
             value="tab1",
             children=
             [

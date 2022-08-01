@@ -86,7 +86,11 @@ def map_display(app, geojson_style):
         Input("sim_zoom", "n_clicks"),
         Input("eval_zoom", "n_clicks"),
         # only unlock hcu,
-        Input("eval_unlocked4", "data")
+        Input("eval_unlocked4", "data"),
+        ## tab change ##
+        Input("tabs", "value"),
+        Input("tabs_status", "data")
+
     )
     def display(
         ## modal
@@ -105,10 +109,13 @@ def map_display(app, geojson_style):
         eval_traj_layers,
         eval_unlocked,
         ## buttons
-        sim_zoom,
-        eval_zoom,
+        sim_zoom_btn,
+        eval_zoom_btn,
         # unlock
-        unlocked
+        unlocked,
+        ## tab change
+        tabs_now,
+        tabs_before
         ):
         # presetting styles / zoom / center
         hcu_style = {"display": "None"}
@@ -128,14 +135,22 @@ def map_display(app, geojson_style):
         ]
         date = dates.index(max(dates))
         if sum(dates):
-            if date == 0: zoom, center = sim_map_layers["zoom"], sim_map_layers["center"]
-            elif date == 1: zoom, center = sim_ant_layers["zoom"], sim_ant_layers["center"]
-            elif date == 2: zoom, center = sim_ref_layers["zoom"], sim_ref_layers["center"]
-            elif date == 3: zoom, center = sim_gt_layers["zoom"], sim_gt_layers["center"]
-            elif date == 4: zoom, center = sim_traj_layers["zoom"], sim_traj_layers["center"]
-            elif date == 5: zoom, center = eval_map_layers["zoom"], eval_map_layers["center"]
-            elif date == 6: zoom, center = eval_gt_layers["zoom"], eval_gt_layers["center"]
+            if   date == 0: zoom, center = sim_map_layers["zoom"]  , sim_map_layers["center"]
+            elif date == 1: zoom, center = sim_ant_layers["zoom"]  , sim_ant_layers["center"]
+            elif date == 2: zoom, center = sim_ref_layers["zoom"]  , sim_ref_layers["center"]
+            elif date == 3: zoom, center = sim_gt_layers["zoom"]   , sim_gt_layers["center"]
+            elif date == 4: zoom, center = sim_traj_layers["zoom"] , sim_traj_layers["center"]
+            elif date == 5: zoom, center = eval_map_layers["zoom"] , eval_map_layers["center"]
+            elif date == 6: zoom, center = eval_gt_layers["zoom"]  , eval_gt_layers["center"]
             elif date == 7: zoom, center = eval_traj_layers["zoom"], eval_traj_layers["center"]
+        # ============================================================================================================================================================== #
+        ## keep focus when changing tabs ##
+        if tabs_now != tabs_before:
+            if sim_unlocked or eval_unlocked: # if hcu floorplans are unlocked
+                zoom = 19
+                center = (53.540239664876104, 10.004663417352164)
+            return display_done, no_update, tabs_now, no_update, no_update, center, zoom, no_update, no_update, no_update, center, zoom, no_update
+        # ============================================================================================================================================================== #
         # ============================================================================================================================================================== #
         ## regain focus ##
         # getting clicked button
@@ -145,7 +160,7 @@ def map_display(app, geojson_style):
             if sim_unlocked or eval_unlocked: # if hcu floorplans are unlocked
                 zoom = 19
                 center = (53.540239664876104, 10.004663417352164)
-            return display_done, no_update, no_update, no_update, center, zoom, no_update, no_update, no_update, center, zoom, no_update
+            return display_done, no_update, no_update, no_update, no_update, center, zoom, no_update, no_update, no_update, center, zoom, no_update
         # ============================================================================================================================================================== #
         if time.time() - unlocked > 5: onlyHCU = False
         else: onlyHCU = True
@@ -190,6 +205,6 @@ def map_display(app, geojson_style):
             eval_layers += eu.floorplan2layer(geojson_style)
             hcu_style = {"display": "block"}
             ly_style = {"display": "block"}
-        if onlyHCU: return display_done, no_update, ly_style, sim_layers, center, zoom, hcu_style, ly_style, eval_layers, center, zoom, hcu_style
-        elif sim_layers: return not display_done, no_update, ly_style, sim_layers, center, zoom, hcu_style, ly_style, eval_layers, center, zoom, hcu_style
-        else: return display_done, no_update, ly_style, [], center, zoom, hcu_style, ly_style, [], center, zoom, hcu_style
+        if onlyHCU: return display_done, no_update, no_update, ly_style, sim_layers, center, zoom, hcu_style, ly_style, eval_layers, center, zoom, hcu_style
+        elif sim_layers: return not display_done, no_update, no_update, ly_style, sim_layers, center, zoom, hcu_style, ly_style, eval_layers, center, zoom, hcu_style
+        else: return display_done, no_update, no_update, ly_style, [], center, zoom, hcu_style, ly_style, [], center, zoom, hcu_style

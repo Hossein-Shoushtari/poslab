@@ -1,18 +1,32 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import utils as u
-import evaluator.utils as eu
+import json
 
-# data
-gt_select = "gt"
-traj_select = "sim__freq1_err3_user3"
-gt = np.loadtxt(f"assets/groundtruth/{gt_select}.csv", skiprows=1)
-traj = np.loadtxt(f"assets/trajectories/{traj_select}.csv", skiprows=1)
-# interpolation
-interpolations = eu.interpolation(gt, [traj])
-# cdf
-cdf = eu.normCDF(interpolations[0][0], interpolations[0][1])
+def plotly_map_traces(filename: str) -> list:
+    # data
+    polygons = []
+    markers = []
+    with open(f"assets/{filename}.geojson", "r") as data:
+        data = json.loads(data.read())
+        features = data["features"]
+    # getting polygon and marker coordinates
+    for feature in features:
+        _type = feature["geometry"]["type"]
+        if "Point" in _type:
+            coordinates = feature["geometry"]["coordinates"]
+            markers.append([coordinates[0], coordinates[1]])
 
-cdf = cdf[cdf[:, 0].argsort()]
-print(cdf)
+        if "Polygon" in _type:
+            coordinates_list = feature["geometry"]["coordinates"]
+            for coordinates in coordinates_list:
+                try:
+                    lat = [coors[0] for coors in coordinates[0]]
+                    lon = [coors[1] for coors in coordinates[0]]
+                except:
+                    lat = [coors[0] for coors in coordinates]
+                    lon = [coors[1] for coors in coordinates]
+                polygons.append([lat, lon])
+    return [polygons, markers]
 
+
+result = plotly_map_traces("maps/test")
+
+print(result)
