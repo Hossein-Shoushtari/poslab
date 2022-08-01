@@ -55,6 +55,8 @@ def map_display(app, geojson_style):
         Output("display_done", "is_open"),
         # loading status #
         Output("map_spin", "children"),
+        # tabs status #
+        Output("tabs_status", "data"),
         ### OUTPUTS ###
         ## simulator ##
         Output("sim_div_lc", "style"),      # div layer control
