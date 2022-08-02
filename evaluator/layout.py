@@ -235,7 +235,8 @@ def eval_map(geojson_style):
                 dl.FullscreenControl(), # possibility to get map fullscreen
             ],
             style={"width": "100%", "height": "70vh", "margin": "auto", "display": "block", "border-radius": 10},
-            id="eval_map"
+            id="eval_map",
+            bounds=[[35.81781315869664, -47.90039062500001], [60.71619779357716, 67.67578125000001]] # center of Europe as centroid
         )
     )
     return _map
@@ -416,19 +417,19 @@ def help_canvas():
                     className="d-flex align-items-center",
                     style={"height": "75px", "color": "silver", "background": "#4598DB", "border-radius": 10}
                 ),
-                dbc.Alert(
-                    [
-                        html.Div(html.Img(src="assets/images/bug_sign.svg"), style={"marginRight": "10px"}),
-                        html.Div(
-                            [
-                                html.P("Are the layer names mixed up?", style={"marginBottom": "0px"}),
-                                html.P("Just switch tabs and come back!", style={"marginBottom": "0px"}),
-                            ]
-                        ),
-                    ],
-                    className="d-flex align-items-center",
-                    style={"height": "75px", "color": "silver", "background": "#70251B", "border-radius": 10}
-                ),
+                # dbc.Alert(
+                #     [
+                #         html.Div(html.Img(src="assets/images/bug_sign.svg"), style={"marginRight": "10px"}),
+                #         html.Div(
+                #             [
+                #                 html.P("Are the layer names mixed up?", style={"marginBottom": "0px"}),
+                #                 html.P("Just switch tabs and come back!", style={"marginBottom": "0px"}),
+                #             ]
+                #         ),
+                #     ],
+                #     className="d-flex align-items-center",
+                #     style={"height": "75px", "color": "silver", "background": "#70251B", "border-radius": 10}
+                # ),
                 html.Div([
                     # info upload
                     html.H5("UPLOAD", style={"text-align": "center", "color": "#3B5A7F"}),

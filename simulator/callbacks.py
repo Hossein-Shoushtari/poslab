@@ -57,12 +57,10 @@ def sim_calls(app):
                 converted = gp.GeoDataFrame(gp_file, crs=gp_file.crs).to_crs(4326) # converting crs from uploaded file to WGS84
                 converted.to_file(f"assets/maps/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
             lon, lat = u.extract_coordinates(gp_file)
-            zoom = u.zoom_lvl(lon, lat)               # zoom for latest uploaded map
-            center = u.centroid(lon, lat)             # center of latest uploaded map
+            bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
             layers = {
                 "layers": True,
-                "zoom": zoom,
-                "center": center,
+                "bounds": bounds,
                 "date": time.time()
             }
             return map_warn, layers, no_update # returning uploaded layers
@@ -141,12 +139,10 @@ def sim_calls(app):
                 with open("assets/antennas/antennas.csv", "w") as file: file.write(ant_decoded) # saving file
                 # getting zoom lvl and center point
                 lon, lat = u.from_32632_to_4326(np.loadtxt("assets/antennas/antennas.csv", skiprows=1))
-                zoom = u.zoom_lvl(lon, lat)     # zoom lvl
-                center = u.centroid(lon, lat)   # center
+                bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
                 layers = {
                     "layers": True,
-                    "zoom": zoom,
-                    "center": center,
+                    "bounds": bounds,
                     "date": time.time()
                 }
                 return ul_warn, ul_done, layers, no_update # if everything went fine ...
@@ -317,12 +313,10 @@ def sim_calls(app):
                     export_gt(gt)
                     # getting zoom lvl and center point
                     lon, lat = u.from_32632_to_4326(gt[:,1:3])
-                    zoom = u.zoom_lvl(lon, lat)     # zoom lvl
-                    center = u.centroid(lon, lat)   # center
+                    bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
                     layers = {
                         "layers": True,
-                        "zoom": zoom,
-                        "center": center,
+                        "bounds": bounds,
                         "date": time.time()
                     }
                     return gen_warn, sel_warn, no_update, layers, no_update           # successful generator
@@ -335,13 +329,11 @@ def sim_calls(app):
                 data = np.loadtxt(f"assets/waypoints/{ref_data}.csv", skiprows=1)[:, 1:3]
                 # getting zoom lvl and center point
                 lon, lat = u.from_32632_to_4326(data)
-                zoom = u.zoom_lvl(lon, lat)     # zoom lvl
-                center = u.centroid(lon, lat)   # center
+                bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
                 # turning ref points into layer of markers
                 layer = {
                     "layers": su.ref2marker(data, check),
-                    "zoom": zoom,
-                    "center": center,
+                    "bounds": bounds,
                     "date": time.time()
                 }
                 return gen_warn, sel_warn, layer, no_update, no_update             # successful
@@ -466,12 +458,10 @@ def sim_calls(app):
                 export_sim(*simulation, (ms_freq, err, num_user))
                 # getting zoom lvl and center point
                 lon, lat = u.from_32632_to_4326(np.loadtxt(f"assets/trajectories/sim__freq{ms_freq}_err{err}_user{num_user}.csv", skiprows=1)[:,1:3])
-                zoom = u.zoom_lvl(lon, lat)     # zoom lvl
-                center = u.centroid(lon, lat)   # center
+                bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
                 layers = {
                     "layers": True,
-                    "zoom": zoom,
-                    "center": center,
+                    "bounds": bounds,
                     "date": time.time()
                 }
                 return sim_warn, layers, no_update

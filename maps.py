@@ -2,6 +2,8 @@
 #### IMPORTS
 # dash
 from dash import Output, Input, State, no_update, callback_context
+# installed
+import geopandas as gp
 # built in
 import time
 # utils
@@ -51,24 +53,22 @@ def map_display(app, geojson_style):
 
     # map display =======================================================================================================================
     @app.callback(
+        ### OUTPUTS ###
         # modal #
         Output("display_done", "is_open"),
         # loading status #
         Output("map_spin", "children"),
-        # tabs status #
+        # tab change #
         Output("tabs_status", "data"),
-        ### OUTPUTS ###
         ## simulator ##
         Output("sim_div_lc", "style"),      # div layer control
         Output("sim_lc", "children"),       # layer control        
-        Output("sim_map", "center"),        # map center
-        Output("sim_map", "zoom"),          # map zoom level
+        Output("sim_map", "bounds"),        # map bounds
         Output("sim_hcu_panel", "style"),   # hcu info panel
         ## evaluator ##
         Output("eval_div_lc", "style"),     # div layer control
         Output("eval_lc", "children"),      # layer control        
-        Output("eval_map", "center"),       # map center
-        Output("eval_map", "zoom"),         # map zoom level
+        Output("eval_map", "bounds"),       # map bounds
         Output("eval_hcu_panel", "style"),  # hcu info panel
         ### INPUTS ###
         State("display_done", "is_open"),
@@ -87,9 +87,9 @@ def map_display(app, geojson_style):
         ## buttons ##
         Input("sim_zoom", "n_clicks"),
         Input("eval_zoom", "n_clicks"),
-        # only unlock hcu,
+        # only unlock hcu
         Input("eval_unlocked4", "data"),
-        ## tab change ##
+        # tab change
         Input("tabs", "value"),
         Input("tabs_status", "data")
 
@@ -116,15 +116,18 @@ def map_display(app, geojson_style):
         # unlock
         unlocked,
         ## tab change
-        tabs_now,
-        tabs_before
+        tab_now,
+        tab_before
         ):
-        # presetting styles / zoom / center
+        # ============================================================================================================================================================== #
+        ## just a tab change ##
+        if tab_now != tab_before:
+            return display_done, no_update, tab_now, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
+        # ============================================================================================================================================================== #
         hcu_style = {"display": "None"}
         ly_style = {"display": "None"}
-        zoom = 4
-        center = (49.845359730413186, 9.90578149727622) # center of Europe
-        # getting zoom and center from latest change
+        bounds=[[35.81781315869664, -47.90039062500001], [60.71619779357716, 67.67578125000001]] # center of Europe as centroid
+        # getting bounds from latest change
         dates = [
             sim_map_layers["date"],
             sim_ant_layers["date"],
@@ -137,22 +140,14 @@ def map_display(app, geojson_style):
         ]
         date = dates.index(max(dates))
         if sum(dates):
-            if   date == 0: zoom, center = sim_map_layers["zoom"]  , sim_map_layers["center"]
-            elif date == 1: zoom, center = sim_ant_layers["zoom"]  , sim_ant_layers["center"]
-            elif date == 2: zoom, center = sim_ref_layers["zoom"]  , sim_ref_layers["center"]
-            elif date == 3: zoom, center = sim_gt_layers["zoom"]   , sim_gt_layers["center"]
-            elif date == 4: zoom, center = sim_traj_layers["zoom"] , sim_traj_layers["center"]
-            elif date == 5: zoom, center = eval_map_layers["zoom"] , eval_map_layers["center"]
-            elif date == 6: zoom, center = eval_gt_layers["zoom"]  , eval_gt_layers["center"]
-            elif date == 7: zoom, center = eval_traj_layers["zoom"], eval_traj_layers["center"]
-        # ============================================================================================================================================================== #
-        ## keep focus when changing tabs ##
-        if tabs_now != tabs_before:
-            if sim_unlocked or eval_unlocked: # if hcu floorplans are unlocked
-                zoom = 19
-                center = (53.540239664876104, 10.004663417352164)
-            return display_done, no_update, tabs_now, no_update, no_update, center, zoom, no_update, no_update, no_update, center, zoom, no_update
-        # ============================================================================================================================================================== #
+            if   date == 0: bounds = sim_map_layers["bounds"]
+            elif date == 1: bounds = sim_ant_layers["bounds"]
+            elif date == 2: bounds = sim_ref_layers["bounds"]
+            elif date == 3: bounds = sim_gt_layers["bounds"]
+            elif date == 4: bounds = sim_traj_layers["bounds"]
+            elif date == 5: bounds = eval_map_layers["bounds"]
+            elif date == 6: bounds = eval_gt_layers["bounds"]
+            elif date == 7: bounds = eval_traj_layers["bounds"]
         # ============================================================================================================================================================== #
         ## regain focus ##
         # getting clicked button
@@ -160,9 +155,8 @@ def map_display(app, geojson_style):
         # focus
         if "sim_zoom" in button or "eval_zoom" in button:
             if sim_unlocked or eval_unlocked: # if hcu floorplans are unlocked
-                zoom = 19
-                center = (53.540239664876104, 10.004663417352164)
-            return display_done, no_update, no_update, no_update, no_update, center, zoom, no_update, no_update, no_update, center, zoom, no_update
+                bounds = [[53.53985942305863, 10.003506584890614], [53.54054129105324, 10.005749166803048]] # HCU boundaries
+            return display_done, no_update, no_update, no_update, no_update, bounds, no_update, no_update, no_update, bounds, no_update
         # ============================================================================================================================================================== #
         if time.time() - unlocked > 5: onlyHCU = False
         else: onlyHCU = True
@@ -201,12 +195,12 @@ def map_display(app, geojson_style):
             ly_style = {"display": "block"}
                    # hcu floorplans
         if sim_unlocked or eval_unlocked:
-            zoom = 19
-            center = (53.540239664876104, 10.004663417352164) # HCU coordinates
+            bounds = [[53.53985942305863, 10.003506584890614], [53.54054129105324, 10.005749166803048]] # HCU boundaries
             sim_layers += su.floorplan2layer(geojson_style)
             eval_layers += eu.floorplan2layer(geojson_style)
             hcu_style = {"display": "block"}
             ly_style = {"display": "block"}
-        if onlyHCU: return display_done, no_update, no_update, ly_style, sim_layers, center, zoom, hcu_style, ly_style, eval_layers, center, zoom, hcu_style
-        elif sim_layers: return not display_done, no_update, no_update, ly_style, sim_layers, center, zoom, hcu_style, ly_style, eval_layers, center, zoom, hcu_style
-        else: return display_done, no_update, no_update, ly_style, [], center, zoom, hcu_style, ly_style, [], center, zoom, hcu_style
+
+        if onlyHCU: return display_done, no_update, no_update, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
+        elif sim_layers: return not display_done, no_update, no_update, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
+        else: return display_done, no_update, no_update, ly_style, [], bounds, hcu_style, ly_style, [], bounds, hcu_style

@@ -219,16 +219,8 @@ def zoom_lvl(lon_raw: list, lat_raw: list) -> int:
     RETURN
     zoom : zoom lvl (integer)
     """
-    lon = []
-    lat = []
-    # modify all negative coordinates
-    for i in range(len(lon_raw)):
-        if lon_raw[i] < 0: lon.append(lon_raw[i]+360)
-        else: lon.append(lon_raw[i])
-        if lat_raw[i] < 0: lat.append(lat_raw[i]+180)
-        else: lat.append(lat_raw[i])
-    # finding edge points      
-    maxx, minx, maxy, miny = max(lon), min(lon), max(lat), min(lat)
+    df = gp.GeoDataFrame({"geometry": [sh.Point(lon, lat) for lon, lat in zip(lon_raw, lat_raw)]})
+    minx, miny, maxx, maxy = df.geometry.total_bounds
     # calculating distance in x and y direction
     d = (abs(maxx - minx), abs(maxy - miny)*16/9) # y-direction factorized by 16/9 because of screen ratio
     # getting max distance (x or y)
@@ -237,10 +229,19 @@ def zoom_lvl(lon_raw: list, lat_raw: list) -> int:
     v = 0.002
     # calculating final zoom factor
     if d == 0: zoom = 20            # d=0  (e.g.: simple point was uploaded)
-    else: zoom = 20 - m.log(d/v, 2)     # d>0  (everything else like Polygons, lines, multiple points, etc.)
+    else: zoom = 20 - m.log(d/v, 2) # d>0  (everything else like Polygons, lines, multiple points, etc.)
     if zoom > 20: zoom = 20         # d>20 (zoom level exceeds 20 | e.g.: simple point)
     if zoom > 1: zoom -= 1          # always subtract 1 to make sure everything fits safely
     return zoom
+
+def boundaries(lon_raw: list, lat_raw: list) -> list:
+    # making shapely points out of given coordinates
+    df = gp.GeoDataFrame({"geometry": [sh.Point(lon, lat) for lon, lat in zip(lon_raw, lat_raw)]})
+    # getting edge points (boundaries)
+    minx, miny, maxx, maxy = df.geometry.total_bounds
+    # returning most southwestern and most northeastern point
+    bounds = [[miny, minx], [maxy, maxx]]
+    return bounds
 
 def from_32632_to_4326(data: list) -> tuple:
     """
@@ -337,7 +338,7 @@ def traj2marker() -> list:
         # data
         traj = np.loadtxt(f"assets/trajectories/{csv_file}", skiprows=1)[:, 1:3]
         # displaying only trajectories with maximum 100 markers
-        if traj.shape[0] <= 1000:
+        if traj.shape[0] <= 1500:
             # designing icon (from https://icons8.de/icons/set/marker)
             icon = {
                 "iconUrl": f"https://img.icons8.com/emoji/344/{colors[i%len(colors)]}-circle-emoji.png",

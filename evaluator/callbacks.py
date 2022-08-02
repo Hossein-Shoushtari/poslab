@@ -16,8 +16,8 @@ import numpy as np
 import json
 import time
 # utils (general & evaluator)
-import utils as u
 import evaluator.utils as eu
+import utils as u
 
 
 
@@ -58,12 +58,10 @@ def eval_calls(app):
                 converted = gp.GeoDataFrame(gp_file, crs=gp_file.crs).to_crs(4326) # converting crs from uploaded file to WGS84
                 converted.to_file(f"assets/maps/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
             lon, lat = u.extract_coordinates(gp_file)
-            zoom = u.zoom_lvl(lon, lat)               # zoom for latest uploaded map
-            center = u.centroid(lon, lat)             # center of latest uploaded map
+            bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
             layers = {
                 "layers": True,
-                "zoom": zoom,
-                "center": center,
+                "bounds": bounds,
                 "date": time.time()
             }
             return map_warn, layers, no_update # returning uploaded layers
@@ -133,12 +131,10 @@ def eval_calls(app):
                 else: return not ul_warn, no_update, no_update, no_update # activating modal -> warn
             # getting zoom lvl and center point
             lon, lat = u.from_32632_to_4326(np.loadtxt(f"assets/groundtruth/{gt_filenames[i]}", skiprows=1)[:,1:3])
-            zoom = u.zoom_lvl(lon, lat)     # zoom lvl
-            center = u.centroid(lon, lat)   # center
+            bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
             layers = {
                 "layers": True,
-                "zoom": zoom,
-                "center": center,
+                "bounds": bounds,
                 "date": time.time()
             }
             # if everything went fine ...
@@ -152,12 +148,10 @@ def eval_calls(app):
                 else: return not ul_warn, no_update, no_update, no_update # activating modal -> warn
             # getting zoom lvl and center point
             lon, lat = u.from_32632_to_4326(np.loadtxt(f"assets/trajectories/{tra_filenames[i]}", skiprows=1)[:,1:3])
-            zoom = u.zoom_lvl(lon, lat)     # zoom lvl
-            center = u.centroid(lon, lat)   # center
+            bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
             layers = {
                 "layers": True,
-                "zoom": zoom,
-                "center": center,
+                "bounds": bounds,
                 "date": time.time()
             }
             # if everything went fine ...

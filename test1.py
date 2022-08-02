@@ -1,32 +1,22 @@
-import json
 
-def plotly_map_traces(filename: str) -> list:
-    # data
-    polygons = []
-    markers = []
-    with open(f"assets/{filename}.geojson", "r") as data:
-        data = json.loads(data.read())
-        features = data["features"]
-    # getting polygon and marker coordinates
-    for feature in features:
-        _type = feature["geometry"]["type"]
-        if "Point" in _type:
-            coordinates = feature["geometry"]["coordinates"]
-            markers.append([coordinates[0], coordinates[1]])
+import utils as u
+import geopandas as gp
+import shapely.geometry as sh
 
-        if "Polygon" in _type:
-            coordinates_list = feature["geometry"]["coordinates"]
-            for coordinates in coordinates_list:
-                try:
-                    lat = [coors[0] for coors in coordinates[0]]
-                    lon = [coors[1] for coors in coordinates[0]]
-                except:
-                    lat = [coors[0] for coors in coordinates]
-                    lon = [coors[1] for coors in coordinates]
-                polygons.append([lat, lon])
-    return [polygons, markers]
+def boundaries(lon_raw: list, lat_raw: list) -> list:
+    # making shapely points out of given coordinates
+    df = gp.GeoDataFrame({"geometry": [sh.Point(lon, lat) for lon, lat in zip(lon_raw, lat_raw)]})
+    # getting edge points (boundaries)
+    minx, miny, maxx, maxy = df.geometry.total_bounds
+    # returning most southwestern and most northeastern point
+    bounds = [[miny, minx], [maxy, maxx]]
+    return bounds
 
 
-result = plotly_map_traces("maps/test")
 
-print(result)
+with open(f"assets/floorplans/4OG.geojson", "r") as file:
+    data = file.read()
+lon, lat = u.extract_coordinates(gp.read_file(data))
+bounds = boundaries(lon, lat)
+print(bounds)
+
