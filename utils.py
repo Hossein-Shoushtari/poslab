@@ -22,7 +22,7 @@ import shapely.geometry as sh
 import geopandas as gp
 
 
-def map2layer(geojson_style) -> list:
+def map2layer(quantity, geojson_style) -> list:
     """
     FUNCTION
     - makes layers out of newly uploaded map files
@@ -33,15 +33,13 @@ def map2layer(geojson_style) -> list:
     RETURN
     layers : list of uploaded layers
     """
-    # showing only last layer
-    num_files = next(os.walk("assets/maps"))[2]        # all existing map files
-    show = [False for _ in range(len(num_files)-1)] + [True]  # all False, but last True -> showing only last layer
     # getting list of all files only in the given directory
-    list_of_files = filter( lambda x: os.path.isfile(os.path.join("assets/maps", x)), os.listdir("assets/maps") )
+    list_of_files = filter(lambda x: os.path.isfile(os.path.join("assets/maps", x)), os.listdir("assets/maps"))
     # sorting list of files based on last modification time in ascending order
-    list_of_files = sorted( list_of_files, key = lambda x: os.path.getmtime(os.path.join("assets/maps", x)))
+    list_of_files = sorted(list_of_files, key = lambda x: os.path.getmtime(os.path.join("assets/maps", x)))
+    # taking only the latest uploaded files
+    list_of_files = list_of_files[-quantity:]
     # initializing list to fill it with newly uploaded layers
-    i = 0
     layers = []
     for geojson_file in list_of_files:
         name = geojson_file.split(".")[0]  # getting name of geojson file
@@ -50,8 +48,7 @@ def map2layer(geojson_style) -> list:
             options=dict(style=geojson_style),  # style each polygon
             hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
             hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""))
-        layers.append(dl.Overlay(geojson, name=name, checked=show[i]))
-        i += 1
+        layers.append(dl.Overlay(geojson, name=name, checked=True))
     return layers
 
 def hover_info(feature=None) -> 'html.Div':
@@ -264,7 +261,7 @@ def from_32632_to_4326(data: list) -> tuple:
         lat.append(p.y)
     return [lon, lat]
 
-def gt2marker() -> list:
+def gt2marker(quantity) -> list:
     """
     FUNCTION
     - converts lat and lon from crs32632 (groundtruth) to crs4326
@@ -275,15 +272,15 @@ def gt2marker() -> list:
     """
     # icon colors
     colors = ["red", "green", "yellow", "purple", "orange", "blue", "black", "brown"]
-    # showing only last layer
-    num_files = next(os.walk("assets/groundtruth"))[2]        # all existing ground truth files
-    show = [False for _ in range(len(num_files)-1)] + [True]  # all False, but last True -> showing only last layer
     # getting list of all files only in the given directory
     list_of_files = filter(lambda x: os.path.isfile(os.path.join("assets/groundtruth", x)), os.listdir("assets/groundtruth"))
     # sorting list of files based on last modification time in ascending order
     list_of_files = sorted(list_of_files, key = lambda x: os.path.getmtime(os.path.join("assets/groundtruth", x)))
+    # taking only the latest uploaded files
+    list_of_files = list_of_files[-quantity:]
     # making layers out of all generated ground truth data
-    i = 0
+    num_files = len(next(os.walk("assets/groundtruth"))[2])
+    i = num_files - quantity
     layers = []
     for csv_file in list_of_files:
         # layer & data name
@@ -307,11 +304,11 @@ def gt2marker() -> list:
             marker = dl.Marker(position=[row[1].y, row[1].x], icon=icon)
             markers.append(marker)
         # making layer out of markers
-        layers.append(dl.Overlay(dl.LayerGroup(markers), name=name, checked=show[i]))
+        layers.append(dl.Overlay(dl.LayerGroup(markers), name=name, checked=True))
         i += 1
     return layers
 
-def traj2marker() -> list:
+def traj2marker(quantity) -> list:
     """
     FUNCTION
     - converts lat and lon from crs32632 (trajectories) to crs4326
@@ -322,15 +319,15 @@ def traj2marker() -> list:
     """
     # icon colors
     colors = ["purple", "green", "blue", "red", "orange", "yellow","black", "brown"]
-    # showing only last layer
-    num_files = next(os.walk("assets/trajectories"))[2]       # all existing ground truth files
-    show = [False for _ in range(len(num_files)-1)] + [True]  # all False, but last True -> showing only last layer
     # getting list of all files only in the given directory
     list_of_files = filter(lambda x: os.path.isfile(os.path.join("assets/trajectories", x)), os.listdir("assets/trajectories"))
     # sorting list of files based on last modification time in ascending order
     list_of_files = sorted(list_of_files, key = lambda x: os.path.getmtime(os.path.join("assets/trajectories", x)))
-    # making layers out of all generated trajectory data
-    i = 0
+    # taking only the latest uploaded files
+    list_of_files = list_of_files[-quantity:]
+    # making layers out of all generated ground truth data
+    num_files = len(next(os.walk("assets/trajectories"))[2])
+    i = num_files - quantity
     layers = []
     for csv_file in list_of_files:
         # layer & data name
@@ -338,7 +335,7 @@ def traj2marker() -> list:
         # data
         traj = np.loadtxt(f"assets/trajectories/{csv_file}", skiprows=1)[:, 1:3]
         # displaying only trajectories with maximum 100 markers
-        if traj.shape[0] <= 1500:
+        if traj.shape[0] <= 1000:
             # designing icon (from https://icons8.de/icons/set/marker)
             icon = {
                 "iconUrl": f"https://img.icons8.com/emoji/344/{colors[i%len(colors)]}-circle-emoji.png",
@@ -356,7 +353,7 @@ def traj2marker() -> list:
                 marker = dl.Marker(position=[row[1].y, row[1].x], icon=icon)
                 markers.append(marker)
             # making layer out of markers
-            layers.append(dl.Overlay(dl.LayerGroup(markers), name=name, checked=show[i]))
+            layers.append(dl.Overlay(dl.LayerGroup(markers), name=name, checked=True))
             i += 1
     return layers
 

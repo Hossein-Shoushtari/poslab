@@ -48,18 +48,18 @@ def home_layout():
 
                             html.P("Prof. Dr. Jörg Müller-Litzkow",
                                 style={"color": "silver", "marginTop": "5px", "font-size": "13px", "text-indent": "10px"}),
-                            html.P("President of Hafencity University Hamburg (HCU) and Univ. Prof. for Economics and Digitalization",
+                            html.P("President of HafenCity University Hamburg (HCU) and Univ. Prof. for Economics and Digitalization",
                                 style={"line-height": "110%", "color": "silver", "marginTop": "-20px", "font-size": "12px", "paddingLeft": "10px"}),
 
                             html.P("Prof. Dr. Harald Sternberg",
                                 style={"color": "silver", "marginTop": "-12px", "font-size": "13px", "text-indent": "10px"}),
-                            html.P("""Vice President for Teaching and Digitalization of Hafencity University Hamburg (HCU)
+                            html.P("""Vice President for Teaching and Digitalization of HafenCity University Hamburg (HCU)
                                 and Univ. Prof. for Hydrography and Engineering Geodesy""",
                                 style={"line-height": "110%", "color": "silver", "marginTop": "-20px", "font-size": "12px", "paddingLeft": "10px"}),
 
                             html.P("Nils Hellweg",
                                 style={"color": "silver", "marginTop": "-12px", "font-size": "13px", "text-indent": "10px"}),
-                            html.P("""Project Manager and PhD Student at Hafencity University Hamburg (HCU)""",
+                            html.P("""Project Manager and PhD Student at HafenCity University Hamburg (HCU)""",
                                 style={"line-height": "110%", "color": "silver", "marginTop": "-20px", "font-size": "12px", "paddingLeft": "10px"}),
                         ],
                         width=2),
@@ -70,28 +70,28 @@ def home_layout():
 
                             html.P("Hossein Shoushtari",
                                 style={"color": "silver", "marginTop": "5px", "font-size": "11px", "text-indent": "10px"}),
-                            html.P("Research assistant and PhD Student at Hafencity University Hamburg (HCU)",
+                            html.P("Research assistant and PhD Student at HafenCity University Hamburg (HCU)",
                                 style={"line-height": "110%", "color": "silver", "marginTop": "-18px", "font-size": "10px", "paddingLeft": "10px"}),
                             html.P("hossein.shoushtari@hcu-hamburg.de",
                                 style={"color": "silver", "marginTop": "-18px", "font-size": "10px", "paddingLeft": "10px"}),
 
                             html.P("Dorian Harder",
                                 style={"color": "silver", "marginTop": "-12px", "font-size": "11px", "text-indent": "10px"}),
-                            html.P("Research assistant at Hafencity University Hamburg (HCU)",
+                            html.P("Research assistant at HafenCity University Hamburg (HCU)",
                                 style={"line-height": "110%", "color": "silver", "marginTop": "-18px", "font-size": "10px", "paddingLeft": "10px"}),
                             html.P("dorian.harder@hcu-hamburg.de",
                                 style={"color": "silver", "marginTop": "-18px", "font-size": "10px", "paddingLeft": "10px"}),
 
                             html.P("Georg Fjodorow",
                                 style={"color": "silver", "marginTop": "-12px", "font-size": "11px", "text-indent": "10px"}),
-                            html.P("Master Student at Hafencity University Hamburg (HCU)",
+                            html.P("Master Student at HafenCity University Hamburg (HCU)",
                                 style={"line-height": "110%", "color": "silver", "marginTop": "-18px", "font-size": "10px", "paddingLeft": "10px"}),
                             html.P("georg.fjodorow@hcu-hamburg.de",
                                 style={"color": "silver", "marginTop": "-18px", "font-size": "10px", "paddingLeft": "10px"}),
                                 
                             html.P("Korvin Venzke",
                                 style={"color": "silver", "marginTop": "-12px", "font-size": "11px", "text-indent": "10px"}),
-                            html.P("Bachelor Student at Hafencity University Hamburg (HCU)",
+                            html.P("Bachelor Student at HafenCity University Hamburg (HCU)",
                                 style={"line-height": "110%", "color": "silver", "marginTop": "-18px", "font-size": "10px", "paddingLeft": "10px"}),
                             html.P("korvin.venzke@hcu-hamburg.de",
                                 style={"color": "silver", "marginTop": "-18px", "font-size": "10px", "paddingLeft": "10px"}),

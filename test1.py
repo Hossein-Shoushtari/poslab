@@ -1,22 +1,38 @@
 
 import utils as u
-import geopandas as gp
-import shapely.geometry as sh
+#### IMPORTS
+# dash
+from dash_extensions.javascript import assign
+import dash_bootstrap_components as dbc
+from dash import Dash, dcc, html
+# home
+from home.layout import home_layout
+# simulator
+from simulator.callbacks import sim_calls
+from simulator.layout import sim_layout
+# evaluator
+from evaluator.callbacks import eval_calls
+from evaluator.layout import eval_layout
+# coming soon
+from coming_soon.layout import com_layout
+# simulator & evaluator map
+from maps import map_display
 
-def boundaries(lon_raw: list, lat_raw: list) -> list:
-    # making shapely points out of given coordinates
-    df = gp.GeoDataFrame({"geometry": [sh.Point(lon, lat) for lon, lat in zip(lon_raw, lat_raw)]})
-    # getting edge points (boundaries)
-    minx, miny, maxx, maxy = df.geometry.total_bounds
-    # returning most southwestern and most northeastern point
-    bounds = [[miny, minx], [maxy, maxx]]
-    return bounds
 
+# Geojson rendering logic, must be JavaScript and only initialized once!
+geojson_style = assign("""function(feature, context){
+    const {classes, colorscale, style, colorProp} = context.props.hideout;  // get props from hideout
+    return style;}"""
+)
 
+eval_map_layers = {
+    "layers": True,
+    "quantity": 1,
+    "bounds": 2,
+    "date": 3
+}
 
-with open(f"assets/floorplans/4OG.geojson", "r") as file:
-    data = file.read()
-lon, lat = u.extract_coordinates(gp.read_file(data))
-bounds = boundaries(lon, lat)
-print(bounds)
+maps = u.gt2marker(eval_map_layers["quantity"])
+
+# print(maps)
 

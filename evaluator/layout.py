@@ -21,8 +21,6 @@ def storage():
         dcc.Store(id="eval_unlocked1", data=[], storage_type="memory"),
         dcc.Store(id="eval_unlocked2", data=[], storage_type="memory"),
         dcc.Store(id="eval_unlocked3", data=[], storage_type="memory"),
-        dcc.Store(id="eval_unlocked4", data=0, storage_type="memory"),
-        dcc.Store(id="eval_unlocked5", data=[], storage_type="memory"),
         # HistoNorm checkboxes
         dcc.Store(id="norm_status", data=[], storage_type="memory"),
         dcc.Store(id="histo_status", data=[], storage_type="memory")
@@ -417,19 +415,19 @@ def help_canvas():
                     className="d-flex align-items-center",
                     style={"height": "75px", "color": "silver", "background": "#4598DB", "border-radius": 10}
                 ),
-                # dbc.Alert(
-                #     [
-                #         html.Div(html.Img(src="assets/images/bug_sign.svg"), style={"marginRight": "10px"}),
-                #         html.Div(
-                #             [
-                #                 html.P("Are the layer names mixed up?", style={"marginBottom": "0px"}),
-                #                 html.P("Just switch tabs and come back!", style={"marginBottom": "0px"}),
-                #             ]
-                #         ),
-                #     ],
-                #     className="d-flex align-items-center",
-                #     style={"height": "75px", "color": "silver", "background": "#70251B", "border-radius": 10}
-                # ),
+                dbc.Alert(
+                    [
+                        html.Div(html.Img(src="assets/images/bug_sign.svg"), style={"marginRight": "10px"}),
+                        html.Div(
+                            [
+                                html.P("Are the layer names mixed up?", style={"marginBottom": "0px"}),
+                                html.P("Just switch tabs and come back!", style={"marginBottom": "0px"}),
+                            ]
+                        ),
+                    ],
+                    className="d-flex align-items-center",
+                    style={"height": "75px", "color": "silver", "background": "#70251B", "border-radius": 10}
+                ),
                 html.Div([
                     # info upload
                     html.H5("UPLOAD", style={"text-align": "center", "color": "#3B5A7F"}),
@@ -719,5 +717,4 @@ def eval_layout(geojson_style):
             dbc.CardFooter("Copyright © 2022 Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})
         ]
     )
-
 

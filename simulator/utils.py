@@ -32,6 +32,10 @@ def floorplan2layer(geojson_style) -> list:
     layers = []
     # list of all default floorplan names
     floorplans = ["EG", "1OG", "4OG"]
+    # showing it or not
+    show = [False for _ in range(len(floorplans)-1)] + [True]
+    i = 0
+    # adding all floorplans as layers
     for fp in floorplans:
         geojson = dl.GeoJSON(
             url=f"assets/floorplans/{fp}.geojson",  # url to geojson file
@@ -39,8 +43,8 @@ def floorplan2layer(geojson_style) -> list:
             hoverStyle=arrow_function(dict(weight=1, color="orange")),  # style applied on hover
             hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""),
             id=f"{fp}_sim")
-        layers.append(dl.Overlay(geojson, name=fp, checked=False))
-
+        layers.append(dl.Overlay(geojson, name=fp, checked=show[i]))
+        i += 1
     return layers
 
 def export_drawings(data: dict):

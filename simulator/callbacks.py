@@ -60,6 +60,7 @@ def sim_calls(app):
             bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
             layers = {
                 "layers": True,
+                "quantity": i+1,
                 "bounds": bounds,
                 "date": time.time()
             }
@@ -142,6 +143,7 @@ def sim_calls(app):
                 bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
                 layers = {
                     "layers": True,
+                    "quantity": 1,
                     "bounds": bounds,
                     "date": time.time()
                 }
@@ -316,6 +318,7 @@ def sim_calls(app):
                     bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
                     layers = {
                         "layers": True,
+                        "quantity": 1,
                         "bounds": bounds,
                         "date": time.time()
                     }
@@ -333,6 +336,7 @@ def sim_calls(app):
                 # turning ref points into layer of markers
                 layer = {
                     "layers": su.ref2marker(data, check),
+                    "quantity": None,
                     "bounds": bounds,
                     "date": time.time()
                 }
@@ -461,6 +465,7 @@ def sim_calls(app):
                 bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
                 layers = {
                     "layers": True,
+                    "quantity": 1,
                     "bounds": bounds,
                     "date": time.time()
                 }

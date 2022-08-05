@@ -61,6 +61,7 @@ def eval_calls(app):
             bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
             layers = {
                 "layers": True,
+                "quantity": i+1,
                 "bounds": bounds,
                 "date": time.time()
             }
@@ -134,6 +135,7 @@ def eval_calls(app):
             bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
             layers = {
                 "layers": True,
+                "quantity": i+1,
                 "bounds": bounds,
                 "date": time.time()
             }
@@ -151,6 +153,7 @@ def eval_calls(app):
             bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
             layers = {
                 "layers": True,
+                "quantity": i+1,
                 "bounds": bounds,
                 "date": time.time()
             }
