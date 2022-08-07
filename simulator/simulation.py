@@ -222,7 +222,7 @@ def export_sim(time_stamps: list, positions: list, errors: list, qualities: list
             for j in range(len(ant)):
                 line += ant[j][i]
             ants.append(line)
-        with open(f"assets/exports/sm/sim_meas__{name[0]}_{name[1]}_{name[2]}.csv", "w") as f:
+        with open(f"assets/exports/sm/sim__freq{name[0]}_err{name[1]}_user{name[2]}.csv", "w") as f:
             lines = [[time_stamps[i], positions[i][0], positions[i][1], errors[i], qualities[i], ants[i]] for i in range(len(time_stamps))]
             output = f"timestamp x y error quality {ant_header[:-1]}\n"
             for row in lines:
@@ -230,7 +230,7 @@ def export_sim(time_stamps: list, positions: list, errors: list, qualities: list
             f.write(output)
     # no antennas
     else:
-        with open(f"assets/exports/sm/sim_meas__{name[0]}_{name[1]}_{name[2]}.csv", "w") as f:
+        with open(f"assets/exports/sm/sim__freq{name[0]}_err{name[1]}_user{name[2]}.csv", "w") as f:
             lines = [[time_stamps[i], positions[i][0], positions[i][1], errors[i], qualities[i]] for i in range(len(time_stamps))]
             output = "timestamp x y error quality \n"
             for row in lines:

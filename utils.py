@@ -132,7 +132,7 @@ def extract_coordinates(data: list) -> list:
 def time():
     # for Hossein's time confusion
     H, M, S = datetime.now().strftime('%H'), datetime.now().strftime('%M'), datetime.now().strftime('%S')
-    name = f"{int(H)+2}+{M}+{S}"
+    name = f"{int(H)+2}h-{M}min-{S}sec"
     return name
 
 def upload_encoder(content: str) -> str:
@@ -170,6 +170,8 @@ def sending_email():
     msg.attach(body_part)
     # zipping all dirs if not empty
     if len(os.listdir("assets/antennas")): st.make_archive(f"assets/zip/antennas-{time()}", 'zip', "assets/antennas")
+    if len(os.listdir("assets/groundtruth")): st.make_archive(f"assets/zip/groundtruth-{time()}", 'zip', "assets/groundtruth")
+    if len(os.listdir("assets/trajectories")): st.make_archive(f"assets/zip/trajectories-{time()}", 'zip', "assets/trajectories")
     if len(os.listdir("assets/maps")): st.make_archive(f"assets/zip/maps-{time()}", 'zip', "assets/maps")
     if len(os.listdir("assets/sensors/acc")) or len(os.listdir("assets/sensors/bar")) or len(os.listdir("assets/sensors/gyr")) or len(os.listdir("assets/sensors/mag")): st.make_archive(f"assets/zip/sensors-{time()}", 'zip', "assets/sensors")
     if len(os.listdir("assets/waypoints")): st.make_archive(f"assets/zip/waypoints-{time()}", 'zip', "assets/waypoints")
@@ -180,9 +182,9 @@ def sending_email():
             # attach the file with filename to the email
             msg.attach(MIMEApplication(file.read(), Name=f'{zip}'))
     # creating SMTP object
-    smtp_obj = smtplib.SMTP_SSL("smtp.gmail.com")
+    smtp_obj = smtplib.SMTP_SSL("mail.tu-harburg.de")
     # login to the server
-    smtp_obj.login("cpsimulation2022@gmail.com", "simulation2evaluation20xx")
+    smtp_obj.login("hne164@hcu-hamburg.de", "NivrokUni2022?")
 
     # converting the message to a string and send it
     smtp_obj.sendmail(msg['From'], msg['To'], msg.as_string())
@@ -394,3 +396,4 @@ def dummy():
 if __name__ == "__main__":
     deleter()
     dummy()
+    # sending_email()

@@ -38,8 +38,7 @@ def tooltips():
         dbc.Tooltip("accelerator | csv",    target="eval_ul_acc",        placement="bottom"),
         dbc.Tooltip("barometer | csv",      target="eval_ul_bar",        placement="top"),
         dbc.Tooltip("magnetometer | csv",   target="eval_ul_mag",        placement="bottom"),
-        dbc.Tooltip("focus",                target="eval_zoom",          placement="right"),
-        dbc.Tooltip("focus",                target="eval_zoom2",         placement="right")
+        dbc.Tooltip("focus",                target="eval_zoom_img",      placement="right")
     ])
     return tooltips
 
@@ -227,7 +226,7 @@ def eval_map(geojson_style):
             [   
                 html.Div(id="eval_hcu_panel", children=info, style={"display": "None"}),
                 html.Button(html.Img(src="assets/images/research_sign.svg"), id="eval_hcu_maps", style=btn_style1),
-                html.Button(html.Img(src="assets/images/focus_sign2.svg", id="eval_zoom2"), id="eval_zoom", style=btn_style2),
+                html.Button(html.Img(src="assets/images/focus_sign2.svg", id="eval_zoom_img"), id="eval_zoom", style=btn_style2),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
                 html.Div(id="eval_div_lc", children=dl.LayersControl(id="eval_lc", children=eu.floorplan2layer(geojson_style)), style={"display": "None"}), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
@@ -470,7 +469,7 @@ def help_canvas():
                 style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"})
             ],
         id="eval_help_cv",
-        scrollable=True,
+        scrollable=False,
         title="Help",
         is_open=False)
     ])

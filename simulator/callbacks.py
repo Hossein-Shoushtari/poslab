@@ -456,7 +456,7 @@ def sim_calls(app):
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "sim_btn" in button:
-            if gt_select and err and ms_freq and net_cap and num_user and num_int:
+            try:
                 simulation = simulate_positions(gt_select, float(err), float(ms_freq), float(net_cap), int(num_user), int(num_int), sem_err_rang, int_rang, sem_err)
                 # formatting and saving simulation data
                 export_sim(*simulation, (ms_freq, err, num_user))
@@ -470,7 +470,8 @@ def sim_calls(app):
                     "date": time.time()
                 }
                 return sim_warn, layers, no_update
-            else: return not sim_warn, no_update, no_update
+            except:
+                return not sim_warn, no_update, no_update
         else: return sim_warn, no_update, no_update
 
     # export ============================================================================================================================
@@ -505,14 +506,14 @@ def sim_calls(app):
         if "sim_exp_btn" in button:
             if drawings["features"]: # save drawn data if so
                 su.export_drawings(drawings)
-            if len(listdir("assets/exports/gt")) or len(listdir("assets/exports/draw")):
+            if len(listdir("assets/exports/gt")) or len(listdir("assets/exports/sm")) or len(listdir("assets/exports/draw")):
                 # zipping
                 zip_folder = st.make_archive(f"assets/zip/L5IN_export_{u.time()}", 'zip', "assets/exports")
                 # sending email with all data added (if it does not exceed 25MB!)
                 try: u.sending_email()
                 except: pass
                 # downloading
-                download = dcc.send_file(f"assets/zip/{zip_folder[-24:]}", filename=f"L5IN_export_{u.time()}.zip")
+                download = dcc.send_file(f"assets/zip/{zip_folder[-31:]}", filename=f"L5IN_export_{u.time()}.zip")
                 return not exp_done, exp_warn, download, no_update # export successful
             return exp_done, not exp_warn, no_update, no_update # export failed
         else:

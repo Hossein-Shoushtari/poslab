@@ -36,10 +36,9 @@ def tooltips():
         dbc.Tooltip("accelerator | csv",    target="sim_ul_acc",       placement="bottom"),
         dbc.Tooltip("barometer | csv",      target="sim_ul_bar",       placement="top"),
         dbc.Tooltip("magnetometer | csv",   target="sim_ul_mag",       placement="bottom"),
-        dbc.Tooltip("reset",                target="ss_reset",         placement="right"),
-        dbc.Tooltip("settings",             target="sim_set",          placement="right"),
-        dbc.Tooltip("focus",                target="sim_zoom",         placement="right"),
-        dbc.Tooltip("focus",                target="sim_zoom2",        placement="right")
+        dbc.Tooltip("reset",                target="ss_reset_img",     placement="right"),
+        dbc.Tooltip("settings",             target="sim_set_img",      placement="right"),
+        dbc.Tooltip("focus",                target="sim_zoom_img",     placement="right")
     ])
     return tooltips
 
@@ -143,7 +142,7 @@ def modals():
     # simulation warning
     sim_warn = dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
-        dbc.ModalBody("Please select data first!")],
+        dbc.ModalBody("Please select and enter the right data first!")],
         id="sim_warn",
         size="sm",
         is_open=False
@@ -249,7 +248,7 @@ def sim_map(geojson_style):
             [   
                 html.Div(id="sim_hcu_panel", children=info, style={"display": "None"}),
                 html.Button(html.Img(src="assets/images/research_sign.svg"), id="sim_hcu_maps", style=btn_style1),
-                html.Button(html.Img(src="assets/images/focus_sign2.svg", id="sim_zoom2"), id="sim_zoom", style=btn_style2),
+                html.Button(html.Img(src="assets/images/focus_sign2.svg", id="sim_zoom_img"), id="sim_zoom", style=btn_style2),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
                 html.Div(id="sim_div_lc", children=dl.LayersControl(id="sim_lc", children=su.floorplan2layer(geojson_style))), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
@@ -324,7 +323,7 @@ def help_canvas():
                             "For performance reasons, only trajectories up to 1000 points are displayed on the map.",
                         ],
                         className="d-flex align-items-center",
-                        style={"height": "90px", "color": "#303030", "background": "#774E06"}
+                        style={"height": "90px", "color": "gray", "background": "#774E06"}
                     ),
                     html.P("Instructions for simulating measurements:", style={"color": "gray"}),
                     dbc.Row([
@@ -392,7 +391,7 @@ def gt_canvas():
                     "The first and the last waypoint should always be selected.",
                 ],
                 className="d-flex align-items-center",
-                style={"height": "75px", "color": "#303030", "background": "#774E06", "border-radius": 10}
+                style={"height": "75px", "color": "gray", "background": "#774E06", "border-radius": 10}
             ),
             html.Div([
                 # buttons
@@ -477,7 +476,7 @@ def sim_set_canvas():
                     [
                     # Semantic Errors
                     html.H5("Semantic Errors", style={"text-align": "left", "color": "silver"}),
-                    html.Div(dbc.Button(html.Img(src="assets/images/reset_sign.svg"), id="ss_reset", color="light", outline=True, style={"border": "0px"}),
+                    html.Div(dbc.Button(html.Img(src="assets/images/reset_sign.svg", id="ss_reset_img"), id="ss_reset", style={"border": "0px", "background": "transparent"}),
                         style={"text-align": "right","marginTop": "-39px", "marginRight": "-5px"}),
                     html.Hr(style={"margin": "auto", "width": "100%", "color": "silver", "height": "3px", "marginBottom": "-10px"}),
                     html.Br(),
@@ -607,7 +606,7 @@ def sim_layout(geojson_style):
                 html.Div(
                     [
                         html.H5("Simulation", style=H5_style),
-                        html.Div(dbc.Button(html.Img(src="assets/images/settings_sign.svg"), id="sim_set", color="light", outline=True, style={"border": "0px"}),
+                        html.Div(dbc.Button(html.Img(src="assets/images/settings_sign.svg", id="sim_set_img"), id="sim_set", style={"border": "0px", "background": "transparent"}),
                             style={"text-align": "right","marginTop": "-35px", "marginRight": "3px"})
                     ]
                 ),
