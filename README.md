@@ -15,7 +15,7 @@
 > **sensors** : all uploaded sensor data (acc, bar, gyr, mag)  
 > **trajectories** : uploaded trajectories for evaluation    
 > **waypoints** : uploaded waypoints for ground truth  
-> **zip** : zip directories that are either downloaded for the user or sent to us as an attachment in an email  
+> **mail** : zip directories that are either downloaded for the user or sent to us as an attachment in an email  
 #### coming soon
 > Coming-soon tab with all its required python scripts
 #### evaluator
@@ -30,7 +30,8 @@
 > **maps.py** : all logic code related to the two maps in Simulator & Evaluator (unlock HCU maps, show all uploaded/generated, zoom, center etc.)   
 > **dashExtensions_default.js** : GeoJSON rendering logic. Must be in Java Script. It's used for dash-leaflet. It's only initialized once in the beginning.  
 > **spinner_styling.css** : CSS styling of the blue spinner/loading sign  
-> **tabs.css** : CSS styling of the four tabs   
+> **tabs.css** : CSS styling of the four tabs  
+> **example_data.zip** : some example data for the user to know how to format his own data  
 > **util.py** : Required general functions from all tabs  
 > **.gitignore**, **Procfile**, **requirements.txt** : for heroku deploy  
 

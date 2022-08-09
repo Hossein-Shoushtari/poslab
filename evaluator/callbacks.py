@@ -528,6 +528,23 @@ def eval_calls(app):
         }
         return fig, config, no_update
 
+    # example data =====================================================================================================================
+    @app.callback(
+        ### Outputs ###
+        # download
+        Output("eval_exdata_dl", "data"), # download data
+        ### Inputs ###
+        # button
+        Input("eval_exdata", "n_clicks"), # export button click status
+    )
+    def example_data(btn):
+        button = [p["prop_id"] for p in callback_context.triggered][0]
+        if "eval_exdata" in button:
+            download = dcc.send_file("assets/example_data.zip", filename="example_data.zip")
+            return download  # download
+        else:
+            return no_update # no button clicked
+
     # export ============================================================================================================================
     @app.callback(
         ### Outputs ###

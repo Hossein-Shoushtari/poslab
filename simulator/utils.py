@@ -47,7 +47,7 @@ def floorplan2layer(geojson_style) -> list:
         i += 1
     return layers
 
-def export_drawings(data: dict):
+def save_drawings(data: dict):
     """
     FUNCTION
     - formats received dictionary (replaces ' with ")

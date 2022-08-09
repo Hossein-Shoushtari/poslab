@@ -90,87 +90,91 @@ def spinners():
 
 def modals():
     ### MODALs
-    # upload warning
-    ul_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
-        dbc.ModalBody("Wrong file format! Upload denied.")],
-        id="eval_ul_warn",
-        size="sm",
-        is_open=False
-    )
-    # upload done
-    ul_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
-        dbc.ModalBody("Upload successful!")],
-        id="eval_ul_done",
-        size="sm",
-        is_open=False
-    )
-    # map warning
-    map_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
-        dbc.ModalBody("Wrong file format! Upload denied.")],
-        id="eval_map_warn",
-        size="sm",
-        is_open=False
-    )
-    # map display done
-    display_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
-        dbc.ModalBody("Successful!")],
-        id="eval_display",
-        size="sm",
-        is_open=False
-    )
-    # cdf warning
-    cdf_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
-        dbc.ModalBody("Please select data first!")],
-        id="cdf_warn",
-        size="sm",
-        is_open=False
-    )
-    # cdf graph
-    graph_modal = dbc.Modal(
+    modals = html.Div(
         [
-            dbc.ModalHeader(dbc.ModalTitle("CDF Plot")),
-            dbc.ModalBody(
-                dcc.Graph(figure={}, config={
-                    "staticPlot": False,     # True, False
-                    "scrollZoom": True,      # True, False
-                    "doubleClick": False,    # "reset", "autosize" or "reset+autosize", False
-                    "showTips": True,        # True, False
-                    "displayModeBar": True,  # True, False, "hover"
-                    "watermark": True
-                    },
-                    id="graph",
-                    className="six columns")
-                )
-        ],
-        id="cdf_show",
-        size="xl",
-        backdrop="static",
-        is_open=False
+            # upload warning
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
+                dbc.ModalBody("Wrong file format! Upload denied.")],
+                id="eval_ul_warn",
+                size="sm",
+                is_open=False
+            ),
+            # upload done
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
+                dbc.ModalBody("Upload successful!")],
+                id="eval_ul_done",
+                size="sm",
+                is_open=False
+            ),
+            # map warning
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
+                dbc.ModalBody("Wrong file format! Upload denied.")],
+                id="eval_map_warn",
+                size="sm",
+                is_open=False
+            ),
+            # map display done
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
+                dbc.ModalBody("Successful!")],
+                id="eval_display",
+                size="sm",
+                is_open=False
+            ),
+            # cdf warning
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
+                dbc.ModalBody("Please select data first!")],
+                id="cdf_warn",
+                size="sm",
+                is_open=False
+            ),
+            # cdf graph
+            dbc.Modal(
+                [
+                    dbc.ModalHeader(dbc.ModalTitle("CDF Plot")),
+                    dbc.ModalBody(
+                        dcc.Graph(figure={}, config={
+                            "staticPlot": False,     # True, False
+                            "scrollZoom": True,      # True, False
+                            "doubleClick": False,    # "reset", "autosize" or "reset+autosize", False
+                            "showTips": True,        # True, False
+                            "displayModeBar": True,  # True, False, "hover"
+                            "watermark": True
+                            },
+                            id="graph",
+                            className="six columns")
+                        )
+                ],
+                id="cdf_show",
+                size="xl",
+                backdrop="static",
+                is_open=False
+            ),
+            # visual
+            visual_modal(),
+            # export warning
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
+                dbc.ModalBody("Nothing to export!")],
+                id="eval_exp_warn",
+                size="sm",
+                is_open=False
+            ),
+            # export done
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
+                dbc.ModalBody("Export successful!")],
+                id="eval_exp_done",
+                size="sm",
+                is_open=False
+            )
+        ]
     )
-    # visual
-    visual = visual_modal()
-    # export warning
-    exp_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
-        dbc.ModalBody("Nothing to export!")],
-        id="eval_exp_warn",
-        size="sm",
-        is_open=False
-    )
-    # export done
-    exp_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
-        dbc.ModalBody("Export successful!")],
-        id="eval_exp_done",
-        size="sm",
-        is_open=False
-    )
-    return html.Div([visual, ul_warn, ul_done, display_done, cdf_warn, graph_modal, map_warn, exp_warn, exp_done])
+    return modals
 
 def eval_map(geojson_style):
     ### MAP
@@ -192,26 +196,26 @@ def eval_map(geojson_style):
             "width": "240px"
         }
     )
-    # unlock hcu maps button
-    btn_style1 = {
+    # zoom botton
+    focus_style = {
         "position": "absolute",
         "top": "110px",
         "left": "10px",
         "z-index": "500",
         "backgroundColor": "white",
-        "border": "2px solid #B2AFAC",
+        "border": "2px solid #CCCCCC",
         "border-radius": 4,
         "width": "34px",
         "height": "34px"
     }
-    # zoom botton
-    btn_style2 = {
+    # unlock hcu maps button
+    research_style = {
         "position": "absolute",
         "top": "150px",
         "left": "10px",
         "z-index": "500",
         "backgroundColor": "white",
-        "border": "2px solid #B2AFAC",
+        "border": "2px solid #CCCCCC",
         "border-radius": 4,
         "width": "34px",
         "height": "34px"
@@ -225,8 +229,8 @@ def eval_map(geojson_style):
         dl.Map(
             [   
                 html.Div(id="eval_hcu_panel", children=info, style={"display": "None"}),
-                html.Button(html.Img(src="assets/images/research_sign.svg"), id="eval_hcu_maps", style=btn_style1),
-                html.Button(html.Img(src="assets/images/focus_sign2.svg", id="eval_zoom_img"), id="eval_zoom", style=btn_style2),
+                html.Button(html.Img(src="assets/images/focus_sign2.svg", id="eval_zoom_img"), id="eval_zoom", style=focus_style),
+                html.Button(html.Img(src="assets/images/research_sign.svg"), id="eval_hcu_maps", style=research_style),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
                 html.Div(id="eval_div_lc", children=dl.LayersControl(id="eval_lc", children=eu.floorplan2layer(geojson_style)), style={"display": "None"}), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
@@ -416,6 +420,19 @@ def help_canvas():
                 ),
                 dbc.Alert(
                     [
+                        html.Button(html.Img(src="assets/images/download_sign.svg", style={"marginLeft": "-8px"}), id="eval_exdata", style={"marginRight": "10px", "width": "48px", "background": "transparent", "border": "0px"}),
+                        html.Div(
+                            [
+                                html.P("Not sure about the file formats?", style={"marginBottom": "0px"}),
+                                html.P("Download example data here!", style={"marginBottom": "0px"}),
+                            ]
+                        ),
+                    ],
+                    className="d-flex align-items-center",
+                    style={"height": "75px", "color": "silver", "background": "#008000", "border-radius": 10}
+                ),
+                dbc.Alert(
+                    [
                         html.Div(html.Img(src="assets/images/bug_sign.svg"), style={"marginRight": "10px"}),
                         html.Div(
                             [
@@ -479,6 +496,7 @@ def help_canvas():
 def eval_layout(geojson_style):
     ### DOWNLOAD
     export = dcc.Download(id="eval_export")
+    example_data = dcc.Download(id="eval_exdata_dl")
 
     ### UPLOAD
     ## Buttons
@@ -694,6 +712,7 @@ def eval_layout(geojson_style):
                     storage(),
                     # download
                     export,
+                    example_data,
                     # modals
                     modals(),
                     # canvas

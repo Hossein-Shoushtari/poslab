@@ -48,8 +48,7 @@ app.layout = html.Div(
     [
         # storage
         dcc.Store(id="unlocked", data={"unlocked": False,"date": 0}, storage_type="memory"),
-        dcc.Store(id="sim_layers", data=[], storage_type="memory"),
-        dcc.Store(id="eval_layers", data=[], storage_type="memory"),
+        dcc.Store(id="layers", data=[], storage_type="memory"),
         # upload and map display done
         dbc.Modal([
             dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),

@@ -36,8 +36,8 @@ def tooltips():
         dbc.Tooltip("accelerator | csv",    target="sim_ul_acc",       placement="bottom"),
         dbc.Tooltip("barometer | csv",      target="sim_ul_bar",       placement="top"),
         dbc.Tooltip("magnetometer | csv",   target="sim_ul_mag",       placement="bottom"),
-        dbc.Tooltip("reset",                target="ss_reset_img",     placement="right"),
         dbc.Tooltip("settings",             target="sim_set_img",      placement="right"),
+        dbc.Tooltip("save",                 target="sim_save_img",     placement="right"),
         dbc.Tooltip("focus",                target="sim_zoom_img",     placement="right")
     ])
     return tooltips
@@ -83,117 +83,136 @@ def spinners():
 
 def modals():
     ### MODALs
-    # upload warning
-    ul_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
-        dbc.ModalBody("Wrong file format! Upload denied.")],
-        id="sim_ul_warn",
-        size="sm",
-        is_open=False
-    )
-    # upload done
-    ul_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
-        dbc.ModalBody("Upload successful!")],
-        id="sim_ul_done",
-        size="sm",
-        is_open=False
-    )
-    # map warning
-    map_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
-        dbc.ModalBody("Wrong file format! Upload denied.")],
-        id="sim_map_warn",
-        size="sm",
-        is_open=False
-    )
-    # map display done
-    display_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
-        dbc.ModalBody("Successful!")],
-        id="sim_display",
-        size="sm",
-        is_open=False
-    )
-    # data selection warning
-    sel_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
-        dbc.ModalBody("Please select data first!")],
-        id="sel_warn",
-        size="sm",
-        is_open=False
-    )
-    # gt calculation warning
-    gen_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
-        dbc.ModalBody("Apparently acc and gyr are missing. Please upload them first!")],
-        id="gen_warn",
-        size="sm",
-        is_open=False
-    )
-    # gt calculation done
-    gen_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
-        dbc.ModalBody("Generation successful!")],
-        id="gen_done",
-        size="sm",
-        is_open=False
-    )
-    # simulation warning
-    sim_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
-        dbc.ModalBody("Please select and enter the right data first!")],
-        id="sim_warn",
-        size="sm",
-        is_open=False
-    )
-    # export warning
-    exp_warn = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
-        dbc.ModalBody("Nothing to export!")],
-        id="sim_exp_warn",
-        size="sm",
-        is_open=False
-    )
-    # export done
-    exp_done = dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
-        dbc.ModalBody("Export successful!")],
-        id="sim_exp_done",
-        size="sm",
-        is_open=False
-    )
-    # simulate measurements - select ground truth
-    sim_modal = dbc.Modal(
+    modals = html.Div(
         [
-            dbc.ModalHeader(dbc.ModalTitle("Simulate Measurements")),
-            dbc.ModalBody(
-                html.Div(
-                    [
-                        dbc.Label("Ground Truth"),
-                        dcc.Dropdown(
-                            id="sim_gt_select",
-                            options=[],
-                            placeholder="Select Data",
-                            clearable=True,
-                            optionHeight=35,
-                            multi=False,
-                            searchable=True,
-                            style={"marginBottom": "15px", "color": "black"},
-                        )
-                    ]
-                )
+            # upload warning
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
+                dbc.ModalBody("Wrong file format! Upload denied.")],
+                id="sim_ul_warn",
+                size="sm",
+                is_open=False
             ),
-            dbc.ModalFooter(
-                dbc.Button("Simulate", color="primary", id="sim_btn")
+            # upload done
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
+                dbc.ModalBody("Upload successful!")],
+                id="sim_ul_done",
+                size="sm",
+                is_open=False
+            ),
+            # map warning
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
+                dbc.ModalBody("Wrong file format! Upload denied.")],
+                id="sim_map_warn",
+                size="sm",
+                is_open=False
+            ),
+            # map display done
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
+                dbc.ModalBody("Successful!")],
+                id="sim_display",
+                size="sm",
+                is_open=False
+            ),
+            # data selection warning
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
+                dbc.ModalBody("Please select data first!")],
+                id="sel_warn",
+                size="sm",
+                is_open=False
+            ),
+            # gt calculation warning
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
+                dbc.ModalBody("Something went wrong. Please check the formats.")],
+                id="gen_warn",
+                size="sm",
+                is_open=False
+            ),
+            # gt calculation done
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
+                dbc.ModalBody("Generation successful!")],
+                id="gen_done",
+                size="sm",
+                is_open=False
+            ),
+            # simulation warning
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
+                dbc.ModalBody("Please select and enter the right data first!")],
+                id="sim_warn",
+                size="sm",
+                is_open=False
+            ),
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
+                dbc.ModalBody("500 points limit reached! Trajectory not shown on map but still in system.")],
+                id="sim_overflow",
+                size="sm",
+                is_open=False
+            ),
+            # save drawings done
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
+                dbc.ModalBody("Saved!")],
+                id="sim_save_done",
+                size="sm",
+                is_open=False
+            ),
+            # export warning
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
+                dbc.ModalBody("Nothing to export!")],
+                id="sim_exp_warn",
+                size="sm",
+                is_open=False
+            ),
+            # export done
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
+                dbc.ModalBody("Export successful!")],
+                id="sim_exp_done",
+                size="sm",
+                is_open=False
+            ),
+            # simulate measurements - select ground truth
+            dbc.Modal(
+                [
+                    dbc.ModalHeader(dbc.ModalTitle("Simulate Measurements")),
+                    dbc.ModalBody(
+                        html.Div(
+                            [
+                                dbc.Label("Ground Truth"),
+                                dcc.Dropdown(
+                                    id="sim_gt_select",
+                                    options=[],
+                                    placeholder="Select Data",
+                                    clearable=True,
+                                    optionHeight=35,
+                                    multi=False,
+                                    searchable=True,
+                                    style={"marginBottom": "15px", "color": "black"},
+                                )
+                            ]
+                        )
+                    ),
+                    dbc.ModalFooter(
+                        dbc.Button("Simulate", color="primary", id="sim_btn")
+                    )
+                ],
+                id="sim_modal",
+                backdrop="static",
+                is_open=False,
             )
-        ],
-        id="sim_modal",
-        backdrop="static",
-        is_open=False,
+        ]
     )
-    return html.Div([ul_warn, ul_done, map_warn, display_done, gen_warn, gen_done, sel_warn, exp_warn, exp_done, sim_warn, sim_modal])
-
+    return modals
+    
 def sim_map(geojson_style):
     ### MAP
     # info panel for hcu maps
@@ -214,26 +233,40 @@ def sim_map(geojson_style):
             "width": "240px"
         }
     )
-    # unlock hcu maps button
-    btn_style1 = {
+    # save botton
+    save_style = {
         "position": "absolute",
-        "top": "325px",
+        "top": "310px",
         "left": "10px",
-        "z-index": "500",
+        "z-index": "1000",
         "backgroundColor": "white",
-        "border": "2px solid #B2AFAC",
-        "border-radius": 4,
+        "border": "2px solid #CCCCCC",
+        "border-top": "1px solid #CCCCCC",
+        "border-bottom-left-radius": 4,
+        "border-bottom-right-radius": 4,
         "width": "34px",
         "height": "34px"
     }
     # zoom botton
-    btn_style2 = {
+    focus_style = {
         "position": "absolute",
-        "top": "370px",
+        "top": "355px",
         "left": "10px",
         "z-index": "500",
         "backgroundColor": "white",
-        "border": "2px solid #B2AFAC",
+        "border": "2px solid #CCCCCC",
+        "border-radius": 4,
+        "width": "34px",
+        "height": "34px"
+    }
+    # unlock hcu maps button
+    research_style = {
+        "position": "absolute",
+        "top": "400px",
+        "left": "10px",
+        "z-index": "500",
+        "backgroundColor": "white",
+        "border": "2px solid #CCCCCC",
         "border-radius": 4,
         "width": "34px",
         "height": "34px"
@@ -247,8 +280,9 @@ def sim_map(geojson_style):
         dl.Map(
             [   
                 html.Div(id="sim_hcu_panel", children=info, style={"display": "None"}),
-                html.Button(html.Img(src="assets/images/research_sign.svg"), id="sim_hcu_maps", style=btn_style1),
-                html.Button(html.Img(src="assets/images/focus_sign2.svg", id="sim_zoom_img"), id="sim_zoom", style=btn_style2),
+                html.Button(html.Img(src="assets/images/save_sign.svg", id="sim_save_img"), id="sim_save", style=save_style),
+                html.Button(html.Img(src="assets/images/focus_sign2.svg", id="sim_zoom_img"), id="sim_zoom", style=focus_style),
+                html.Button(html.Img(src="assets/images/research_sign.svg"), id="sim_hcu_maps", style=research_style),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
                 html.Div(id="sim_div_lc", children=dl.LayersControl(id="sim_lc", children=su.floorplan2layer(geojson_style))), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
@@ -277,6 +311,19 @@ def help_canvas():
                     ],
                     className="d-flex align-items-center",
                     style={"height": "75px", "color": "silver", "background": "#4598DB", "border-radius": 10}
+                ),
+                dbc.Alert(
+                    [
+                        html.Button(html.Img(src="assets/images/download_sign.svg", style={"marginLeft": "-8px"}), id="sim_exdata", style={"marginRight": "10px", "width": "48px", "background": "transparent", "border": "0px"}),
+                        html.Div(
+                            [
+                                html.P("Not sure about the file formats?", style={"marginBottom": "0px"}),
+                                html.P("Download example data here!", style={"marginBottom": "0px"}),
+                            ]
+                        ),
+                    ],
+                    className="d-flex align-items-center",
+                    style={"height": "75px", "color": "silver", "background": "#008000", "border-radius": 10}
                 ),
                 dbc.Alert(
                     [
@@ -320,7 +367,7 @@ def help_canvas():
                     dbc.Alert(
                         [
                             html.Div(html.Img(src="assets/images/warning_sign.svg"), style={"marginRight": "10px"}),
-                            "For performance reasons, only trajectories up to 1000 points are displayed on the map.",
+                            "For performance reasons, only trajectories up to 500 points are displayed on the map.",
                         ],
                         className="d-flex align-items-center",
                         style={"height": "90px", "color": "gray", "background": "#774E06"}
@@ -519,6 +566,7 @@ def sim_layout(geojson_style):
 
     ### DOWNLOAD
     export = dcc.Download(id="sim_export")
+    example_data = dcc.Download(id="sim_exdata_dl")
 
     ### UPLOAD
     ## Buttons
@@ -713,6 +761,7 @@ def sim_layout(geojson_style):
                     storage(),
                     # download
                     export,
+                    example_data,
                     # modals
                     modals(),
                     # canvas

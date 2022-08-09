@@ -68,7 +68,10 @@ def hover_info(feature=None) -> 'html.Div':
     header = [html.H4("Space Information", style={"textAlign": "center"}), html.Hr(style={"width": "60%", "margin": "auto", "marginBottom": "10px"})]
     # while no hover...
     if not feature:
-        return header + [html.P("Select a floorplan. Hover over a segment.", style={"textAlign": "center", "fontSize": "10px"})]
+        return header + [
+                html.P("Select a floorplan.", style={"textAlign": "center", "fontSize": "13px", "marginBottom": "0px"}),
+                html.P("Hover over a segment.", style={"textAlign": "center", "fontSize": "13px", "marginBottom": "0px"})
+            ]
     # when hover...
     # creating table for properties
     table_header = [html.Thead(html.Tr([html.Th("Properties", style={"width": "90px", "color": "white"}), html.Th("Value", style={"color": "white"})]))]
@@ -129,7 +132,7 @@ def extract_coordinates(data: list) -> list:
             lat.append(pt[1])
     return [lon, lat]
 
-def time():
+def time() -> str:
     # for Hossein's time confusion
     H, M, S = datetime.now().strftime('%H'), datetime.now().strftime('%M'), datetime.now().strftime('%S')
     name = f"{int(H)+2}h-{M}min-{S}sec"
@@ -152,7 +155,7 @@ def upload_encoder(content: str) -> str:
 
     return decoded_content
 
-def sending_email():
+def sending_email() -> None:
     """
     FUNCTION
     - sends an email with all uploaded and generated data as zip files to 'cpsimulation2022@gmail.com'
@@ -160,6 +163,8 @@ def sending_email():
     RETURN
     nothing... just sending an email
     """
+    # deleting possible zip files in mail folder
+    for filename in os.listdir("assets/mail"): os.remove(f"assets/mail/{filename}")
     # creating a multipart message
     msg = MIMEMultipart()
     body_part = MIMEText("Check out the latest uploaded and calculated data!", 'plain')
@@ -169,16 +174,17 @@ def sending_email():
     # adding body to email
     msg.attach(body_part)
     # zipping all dirs if not empty
-    if len(os.listdir("assets/antennas")): st.make_archive(f"assets/zip/antennas-{time()}", 'zip', "assets/antennas")
-    if len(os.listdir("assets/groundtruth")): st.make_archive(f"assets/zip/groundtruth-{time()}", 'zip', "assets/groundtruth")
-    if len(os.listdir("assets/trajectories")): st.make_archive(f"assets/zip/trajectories-{time()}", 'zip', "assets/trajectories")
-    if len(os.listdir("assets/maps")): st.make_archive(f"assets/zip/maps-{time()}", 'zip', "assets/maps")
-    if len(os.listdir("assets/sensors/acc")) or len(os.listdir("assets/sensors/bar")) or len(os.listdir("assets/sensors/gyr")) or len(os.listdir("assets/sensors/mag")): st.make_archive(f"assets/zip/sensors-{time()}", 'zip', "assets/sensors")
-    if len(os.listdir("assets/waypoints")): st.make_archive(f"assets/zip/waypoints-{time()}", 'zip', "assets/waypoints")
+    st.make_archive(f"assets/mail/L5IN_export_{time()}", 'zip', "assets/exports")
+    if len(os.listdir("assets/antennas")): st.make_archive(f"assets/mail/antennas-{time()}", 'zip', "assets/antennas")
+    if len(os.listdir("assets/groundtruth")): st.make_archive(f"assets/mail/groundtruth-{time()}", 'zip', "assets/groundtruth")
+    if len(os.listdir("assets/trajectories")): st.make_archive(f"assets/mail/trajectories-{time()}", 'zip', "assets/trajectories")
+    if len(os.listdir("assets/maps")): st.make_archive(f"assets/mail/maps-{time()}", 'zip', "assets/maps")
+    if len(os.listdir("assets/sensors/acc")) or len(os.listdir("assets/sensors/bar")) or len(os.listdir("assets/sensors/gyr")) or len(os.listdir("assets/sensors/mag")): st.make_archive(f"assets/mail/sensors-{time()}", 'zip', "assets/sensors")
+    if len(os.listdir("assets/waypoints")): st.make_archive(f"assets/mail/waypoints-{time()}", 'zip', "assets/waypoints")
     # attaching all files 
-    for zip in os.listdir("assets/zip"):
+    for zip in os.listdir("assets/mail"):
         # open and read the file in binary
-        with open(f"assets/zip/{zip}","rb") as file:
+        with open(f"assets/mail/{zip}","rb") as file:
             # attach the file with filename to the email
             msg.attach(MIMEApplication(file.read(), Name=f'{zip}'))
     # creating SMTP object
@@ -234,6 +240,18 @@ def zoom_lvl(lon_raw: list, lat_raw: list) -> int:
     return zoom
 
 def boundaries(lon_raw: list, lat_raw: list) -> list:
+    """
+    FUNCTION
+    - calculates the to bondary points (most southwestern and
+      most northeastern point) of given shapes
+    -------
+    PARAMETER
+    lon_raw : longitude
+    lat_raw : latitude
+    -------
+    RETURN
+    bounds : boundaries (List[list])
+    """
     # making shapely points out of given coordinates
     df = gp.GeoDataFrame({"geometry": [sh.Point(lon, lat) for lon, lat in zip(lon_raw, lat_raw)]})
     # getting edge points (boundaries)
@@ -337,7 +355,7 @@ def traj2marker(quantity) -> list:
         # data
         traj = np.loadtxt(f"assets/trajectories/{csv_file}", skiprows=1)[:, 1:3]
         # displaying only trajectories with maximum 100 markers
-        if traj.shape[0] <= 1000:
+        if traj.shape[0] < 500:
             # designing icon (from https://icons8.de/icons/set/marker)
             icon = {
                 "iconUrl": f"https://img.icons8.com/emoji/344/{colors[i%len(colors)]}-circle-emoji.png",
@@ -375,7 +393,7 @@ def deleter():
     for filename in os.listdir("assets/sensors/mag"): os.remove(f"assets/sensors/mag/{filename}")
     for filename in os.listdir("assets/trajectories"): os.remove(f"assets/trajectories/{filename}")
     for filename in os.listdir("assets/waypoints"): os.remove(f"assets/waypoints/{filename}")
-    for filename in os.listdir("assets/zip"): os.remove(f"assets/zip/{filename}")
+    for filename in os.listdir("assets/mail"): os.remove(f"assets/mail/{filename}")
 
 def dummy():
     with open("assets/antennas/dummy", "w") as f: f.write("")
@@ -390,7 +408,7 @@ def dummy():
     with open("assets/sensors/mag/dummy", "w") as f: f.write("")
     with open("assets/trajectories/dummy", "w") as f: f.write("")
     with open("assets/waypoints/dummy", "w") as f: f.write("")
-    with open("assets/zip/dummy", "w") as f: f.write("")
+    with open("assets/mail/dummy", "w") as f: f.write("")
 
 
 if __name__ == "__main__":

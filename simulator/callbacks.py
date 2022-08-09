@@ -463,16 +463,67 @@ def sim_calls(app):
                 # getting zoom lvl and center point
                 lon, lat = u.from_32632_to_4326(np.loadtxt(f"assets/trajectories/sim__freq{ms_freq}_err{err}_user{num_user}.csv", skiprows=1)[:,1:3])
                 bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
+                # getting number of points -> overflow True or False
+                if len(simulation[0]) > 500: overflow = True
+                else: overflow = False
                 layers = {
                     "layers": True,
                     "quantity": 1,
                     "bounds": bounds,
+                    "overflow": overflow,
                     "date": time.time()
                 }
                 return sim_warn, layers, no_update
             except:
                 return not sim_warn, no_update, no_update
         else: return sim_warn, no_update, no_update
+
+    # save drawings =====================================================================================================================
+    @app.callback(
+        ### Outputs ###
+        # modal
+        Output("sim_save_done", "is_open"), # save done status
+        ### Inputs ###
+        # modal
+        State("sim_save_done", "is_open"),  # done
+        # leaflet drawings
+        Input("edit_control", "geojson"),
+        # button
+        Input("sim_save", "n_clicks"),      # save button click status
+    )
+    def save(
+        # modal
+        save_done,
+        # drawings
+        drawings,
+        # button
+        save_btn
+        ):
+        button = [p["prop_id"] for p in callback_context.triggered][0]
+        if "sim_save" in button:
+            if drawings["features"]: # save drawn data if so
+                su.save_drawings(drawings)
+                return not save_done # saving successful
+            return save_done # nothing to save
+        else:
+            return save_done # no button clicked
+
+    # example data =====================================================================================================================
+    @app.callback(
+        ### Outputs ###
+        # download
+        Output("sim_exdata_dl", "data"), # download data
+        ### Inputs ###
+        # button
+        Input("sim_exdata", "n_clicks"), # export button click status
+    )
+    def example_data(btn):
+        button = [p["prop_id"] for p in callback_context.triggered][0]
+        if "sim_exdata" in button:
+            download = dcc.send_file("assets/example_data.zip", filename="example_data.zip")
+            return download  # download
+        else:
+            return no_update # no button clicked
 
     # export ============================================================================================================================
     @app.callback(
@@ -488,8 +539,6 @@ def sim_calls(app):
         # modal
         State("sim_exp_done", "is_open"),     # done
         State("sim_exp_warn", "is_open"),     # warn
-        # leaflet drawings
-        Input("edit_control", "geojson"),
         # button
         Input("sim_exp_btn", "n_clicks"), # export button click status
     )
@@ -497,25 +546,21 @@ def sim_calls(app):
         # modal
         exp_done,
         exp_warn,
-        # drawings
-        drawings,
         # button
         exp_clicks
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "sim_exp_btn" in button:
-            if drawings["features"]: # save drawn data if so
-                su.export_drawings(drawings)
             if len(listdir("assets/exports/gt")) or len(listdir("assets/exports/sm")) or len(listdir("assets/exports/draw")):
                 # zipping
-                zip_folder = st.make_archive(f"assets/zip/L5IN_export_{u.time()}", 'zip', "assets/exports")
-                # sending email with all data added (if it does not exceed 25MB!)
+                zip_folder = st.make_archive(f"assets/mail/L5IN_export_{u.time()}", 'zip', "assets/exports")
+                # downloading
+                download = dcc.send_file(f"assets/mail/{zip_folder[-31:]}", filename=f"L5IN_export_{u.time()}.zip")
+                # sending email with all data added
                 try: u.sending_email()
                 except: pass
-                # downloading
-                download = dcc.send_file(f"assets/zip/{zip_folder[-31:]}", filename=f"L5IN_export_{u.time()}.zip")
                 return not exp_done, exp_warn, download, no_update # export successful
-            return exp_done, not exp_warn, no_update, no_update # export failed
+            return exp_done, not exp_warn, no_update, no_update # nothing to export
         else:
             return exp_done, exp_warn, no_update, no_update # no button clicked
     
