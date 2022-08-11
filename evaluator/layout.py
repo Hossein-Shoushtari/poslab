@@ -143,7 +143,12 @@ def modals():
                             "doubleClick": False,    # "reset", "autosize" or "reset+autosize", False
                             "showTips": True,        # True, False
                             "displayModeBar": True,  # True, False, "hover"
-                            "watermark": True
+                            "watermark": True,
+                            "toImageButtonOptions": {
+                                "format": "png",      # one of png, svg, jpeg, webp
+                                "filename": "cdf_plot",
+                                "scale": 1              # multiply title/legend/axis/canvas sizes by this factor
+                            }
                             },
                             id="graph",
                             className="six columns")

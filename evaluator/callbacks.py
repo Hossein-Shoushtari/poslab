@@ -512,7 +512,7 @@ def eval_calls(app):
             "editable": True,
             "toImageButtonOptions": {
                 "format": _format,      # one of png, svg, jpeg, webp
-                "filename": "my_plot",
+                "filename": "map_plot",
                 "height": 1000,
                 "width": 2000,
                 "scale": 1              # multiply title/legend/axis/canvas sizes by this factor
