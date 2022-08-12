@@ -385,14 +385,43 @@ def eval_calls(app):
         Input("vis_ant_select", "value"),
         Input("vis_bg_select", "value"),
         Input("vis_format_select", "value"),
+        Input("vis_map", "figure")
     )
-    def update_fig(_map, refs, gts, trajs, ant, bg, _format):
+    def update_fig(_map, refs, gts, trajs, ant, bg, _format, FIG):
+        # refreshing configurations
+        trigger = [p["prop_id"] for p in callback_context.triggered][0]
+        if "vis_format_select" in trigger:
+            if not _format: _format = "png"
+            config={
+                "staticPlot": False,        # True, False
+                "scrollZoom": True,         # True, False
+                "showTips": True,           # True, False
+                "displayModeBar": "hover",  # True, False, "hover"
+                "watermark": True,
+                "editable": True,
+                "toImageButtonOptions": {
+                    "format": _format,      # one of png, svg, jpeg, webp
+                    "filename": "map_plot",
+                    "height": 1000,
+                    "width": 2000,
+                    "scale": 1              # multiply title/legend/axis/canvas sizes by this factor
+                },
+                "modeBarButtonsToAdd": [
+                    "drawline",
+                    "drawopenpath",
+                    "drawclosedpath",
+                    "drawcircle",
+                    "drawrect",
+                    "eraseshape"
+                ]
+            }
+            return FIG, config, no_update
+        # building figures 
         fig = go.Figure(go.Scattermapbox())
         layers = []
         zoom = 1
         center = (0, 0)
         if not bg: bg = "white-bg"
-        if not _format: _format = "png"
         if _map:
             # creating one dummy line for legend
             fig.add_trace(go.Scattermapbox(
@@ -502,31 +531,7 @@ def eval_calls(app):
             },
             showlegend=True
         )
-        # refreshing configurations
-        config={
-            "staticPlot": False,        # True, False
-            "scrollZoom": True,         # True, False
-            "showTips": True,           # True, False
-            "displayModeBar": "hover",  # True, False, "hover"
-            "watermark": True,
-            "editable": True,
-            "toImageButtonOptions": {
-                "format": _format,      # one of png, svg, jpeg, webp
-                "filename": "map_plot",
-                "height": 1000,
-                "width": 2000,
-                "scale": 1              # multiply title/legend/axis/canvas sizes by this factor
-            },
-            "modeBarButtonsToAdd": [
-                "drawline",
-                "drawopenpath",
-                "drawclosedpath",
-                "drawcircle",
-                "drawrect",
-                "eraseshape"
-            ]
-        }
-        return fig, config, no_update
+        return fig, no_update, no_update
 
     # example data =====================================================================================================================
     @app.callback(

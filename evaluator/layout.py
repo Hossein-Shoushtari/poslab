@@ -398,6 +398,29 @@ def visual_modal():
                 ),
                 dcc.Graph(
                     id="vis_map",
+                    config={
+                        "staticPlot": False,        # True, False
+                        "scrollZoom": True,         # True, False
+                        "showTips": True,           # True, False
+                        "displayModeBar": "hover",  # True, False, "hover"
+                        "watermark": True,
+                        "editable": True,
+                        "toImageButtonOptions": {
+                            "format": "png",      # one of png, svg, jpeg, webp
+                            "filename": "map_plot",
+                            "height": 1000,
+                            "width": 2000,
+                            "scale": 1              # multiply title/legend/axis/canvas sizes by this factor
+                        },
+                        "modeBarButtonsToAdd": [
+                            "drawline",
+                            "drawopenpath",
+                            "drawclosedpath",
+                            "drawcircle",
+                            "drawrect",
+                            "eraseshape"
+                        ]
+                    },
                     className="six columns",
                     style={"height": "660px"})
             ]),
