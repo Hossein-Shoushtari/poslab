@@ -171,12 +171,14 @@ def map_display(app, geojson_style):
         # maps ------------------------------------------------------------------------------
         if "sim_map_layers" in trigger:
             maps = u.map2layer(sim_map_layers["quantity"], geojson_style)
+            layers += maps
             sim_layers += maps
             eval_layers += maps
             ly_style = {"display": "block"}
             return not display_done, display_done, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
         elif "eval_map_layers" in trigger:
             maps = u.map2layer(eval_map_layers["quantity"], geojson_style)
+            layers += maps
             sim_layers += maps
             eval_layers += maps
             ly_style = {"display": "block"}
