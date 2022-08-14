@@ -63,7 +63,7 @@ def map_display(app, geojson_style):
         ### OUTPUTS ###
         # modal #
         Output("display_done", "is_open"),
-        Output("sim_overflow", "is_open"),
+        Output("overflow", "is_open"),
         # loading status #
         Output("map_spin", "children"),
         # layers #
@@ -80,7 +80,7 @@ def map_display(app, geojson_style):
         Output("eval_hcu_panel", "style"),  # hcu info panel
         ### INPUTS ###
         State("display_done", "is_open"),   # modal
-        State("sim_overflow", "is_open"),   # modal
+        State("overflow", "is_open"),   # modal
         Input("unlocked", "data"),          # unlocked status hcu maps
         Input("layers", "data"),
         ## simulator ##
@@ -100,7 +100,7 @@ def map_display(app, geojson_style):
     def display(
         ## modal
         display_done,
-        sim_overflow,
+        overflow,
         ## HCU
         unlocked,
         ## layers
@@ -151,7 +151,7 @@ def map_display(app, geojson_style):
         ## regain focus ##
         # focus
         if "sim_zoom" in trigger or "eval_zoom" in trigger:
-            return display_done, display_done, no_update, no_update, no_update, no_update, bounds, no_update, no_update, no_update, bounds, no_update
+            return display_done, overflow, no_update, no_update, no_update, no_update, bounds, no_update, no_update, no_update, bounds, no_update
         # ============================================================================================================================================================== #
         # getting all different layers
         sim_layers = []
@@ -175,14 +175,14 @@ def map_display(app, geojson_style):
             sim_layers += maps
             eval_layers += maps
             ly_style = {"display": "block"}
-            return not display_done, display_done, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
+            return not display_done, overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
         elif "eval_map_layers" in trigger:
             maps = u.map2layer(eval_map_layers["quantity"], geojson_style)
             layers += maps
             sim_layers += maps
             eval_layers += maps
             ly_style = {"display": "block"}
-            return not display_done, display_done, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
+            return not display_done, overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
         # antennas --------------------------------------------------------------------------
         elif "sim_ant_layers" in trigger:
             ants = su.ant2marker()
@@ -190,7 +190,7 @@ def map_display(app, geojson_style):
             sim_layers.append(ants)
             eval_layers.append(ants)
             ly_style = {"display": "block"}
-            return not display_done, display_done, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
+            return not display_done, overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
         # waypoints -------------------------------------------------------------------------
         elif "sim_ref_layers" in trigger :
             to_remove = {"status": False, "index": None}
@@ -206,7 +206,7 @@ def map_display(app, geojson_style):
             sim_layers.append(refs)
             eval_layers.append(refs)
             ly_style = {"display": "block"}
-            return display_done, display_done, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
+            return display_done, overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
         # ground truth ----------------------------------------------------------------------
         elif "sim_gt_layers" in trigger:
             gts = u.gt2marker(sim_gt_layers["quantity"])
@@ -214,14 +214,14 @@ def map_display(app, geojson_style):
             sim_layers += gts
             eval_layers += gts
             ly_style = {"display": "block"}
-            return not display_done, display_done, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
+            return not display_done, overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
         elif "eval_gt_layers" in trigger:
             gts = u.gt2marker(eval_gt_layers["quantity"])
             layers += gts
             sim_layers += gts
             eval_layers += gts
             ly_style = {"display": "block"}
-            return not display_done, display_done, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
+            return not display_done, overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
         # trajectories ----------------------------------------------------------------------
         elif "sim_traj_layers" in trigger:
             trajs = u.traj2marker(sim_traj_layers["quantity"])
@@ -230,14 +230,17 @@ def map_display(app, geojson_style):
             eval_layers += trajs
             ly_style = {"display": "block"}
             if sim_traj_layers["overflow"] == True: # more than 500 points
-                return display_done, not display_done, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
+                return display_done, not overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
             if sim_traj_layers["overflow"] == False: # less than 500 points
-                return not display_done, display_done, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
+                return not display_done, overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
         elif "eval_traj_layers" in trigger:
             trajs = u.traj2marker(eval_traj_layers["quantity"])
             layers += trajs
             sim_layers += trajs
             eval_layers += trajs
             ly_style = {"display": "block"}
-            return not display_done, display_done, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
-        else: return display_done, display_done, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
+            if eval_traj_layers["overflow"] == True: # more than 500 points
+                return display_done, not overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
+            if eval_traj_layers["overflow"] == False: # less than 500 points
+                return not display_done, overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
+        else: return display_done, overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style

@@ -149,13 +149,6 @@ def modals():
                 size="sm",
                 is_open=False
             ),
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
-                dbc.ModalBody("500 points limit reached! Trajectory not shown on map but still in system.")],
-                id="sim_overflow",
-                size="sm",
-                is_open=False
-            ),
             # save drawings done
             dbc.Modal([
                 dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),

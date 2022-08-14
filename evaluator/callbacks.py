@@ -151,10 +151,14 @@ def eval_calls(app):
             # getting zoom lvl and center point
             lon, lat = u.from_32632_to_4326(np.loadtxt(f"assets/trajectories/{tra_filenames[i]}", skiprows=1)[:,1:3])
             bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
+            # getting number of points -> overflow True or False
+            if len(lon) > 500: overflow = True
+            else: overflow = False
             layers = {
                 "layers": True,
                 "quantity": i+1,
                 "bounds": bounds,
+                "overflow": overflow,
                 "date": time.time()
             }
             # if everything went fine ...

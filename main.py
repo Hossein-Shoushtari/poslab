@@ -57,6 +57,14 @@ app.layout = html.Div(
             size="sm",
             is_open=False
         ),
+        # trajectory 500 points limit reached
+        dbc.Modal([
+            dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
+            dbc.ModalBody("500 points limit reached! Trajectory not shown on map but still in system.")],
+            id="overflow",
+            size="sm",
+            is_open=False
+        ),
         # unlock hcu maps
         dbc.Modal(
             [
