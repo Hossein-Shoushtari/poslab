@@ -112,7 +112,7 @@ def normCDF(gt: "ndarray", traj: "ndarray") -> "ndarray":
     xy = xy[xy[:, 0].argsort()]
     return xy
 
-def histoCDF(gt: "ndarray", traj: "ndarray") -> list:
+def histoCDF(gt: "ndarray", traj: "ndarray") -> "ndarray":
     # # data
     gt_x = gt[:,0]
     gt_y = gt[:,1]

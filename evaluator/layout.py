@@ -1,5 +1,7 @@
 ##### Evaluator Tab -- Layout
 ###IMPORTS
+# built in
+import datetime
 # dash
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
@@ -321,7 +323,7 @@ def visual_modal():
                                 style={"marginBottom": "7px", "color": "black"})
                         ]),
                         dbc.Col([
-                            dbc.Label("Format [2000x1000]", style={"color": "silver"}),
+                            dbc.Label("Format [2kx1k]", style={"color": "silver"}),
                             dcc.Dropdown(
                                 id="vis_format_select",
                                 options=[{"label": f, "value": f} for f in ["png", "svg", "jpeg", "webp"]],
@@ -424,7 +426,7 @@ def visual_modal():
                     className="six columns",
                     style={"height": "660px"})
             ]),
-            dbc.ModalFooter(html.Div("Copyright © 2022 Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center", "width": "100%"}))
+            dbc.ModalFooter(html.Div(f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center", "width": "100%"}))
         ],
         id="visual_show",
         fullscreen=True,
@@ -476,7 +478,7 @@ def help_canvas():
                     # info upload
                     html.H5("UPLOAD", style={"text-align": "center", "color": "#3B5A7F"}),
                     html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
-                    html.P("All buttons are for uploading the data required for the simulation. Each file needs the first line as the header. The delimiter is a single space.", style={"color": "gray"}),
+                    html.P("All buttons are for uploading the data required for evaluation. Each file needs the first line as a header. The delimiter is a single space.", style={"color": "gray"}),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Maps", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
                         dbc.Col(html.P("optional; GeoJSON (any CRS)", style={"color": "gray"}))
@@ -760,7 +762,7 @@ def eval_layout(geojson_style):
                     tooltips()
                 ]
             ),
-            dbc.CardFooter("Copyright © 2022 Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})
+            dbc.CardFooter(f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})
         ]
     )
 

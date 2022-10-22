@@ -86,9 +86,6 @@ def compute_steps(acce_datas):
         if step_criterion == 2:
             if (acce_binarys[-1] == -1) and ((acce_binarys[-2] == 1) or (acce_binarys[-2] == 0)):
                 step_flag = True
-        # elif step_criterion == 3:
-        #     if (acce_binarys[-1] == -1) and (acce_binarys[-2] == 0) and (np.sum(acce_binarys[:-2]) > 1):
-        #         step_flag = True
         else:
             if (acce_binarys[-1] == 0) and acce_binarys[-2] == -1:
                 if (state_flag == 1) and ((acce_data[0] - acce_min[0]) > interval_threshold):
@@ -107,8 +104,6 @@ def compute_steps(acce_datas):
 
     return step_timestamps, step_indexs, step_acce_max_mins
 
-def step_counter():
-    print('The number of stesps is:' ,  len(step_timestamps))
 
 def compute_stride_length(step_acce_max_mins):
     K = 0.4

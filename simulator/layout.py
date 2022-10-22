@@ -1,5 +1,7 @@
 ##### Simulator Tab -- Layout
 ###IMPORTS
+# built in
+import datetime
 # dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc
@@ -335,7 +337,7 @@ def help_canvas():
                     # info upload
                     html.H5("UPLOAD", style={"text-align": "center", "color": "#3B5A7F"}),
                     html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
-                    html.P("All buttons are for uploading the data required for the simulation. Each file needs the first line as the header. The delimiter is a single space.", style={"color": "gray"}),
+                    html.P("All buttons are for uploading the data required for simulation. Each file needs the first line as a header. The delimiter is a single space.", style={"color": "gray"}),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Maps", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
                         dbc.Col(html.P("optional; GeoJSON (any CRS)", style={"color": "gray"}))
@@ -415,10 +417,10 @@ def gt_canvas():
                     html.Div(html.Img(src="assets/images/list_sign.svg"), style={"marginRight": "30px"}),
                     html.Div(
                         [
-                            html.P("select all data needed", style={"marginBottom": "0px"}),
-                            html.P("show waypoints on the map", style={"marginBottom": "0px"}),
-                            html.P("select required waypoints", style={"marginBottom": "0px"}),
-                            html.P("generate ground truth", style={"marginBottom": "0px"}),
+                            html.P("Select all data needed", style={"marginBottom": "0px"}),
+                            html.P("Show waypoints on the map", style={"marginBottom": "0px"}),
+                            html.P("Select required waypoints", style={"marginBottom": "0px"}),
+                            html.P("Generate ground truth", style={"marginBottom": "0px"}),
                         ]
                     ),
                 ],
@@ -775,7 +777,7 @@ def sim_layout(geojson_style):
                     tooltips()
                 ]
             ),
-            dbc.CardFooter("Copyright © 2022 Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})
+            dbc.CardFooter(f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})
         ]
     )
 
