@@ -15,11 +15,11 @@ def home_layout():
 
                 html.Br(),
 
-                html.Div(html.Iframe(
-                    src="https://www.youtube.com/embed/w7jk_1mhPY0",
-                    width="842",
-                    height="475" 
-                ), style={"textAlign": "center"}),
+                # html.Div(html.Iframe(
+                #     src="https://www.youtube.com/embed/w7jk_1mhPY0",
+                #     width="842",
+                #     height="475" 
+                # ), style={"textAlign": "center"}),
 
                 html.Br(),
 
@@ -80,19 +80,19 @@ def home_layout():
                             "border-bottom": "3px solid silver"
                         }),
                     style={"text-align": "center"}),
+                html.H5("Responsible for the project", style={"color": "silver", "text-align": "center"}),
                 dbc.Row(
                     [
                         dbc.Col([
-                            html.H5("Responsible for the project:", style={"color": "silver"}),
-
                             html.P(html.B("Prof. Dr. Jörg Müller-Litzkow", style={"color": "silver", "marginTop": "5px"})),
                             html.P("President of HafenCity University Hamburg (HCU) and University Professor for Economics and Digitalization",
                                 style={"line-height": "110%", "color": "silver", "marginTop": "-18px"}),
                             html.P(
                                 html.A("praesident@vw.hcu-hamburg.de", href="mailto: praesident@vw.hcu-hamburg.de", style={"color": "silver"}),
                                 style={"color": "silver", "marginTop": "-18px"}
-                            ),
-
+                            )
+                        ], width=3, style={"height": "136px", "width": "337px"}),
+                        dbc.Col([
                             html.P(html.B("Prof. Dr. Harald Sternberg", style={"color": "silver", "marginTop": "-12px"})),
                             html.P("""Vice President for Teaching and Digitalization of HafenCity University Hamburg (HCU)
                                 and University Professor for Hydrography and Engineering Geodesy""",
@@ -100,43 +100,54 @@ def home_layout():
                             html.P(
                                 html.A("harald.sternberg@hcu-hamburg.de", href="mailto: harald.sternberg@hcu-hamburg.de", style={"color": "silver"}),
                                 style={"color": "silver", "marginTop": "-18px"}
-                            ),
-
+                            )
+                        ], width=3, style={"height": "136px", "width": "337px"}),
+                        dbc.Col([
                             html.P(html.B("Nils Hellweg", style={"color": "silver", "marginTop": "-12px"})),
                             html.P("""Project Manager and PhD Student at HafenCity University Hamburg (HCU)""",
                                 style={"line-height": "110%", "color": "silver", "marginTop": "-18px"}),
                             html.P(
                                 html.A("nils.hellweg@hcu-hamburg.de", href="mailto: nils.hellweg@hcu-hamburg.de", style={"color": "silver"}),
                                 style={"color": "silver", "marginTop": "-18px"}
-                            ),
-                        ], width=3),
+                            )
+                        ], width=3, style={"height": "136px", "width": "337px"})
+                    ], justify="center"
+                ),
+                html.H5("Positioning contact persons", style={"color": "silver", "text-align": "center"}),
+                dbc.Row(
+                    [
                         dbc.Col([
-                            html.H5("Positioning contact persons:", style={"color": "silver"}),
-
                             html.P(html.B("Hossein Shoushtari", style={"color": "silver", "marginTop": "5px"})),
                             html.P("Research assistant and PhD Student at HafenCity University Hamburg (HCU)",
                                 style={"line-height": "110%", "color": "silver", "marginTop": "-18px"}),
                             html.P(
                                 html.A("hossein.shoushtari@hcu-hamburg.de", href="mailto: hossein.shoushtari@hcu-hamburg.de", style={"color": "silver"}),
                                 style={"color": "silver", "marginTop": "-18px"}
-                            ),
-
+                            )
+                        ], width=3, style={"height": "101px", "width": "337px"}),
+                        dbc.Col([
                             html.P(html.B("Dorian Harder", style={"color": "silver", "marginTop": "-12px"})),
                             html.P("Research assistant at HafenCity University Hamburg (HCU)",
                                 style={"line-height": "110%", "color": "silver", "marginTop": "-18px"}),
                             html.P(
                                 html.A("dorian.harder@hcu-hamburg.de", href="mailto: dorian.harder@hcu-hamburg.de", style={"color": "silver"}),
                                 style={"color": "silver", "marginTop": "-18px"}
-                            ),
-
+                            )
+                        ], width=3, style={"height": "101px", "width": "337px"})
+                    ], justify="center"
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col([
                             html.P(html.B("Georg Fjodorow", style={"color": "silver", "marginTop": "-12px"})),
                             html.P("Master Student at HafenCity University Hamburg (HCU)",
                                 style={"line-height": "110%", "color": "silver", "marginTop": "-18px"}),
                             html.P(
                                 html.A("georg.fjodorow@hcu-hamburg.de", href="mailto: georg.fjodorow@hcu-hamburg.de", style={"color": "silver"}),
                                 style={"color": "silver", "marginTop": "-18px"}
-                            ),
-                                
+                            )
+                        ], width=3, style={"height": "101px", "width": "337px"}),
+                        dbc.Col([  
                             html.P(html.B("Korvin Venzke", style={"color": "silver", "marginTop": "-12px"})),
                             html.P("Bachelor Student at HafenCity University Hamburg (HCU)",
                                 style={"line-height": "110%", "color": "silver", "marginTop": "-18px"}),
@@ -144,8 +155,9 @@ def home_layout():
                                 html.A("korvin.venzke@hcu-hamburg.de", href="mailto: korvin.venzke@hcu-hamburg.de", style={"color": "silver"}),
                                 style={"color": "silver", "marginTop": "-18px"}
                             ),
-                        ], width=3)
-                    ], justify="center")
+                        ], width=3, style={"height": "101px", "width": "337px"})
+                    ], justify="center"
+                )
             ]),
         dbc.CardFooter(f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})
     ])
