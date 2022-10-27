@@ -87,12 +87,12 @@ def publications():
                 # slide show
                 dbc.Col([
                     dbc.Carousel(
-                        items=list(reversed([
+                        items=[
                             {
                                 "src": f"assets/images/papers/{paper}.png"
                             } 
                             for paper in papers_list
-                        ])),
+                        ],
                         variant="dark",
                         style={"width": "500px", "margin-left": "2px"},
                         id="paper_carousel"
