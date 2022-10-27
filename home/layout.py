@@ -68,6 +68,7 @@ def about():
     return about
 
 def publications():
+    papers_list = ["2022_9_5_IPIN2022", "2022_4_25_sensors", "2021_4_1_mobility", "2021_2_9_remotesensing", "2021_2_5_electronics"]
     publications = html.Div([
         html.Div(
             html.H4("Publications",
@@ -88,9 +89,9 @@ def publications():
                     dbc.Carousel(
                         items=list(reversed([
                             {
-                                "src": f"assets/images/papers/{file}"
+                                "src": f"assets/images/papers/{paper}.png"
                             } 
-                            for file in os.listdir("assets/images/papers")
+                            for paper in papers_list
                         ])),
                         variant="dark",
                         style={"width": "500px", "margin-left": "2px"},

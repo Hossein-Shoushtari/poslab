@@ -1,9 +1,7 @@
 ##### Callbacks Home
 #### IMPORTS
 # dash
-from dash import html, Output, Input, State, no_update, callback_context
-# built in
-import os
+from dash import Output, Input, no_update, callback_context
 
 
 
