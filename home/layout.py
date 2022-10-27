@@ -93,10 +93,10 @@ def publications():
                             for file in os.listdir("assets/images/papers")
                         ])),
                         variant="dark",
-                        style={"width": "500px"},
+                        style={"width": "500px", "margin-left": "2px"},
                         id="paper_carousel"
                     )
-                ], width=2, style={"margin-left": "5px", "width": "500px", "padding-right": "20px", "margin-top": "5px"}),
+                ], width=2, style={"width": "506px", "margin-top": "5px", "margin-bottom": "11px", "padding-left": "0px"}),
                 # papers
                 dbc.Col([
                     dbc.Alert(
@@ -104,7 +104,7 @@ def publications():
                             html.Div(
                                 html.A(
                                     target="_blank",
-                                    href="https://www.researchgate.net/profile/Hossein-Shoushtari/publication/362134877_L5IN_From_an_Analytical_Platform_to_Optimization_of_Deep_Inertial_Odometry/links/62d8214611afc23ee4cf9c68/L5IN-From-an-Analytical-Platform-to-Optimization-of-Deep-Inertial-Odometry.pdf",
+                                    href="https://www.researchgate.net/publication/362134877_L5IN_From_an_Analytical_Platform_to_Optimization_of_Deep_Inertial_Odometry",
                                     children=html.Button(
                                         html.Img(
                                             src="assets/images/signs/pdf_sign2.svg",
@@ -126,7 +126,7 @@ def publications():
                         ],
                         id="2022_9_5_IPIN2022_paper",
                         className="d-flex align-items-center",
-                        style={"padding": "0px", "color": "white", "margin-left": "5px", "height": "110px", "width": "500px", "background-color": "#737373", "border-left": "4px solid white", "border-radius": 0}
+                        style={"padding": "0px", "color": "white", "height": "110px", "width": "500px", "background-color": "#737373", "border-left": "4px solid white", "border-radius": 0, "margin-left": "-10px"}
                     ),
                     dbc.Alert(
                         [
@@ -155,14 +155,14 @@ def publications():
                         ],
                         id="2022_4_25_sensors_paper",
                         className="d-flex align-items-center",
-                        style={"padding": "0px", "color": "silver", "margin-left": "5px", "height": "110px", "width": "500px", "background-color": "#545454", "border-left": "4px solid silver", "border-radius": 0}
+                        style={"padding": "0px", "color": "silver", "height": "110px", "width": "500px", "background-color": "#545454", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                     ),
                     dbc.Alert(
                         [
                             html.Div(
                                 html.A(
                                     target="_blank",
-                                    href="https://www.researchgate.net/profile/Vladeta-Stojanovic/publication/351234064_A_Conceptual_Digital_Twin_for_5G_Indoor_Navigation/links/608c44ab92851c490fa9dd69/A-Conceptual-Digital-Twin-for-5G-Indoor-Navigation.pdf", 
+                                    href="https://www.researchgate.net/publication/351234064_A_Conceptual_Digital_Twin_for_5G_Indoor_Navigation", 
                                     children=html.Button(
                                         html.Img(
                                             src="assets/images/signs/pdf_sign1.svg",
@@ -184,7 +184,7 @@ def publications():
                         ],
                         id="2021_4_1_mobility_paper",
                         className="d-flex align-items-center",
-                        style={"padding": "0px", "color": "silver", "margin-left": "5px", "height": "110px", "width": "500px", "background-color": "#545454", "border-left": "4px solid silver", "border-radius": 0}
+                        style={"padding": "0px", "color": "silver", "height": "110px", "width": "500px", "background-color": "#545454", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                     ),
                     dbc.Alert(
                         [
@@ -213,7 +213,7 @@ def publications():
                         ],
                         id="2021_2_9_remotesensing_paper",
                         className="d-flex align-items-center",
-                        style={"padding": "0px", "color": "silver", "margin-left": "5px", "height": "110px", "width": "500px", "background-color": "#545454", "border-left": "4px solid silver", "border-radius": 0}
+                        style={"padding": "0px", "color": "silver", "height": "110px", "width": "500px", "background-color": "#545454", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                     ),
                     dbc.Alert(
                         [
@@ -242,9 +242,9 @@ def publications():
                         ],
                         id="2021_2_5_electronics_paper",
                         className="d-flex align-items-center",
-                        style={"padding": "0px", "color": "silver", "margin-left": "5px", "height": "110px", "width": "500px", "background-color": "#545454", "border-left": "4px solid silver", "border-radius": 0}
+                        style={"padding": "0px", "color": "silver", "height": "110px", "width": "500px", "background-color": "#545454", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                     )
-                ], width=2, style={"width": "500px", "padding-left": "20px", "margin-top": "5px"})
+                ], width=2, style={"width": "506px", "margin-top": "5px", "margin-bottom": "11px"})
             ], justify="center"
         ),
     ])
