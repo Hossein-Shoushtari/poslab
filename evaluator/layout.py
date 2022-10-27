@@ -1,7 +1,5 @@
 ##### Evaluator Tab -- Layout
 ###IMPORTS
-# built in
-import datetime
 # dash
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
@@ -10,6 +8,8 @@ import dash_leaflet as dl
 # utils (general & evaluator)
 import evaluator.utils as eu
 import utils as u
+# built in
+import datetime
 
 def storage():
     ### STORAGE
@@ -96,7 +96,7 @@ def modals():
         [
             # upload warning
             dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/error_sign.svg"))),
                 dbc.ModalBody("Wrong file format! Upload denied.")],
                 id="eval_ul_warn",
                 size="sm",
@@ -104,7 +104,7 @@ def modals():
             ),
             # upload done
             dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/done_sign.svg"))),
                 dbc.ModalBody("Upload successful!")],
                 id="eval_ul_done",
                 size="sm",
@@ -112,7 +112,7 @@ def modals():
             ),
             # map warning
             dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/error_sign.svg"))),
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/error_sign.svg"))),
                 dbc.ModalBody("Wrong file format! Upload denied.")],
                 id="eval_map_warn",
                 size="sm",
@@ -120,7 +120,7 @@ def modals():
             ),
             # map display done
             dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/done_sign.svg"))),
                 dbc.ModalBody("Successful!")],
                 id="eval_display",
                 size="sm",
@@ -128,7 +128,7 @@ def modals():
             ),
             # cdf warning
             dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/caution_sign.svg"))),
                 dbc.ModalBody("Please select data first!")],
                 id="cdf_warn",
                 size="sm",
@@ -165,7 +165,7 @@ def modals():
             visual_modal(),
             # export warning
             dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/caution_sign.svg"))),
                 dbc.ModalBody("Nothing to export!")],
                 id="eval_exp_warn",
                 size="sm",
@@ -173,7 +173,7 @@ def modals():
             ),
             # export done
             dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
+                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/done_sign.svg"))),
                 dbc.ModalBody("Export successful!")],
                 id="eval_exp_done",
                 size="sm",
@@ -236,8 +236,8 @@ def eval_map(geojson_style):
         dl.Map(
             [   
                 html.Div(id="eval_hcu_panel", children=info, style={"display": "None"}),
-                html.Button(html.Img(src="assets/images/focus_sign2.svg", id="eval_zoom_img"), id="eval_zoom", style=focus_style),
-                html.Button(html.Img(src="assets/images/research_sign.svg"), id="eval_hcu_maps", style=research_style),
+                html.Button(html.Img(src="assets/images/signs/focus_sign2.svg", id="eval_zoom_img"), id="eval_zoom", style=focus_style),
+                html.Button(html.Img(src="assets/images/signs/research_sign.svg"), id="eval_hcu_maps", style=research_style),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
                 html.Div(id="eval_div_lc", children=dl.LayersControl(id="eval_lc", children=eu.floorplan2layer(geojson_style)), style={"display": "None"}), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
@@ -442,7 +442,7 @@ def help_canvas():
             [
                 dbc.Alert(
                     [
-                        html.Div(html.Img(src="assets/images/focus_sign1.svg"), style={"marginRight": "10px"}),
+                        html.Div(html.Img(src="assets/images/signs/focus_sign1.svg"), style={"marginRight": "10px"}),
                         "Use the focus tool on the map to restore the last view!"
                     ],
                     className="d-flex align-items-center",
@@ -450,7 +450,7 @@ def help_canvas():
                 ),
                 dbc.Alert(
                     [
-                        html.Button(html.Img(src="assets/images/download_sign.svg", style={"marginLeft": "-8px"}), id="eval_exdata", style={"marginRight": "10px", "width": "48px", "background": "transparent", "border": "0px"}),
+                        html.Button(html.Img(src="assets/images/signs/download_sign.svg", style={"marginLeft": "-8px"}), id="eval_exdata", style={"marginRight": "10px", "width": "48px", "background": "transparent", "border": "0px"}),
                         html.Div(
                             [
                                 html.P("Not sure about the file formats?", style={"marginBottom": "0px"}),
@@ -463,7 +463,7 @@ def help_canvas():
                 ),
                 dbc.Alert(
                     [
-                        html.Div(html.Img(src="assets/images/bug_sign.svg"), style={"marginRight": "10px"}),
+                        html.Div(html.Img(src="assets/images/signs/bug_sign.svg"), style={"marginRight": "10px"}),
                         html.Div(
                             [
                                 html.P("Are the layer names mixed up?", style={"marginBottom": "0px"}),

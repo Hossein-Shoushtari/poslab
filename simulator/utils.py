@@ -9,7 +9,6 @@ from dash import html
 # built in
 from datetime import datetime
 import numpy as np
-import os
 # installed
 import shapely.geometry as sh
 import geopandas as gp

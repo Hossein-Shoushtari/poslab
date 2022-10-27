@@ -4,6 +4,7 @@ from dash_extensions.javascript import assign
 import dash_bootstrap_components as dbc
 from dash import Dash, dcc, html
 # home
+from home.callbacks import home_calls
 from home.layout import home_layout
 # simulator
 from simulator.callbacks import sim_calls
@@ -29,7 +30,7 @@ ex_ss = [dbc.themes.DARKLY]
 app = Dash(__name__, external_stylesheets=ex_ss)
 server = app.server
 # title
-app.title = "L5IN+"
+app.title = "L5IN⁺"
 # favicon
 #app._favicon = "favicon.ico"
 
@@ -131,6 +132,7 @@ app.layout = html.Div(
 )
 
 ### CALLBACKS ###
+home_calls(app)
 sim_calls(app)
 eval_calls(app)
 map_display(app, geojson_style)
