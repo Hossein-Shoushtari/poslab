@@ -20,13 +20,13 @@ def tooltips():
 
 def header():
     header = html.Div([
-        html.H2(["L5IN", html.Sup("+"), ": Level 5 Indoor Navigation"], style={"color": "white", "text-align": "center"}),
+        html.H2(["L5IN", html.Sup("+"), ": Level 5 Indoor-Navigation Plus"], style={"color": "white", "text-align": "center"}),
         html.Br(),
-        # html.Div(html.Iframe(
-        #     src="https://www.youtube.com/embed/w7jk_1mhPY0",
-        #     width="842",
-        #     height="475" 
-        # ), style={"textAlign": "center"}),
+        html.Div(html.Iframe(
+            src="https://www.youtube.com/embed/ABc6WXrFHIs",
+            width="900px",
+            height="508px" 
+        ), style={"textAlign": "center"}),
     ])
     return header
 
@@ -45,7 +45,7 @@ def about():
         style={"text-align": "center"}
         ),
         html.Div(
-            html.P("""This is a tool developed by Level 5 Indoor Navigation (L5IN) project with positioning focus.
+            html.P("""This is a tool developed by Level 5 Indoor-Navigation (L5IN) project with positioning focus.
                 The L5IN project deals with real-time navigation inside buildings, using 5G and smartphone sensors.
                 The project demonstrates the feasibility of the transition from outdoor to indoor environment in
                 terms of navigation. The aim of the L5IN project is to use newly introduced 5G technology to demonstrate,
@@ -54,7 +54,7 @@ def about():
                 existing smartphone systems and 5G as a ubiquitous alternative for the GNSS solutions in the context
                 of indoor navigation.""",
                 style={"color": "silver", "font-size": "16px", "padding-left": "10px", "padding-right": "10px"}),
-            style={"width": "90%", "margin": "auto"}
+            style={"width": "80%", "margin": "auto"}
         ),
         html.Div(
             html.P("""The positioning work package is one of the L5IN research areas. Autonomous pedestrian localization would make
@@ -62,13 +62,20 @@ def about():
                 at L5IN and focuses on the approaches and methods such as Monte Carlo Simulation, state estimation filters, machine learning,
                 deep learning and 5G positioning to develop a practice-oriented solution.""",
                 style={"color": "silver", "width": "100%", "font-size": "16px", "padding-left": "10px", "padding-right": "10px"}),
-            style={"width": "90%", "margin": "auto"}
+            style={"width": "80%", "margin": "auto"}
+        ),
+        html.Br(),
+        html.Div(
+            html.Img(
+                src="assets/images/L5INp_Workflow.png",
+                style={"width": "850px"}),
+            style={"textAlign": "center"}
         ),
     ])
     return about
 
 def publications():
-    papers_list = ["2022_9_5_IPIN2022", "2022_4_25_sensors", "2021_4_1_mobility", "2021_2_9_remotesensing", "2021_2_5_electronics"]
+    papers_list = ["2022_9_5_IPIN2022", "2022_4_25_sensors", "2021_2_5_electronics"] 
     publications = html.Div([
         html.Div(
             html.H4("Publications",
@@ -116,11 +123,11 @@ def publications():
                                 ),
                                 style={"width": "44px"}
                             ),
-                            html.Button(
+                            html.Button(html.Div(
                                 [
-                                    html.P(html.B(["L5IN", html.Sup("+"), ": From an Analytical Platform to Optimization of Deep Inertial Odometry (2022)"])),
-                                    html.P("Hossein Shoushtari, Firas Kassawat, Dorian Harder, Korvin Venzke, Jörg Müller-Lietzkow, Harald Sternberg", style={"line-height": "120%"})
-                                ],
+                                    html.P(html.B(["L5IN", html.Sup("+"), ": From an Analytical Platform to Optimization of Deep Inertial Odometry (2022)"]), style={"margin-bottom": "7px"}),
+                                    html.P("Hossein Shoushtari, Firas Kassawat, Dorian Harder, Korvin Venzke, Jörg Müller-Lietzkow, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"})
+                                ]),
                                 id="2022_9_5_IPIN2022_show_btn",
                                 style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "110px", "color": "white", "text-align": "left", "padding": "0px"}
                             ),
@@ -145,74 +152,16 @@ def publications():
                                 ),
                                 style={"width": "44px"}
                             ),
-                            html.Button(
+                            html.Button(html.Div(
                                 [
-                                    html.P(html.B("Real-Time Map Matching with a Backtracking Particle Filter Using Geospatial Analysis (2022)")),
-                                    html.P("Dorian Harder, Hossein Shoushtari, Harald Sternberg", style={"line-height": "120%"})
-                                ],
+                                    html.P(html.B("Real-Time Map Matching with a Backtracking Particle Filter Using Geospatial Analysis (2022)"), style={"margin-bottom": "7px"}),
+                                    html.P("Dorian Harder, Hossein Shoushtari, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"})
+                                ]),
                                 id="2022_4_25_sensors_show_btn",
                                 style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "110px", "color": "silver", "text-align": "left", "padding": "0px"}
                             ),
                         ],
                         id="2022_4_25_sensors_paper",
-                        className="d-flex align-items-center",
-                        style={"padding": "0px", "color": "silver", "height": "110px", "width": "500px", "background-color": "#545454", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
-                    ),
-                    dbc.Alert(
-                        [
-                            html.Div(
-                                html.A(
-                                    target="_blank",
-                                    href="https://www.researchgate.net/publication/351234064_A_Conceptual_Digital_Twin_for_5G_Indoor_Navigation", 
-                                    children=html.Button(
-                                        html.Img(
-                                            src="assets/images/signs/pdf_sign1.svg",
-                                            id="2021_4_1_mobility_pdf_sign",
-                                            style={"margin-left": "-8px"}),
-                                        id="2021_4_1_mobility_pdf_btn",
-                                        style={"margin-left": "8px", "width": "44px", "background": "transparent", "border": "0px"})
-                                ),
-                                style={"width": "44px"}
-                            ),
-                            html.Button(
-                                [
-                                    html.P(html.B("A Conceptual Digital Twin for 5G Indoor Navigation (2021)")),
-                                    html.P("Vladeta Stojanovic, Hossein Shoushtari, Cigdem Askar, Annette Scheider, Caroline Schuldt, Nils Hellweg, Harald Sternberg", style={"line-height": "120%"})
-                                ],
-                                id="2021_4_1_mobility_show_btn",
-                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "110px", "color": "silver", "text-align": "left", "padding": "0px"}
-                            ),
-                        ],
-                        id="2021_4_1_mobility_paper",
-                        className="d-flex align-items-center",
-                        style={"padding": "0px", "color": "silver", "height": "110px", "width": "500px", "background-color": "#545454", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
-                    ),
-                    dbc.Alert(
-                        [
-                            html.Div(
-                                html.A(
-                                    target="_blank",
-                                    href="https://www.mdpi.com/2072-4292/13/4/624",
-                                    children=html.Button(
-                                        html.Img(
-                                            src="assets/images/signs/pdf_sign1.svg",
-                                            id="2021_2_9_remotesensing_pdf_sign",
-                                            style={"margin-left": "-8px"}),
-                                        id="2021_2_9_remotesensing_pdf_btn",
-                                        style={"margin-left": "8px", "width": "44px", "background": "transparent", "border": "0px"})
-                                ),
-                                style={"width": "44px"}
-                            ),
-                            html.Button(
-                                [
-                                    html.P(html.B("L5IN: Overview of an Indoor Navigation Pilot Project (2021)")),
-                                    html.P("Caroline Schuldt, Hossein Shoushtari, Nils Hellweg, Harald Sternberg", style={"line-height": "120%"})
-                                ],
-                                id="2021_2_9_remotesensing_show_btn",
-                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "110px", "color": "silver", "text-align": "left", "padding": "0px"}
-                            ),
-                        ],
-                        id="2021_2_9_remotesensing_paper",
                         className="d-flex align-items-center",
                         style={"padding": "0px", "color": "silver", "height": "110px", "width": "500px", "background-color": "#545454", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                     ),
@@ -232,11 +181,11 @@ def publications():
                                 ),
                                 style={"width": "44px"}
                             ),
-                            html.Button(
+                            html.Button(html.Div(
                                 [
-                                    html.P(html.B("Many Ways Lead to the Goal — Possibilities of Autonomous and Infrastructure-Based Indoor Positioning (2021)")),
-                                    html.P("Hossein Shoushtari, Thomas Willemsen, Harald Sternberg", style={"line-height": "120%"})
-                                ],
+                                    html.P(html.B("Many Ways Lead to the Goal — Possibilities of Autonomous and Infrastructure-Based Indoor Positioning (2021)"), style={"margin-bottom": "7px"}),
+                                    html.P("Hossein Shoushtari, Thomas Willemsen, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"})
+                                ]),
                                 id="2021_2_5_electronics_show_btn",
                                 style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "110px", "color": "silver", "text-align": "left", "padding": "0px"}
                             ),
@@ -273,7 +222,7 @@ def contact():
                     html.P("President of HafenCity University Hamburg (HCU) and University Professor for Economics and Digitization",
                         style={"line-height": "110%", "color": "silver", "margin-top": "-18px"}),
                     html.P(
-                        html.A("praesident@vw.hcu-hamburg.de", href="mailto: praesident@vw.hcu-hamburg.de", style={"color": "silver"}),
+                        html.A("joerg.mueller-lietzkow@hcu-hamburg.de", href="mailto: joerg.mueller-lietzkow@hcu-hamburg.de", style={"color": "silver"}),
                         style={"color": "silver", "margin-top": "-18px"}
                     )
                 ], width=3, style={"height": "136px", "width": "337px"}),
