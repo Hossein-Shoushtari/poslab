@@ -7,7 +7,7 @@ from dash import Output, Input, no_update, callback_context
 
 def home_calls(app):
 
-    papers_list = ["2022_9_5_IPIN2022", "2022_4_25_sensors", "2021_2_5_electronics"]
+    papers_list = ["2022_9_5_IPIN2022", "2022_4_25_sensors", "2021_11_29_IPIN2021", "2021_2_5_electronics"]
 
     @app.callback(
         Output("paper_carousel", "active_index"),

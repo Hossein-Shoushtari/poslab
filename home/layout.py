@@ -11,9 +11,8 @@ def tooltips():
     # tooltips for more information
     tooltips = html.Div([
         dbc.Tooltip("open PDF", target="2022_9_5_IPIN2022_pdf_btn",      placement="left"),
+        dbc.Tooltip("open PDF", target="2021_11_29_IPIN2021_pdf_btn",      placement="left"),
         dbc.Tooltip("open PDF", target="2022_4_25_sensors_pdf_btn",      placement="left"),
-        dbc.Tooltip("open PDF", target="2021_4_1_mobility_pdf_btn",      placement="left"),
-        dbc.Tooltip("open PDF", target="2021_2_9_remotesensing_pdf_btn", placement="left"),
         dbc.Tooltip("open PDF", target="2021_2_5_electronics_pdf_btn",   placement="left"),
     ])
     return tooltips
@@ -75,7 +74,7 @@ def about():
     return about
 
 def publications():
-    papers_list = ["2022_9_5_IPIN2022", "2022_4_25_sensors", "2021_2_5_electronics"] 
+    papers_list = ["2022_9_5_IPIN2022", "2022_4_25_sensors", "2021_11_29_IPIN2021", "2021_2_5_electronics"] 
     publications = html.Div([
         html.Div(
             html.H4("Publications",
@@ -170,6 +169,35 @@ def publications():
                             html.Div(
                                 html.A(
                                     target="_blank",
+                                    href="https://www.researchgate.net/publication/357594689_3D_Indoor_Localization_using_5G-based_Particle_Filtering_and_CAD_Plans",
+                                    children=html.Button(
+                                        html.Img(
+                                            src="assets/images/signs/pdf_sign1.svg",
+                                            id="2021_11_29_IPIN2021_pdf_sign",
+                                            style={"margin-left": "-8px"}),
+                                        id="2021_11_29_IPIN2021_pdf_btn",
+                                        style={"margin-left": "8px", "width": "44px", "background": "transparent", "border": "0px"})
+                                ),
+                                style={"width": "44px"}
+                            ),
+                            html.Button(html.Div(
+                                [
+                                    html.P(html.B("3D Indoor Localization using 5G-based Particle Filtering and CAD Plans (2021)"), style={"margin-bottom": "7px"}),
+                                    html.P("Hossein Shoushtari, Cigdem Askar, Dorian Harder, Thomas Willemsen, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"})
+                                ]),
+                                id="2021_11_29_IPIN2021_show_btn",
+                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "110px", "color": "silver", "text-align": "left", "padding": "0px"}
+                            ),
+                        ],
+                        id="2021_11_29_IPIN2021_paper",
+                        className="d-flex align-items-center",
+                        style={"padding": "0px", "color": "silver", "height": "110px", "width": "500px", "background-color": "#545454", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
+                    ),
+                    dbc.Alert(
+                        [
+                            html.Div(
+                                html.A(
+                                    target="_blank",
                                     href="https://www.mdpi.com/2079-9292/10/4/397",
                                     children=html.Button(
                                         html.Img(
@@ -220,30 +248,18 @@ def contact():
                 dbc.Col([
                     html.P(html.B("Prof. Dr. Jörg Müller-Litzkow", style={"color": "silver", "margin-top": "5px"})),
                     html.P("President of HafenCity University Hamburg (HCU) and University Professor for Economics and Digitization",
-                        style={"line-height": "110%", "color": "silver", "margin-top": "-18px"}),
-                    html.P(
-                        html.A("joerg.mueller-lietzkow@hcu-hamburg.de", href="mailto: joerg.mueller-lietzkow@hcu-hamburg.de", style={"color": "silver"}),
-                        style={"color": "silver", "margin-top": "-18px"}
-                    )
+                        style={"line-height": "110%", "color": "silver", "margin-top": "-18px"})
                 ], width=3, style={"height": "136px", "width": "337px"}),
                 dbc.Col([
                     html.P(html.B("Prof. Dr. Harald Sternberg", style={"color": "silver", "margin-top": "-12px"})),
                     html.P("""Vice President for Teaching and Digitization of HafenCity University Hamburg (HCU)
                         and University Professor for Hydrography and Engineering Geodesy""",
-                        style={"line-height": "110%", "color": "silver", "margin-top": "-18px"}),
-                    html.P(
-                        html.A("harald.sternberg@hcu-hamburg.de", href="mailto: harald.sternberg@hcu-hamburg.de", style={"color": "silver"}),
-                        style={"color": "silver", "margin-top": "-18px"}
-                    )
+                        style={"line-height": "110%", "color": "silver", "margin-top": "-18px"})
                 ], width=3, style={"height": "136px", "width": "337px"}),
                 dbc.Col([
                     html.P(html.B("Nils Hellweg", style={"color": "silver", "margin-top": "-12px"})),
                     html.P("""Project Manager and PhD Student at HafenCity University Hamburg (HCU)""",
-                        style={"line-height": "110%", "color": "silver", "margin-top": "-18px"}),
-                    html.P(
-                        html.A("nils.hellweg@hcu-hamburg.de", href="mailto: nils.hellweg@hcu-hamburg.de", style={"color": "silver"}),
-                        style={"color": "silver", "margin-top": "-18px"}
-                    )
+                        style={"line-height": "110%", "color": "silver", "margin-top": "-18px"})
                 ], width=3, style={"height": "136px", "width": "337px"})
             ], justify="center"
         ),
