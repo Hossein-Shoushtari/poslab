@@ -80,7 +80,7 @@ def map_display(app, geojson_style):
         Output("eval_hcu_panel", "style"),  # hcu info panel
         ### INPUTS ###
         State("display_done", "is_open"),   # modal
-        State("overflow", "is_open"),   # modal
+        State("overflow", "is_open"),       # modal
         Input("unlocked", "data"),          # unlocked status hcu maps
         Input("layers", "data"),
         ## simulator ##

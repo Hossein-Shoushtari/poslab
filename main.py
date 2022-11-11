@@ -52,7 +52,7 @@ app.layout = html.Div(
         dcc.Store(id="layers", data=[], storage_type="memory"),
         # upload and map display done
         dbc.Modal([
-            dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/done_sign.svg"))),
+            dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/done_sign.svg"))),
             dbc.ModalBody("Successful!")],
             id="display_done",
             size="sm",
@@ -60,7 +60,7 @@ app.layout = html.Div(
         ),
         # trajectory 500 points limit reached
         dbc.Modal([
-            dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/caution_sign.svg"))),
+            dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/caution_sign.svg"))),
             dbc.ModalBody("500 points limit reached! Trajectory not shown on map but still in system.")],
             id="overflow",
             size="sm",
