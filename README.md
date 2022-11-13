@@ -77,4 +77,4 @@
 
 <a  href="https://www.paypal.me/KorvinVenzke"><img  src="assets/images/signs/donate_sign.svg"  height="40"></a>
 
-If you enjoyed this project - or just feel generous, consider supporting us!
+If you enjoyed this project — or just feel generous, consider supporting us!

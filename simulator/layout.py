@@ -340,7 +340,7 @@ def help_canvas():
                     html.P("All buttons are for uploading the data required for simulation. Each file needs the first line as a header. The delimiter is a single space.", style={"color": "gray"}),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Maps", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                        dbc.Col(html.P("optional; GeoJSON (any CRS)", style={"color": "gray"}))
+                        dbc.Col(html.P("optional; GeoJSON, any CRS", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Waypoints", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
@@ -523,14 +523,14 @@ def sim_set_canvas():
                     html.Hr(style={"margin": "auto", "width": "100%", "color": "silver", "height": "3px", "marginBottom": "-10px"}),
                     html.Br(),
 
-                    html.P("Number of intervals", style={"text-align": "center", "color": "silver", "marginBottom": "2px"}),
+                    html.P("Number of Intervals", style={"text-align": "center", "color": "silver", "marginBottom": "2px"}),
                     html.Div(dbc.Input(id="num_int", placeholder="Type a number...", type="text", style={"color": "silver", "textAlign": "center"})),
 
-                    html.P("Interval range [sec]", style={"text-align": "center", "color": "silver", "marginBottom": "0px", "marginTop": "10px"}),
+                    html.P("Interval Range [sec]", style={"text-align": "center", "color": "silver", "marginBottom": "0px", "marginTop": "10px"}),
                     dcc.RangeSlider(id="int_rang", min=0, max=30),
                     html.Div(dbc.Row([dbc.Col(html.P(id="int_rang_min")), dbc.Col(html.P(id="int_rang_max", style={"text-align": "right"}))]), style={"margin": "auto", "marginTop": "-25px", "width": "280px"}),
                     
-                    html.P("Semantic error [m]", style={"text-align": "center", "color": "silver", "marginBottom": "0px", "marginTop": "-20px"}),
+                    html.P("Semantic Error [m]", style={"text-align": "center", "color": "silver", "marginBottom": "0px", "marginTop": "-20px"}),
                     dcc.RangeSlider(id="sem_err_rang", min=0, max=20),
                     html.Div(dbc.Row([dbc.Col(html.P(id="sem_err_rang_min")), dbc.Col(html.P(id="sem_err_rang_max", style={"text-align": "right"}))]), style={"margin": "auto", "marginTop": "-25px", "width": "280px"}),
                     ],

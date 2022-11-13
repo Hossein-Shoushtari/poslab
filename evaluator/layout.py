@@ -481,7 +481,7 @@ def help_canvas():
                     html.P("All buttons are for uploading the data required for evaluation. Each file needs the first line as a header. The delimiter is a single space.", style={"color": "gray"}),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Maps", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
-                        dbc.Col(html.P("optional; GeoJSON (any CRS)", style={"color": "gray"}))
+                        dbc.Col(html.P("optional; GeoJSON, any CRS", style={"color": "gray"}))
                     ], className="g-0"),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Paths", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
@@ -504,7 +504,7 @@ def help_canvas():
                     # info evaluation
                     html.H5("EVALUATION", style={"text-align": "center", "color": "silver"}),
                     html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
-                    html.P("Instructions for evaluating:", style={"color": "gray"}),
+                    html.P("Instructions for evaluating results:", style={"color": "gray"}),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("CDF", style={"color": "gray"}), style={"borderLeft": "2px solid white", "paddingLeft": "5px"}), width=4),
                         dbc.Col(html.P("graph either normalized or histogrammed cumulative distribution function", style={"color": "gray"}))
