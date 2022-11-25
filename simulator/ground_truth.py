@@ -427,13 +427,16 @@ def generate_gt(ref: list, acc: list, gyr: list):
     except:
         return None  # something went wrong
 
-def export_gt(ground_truth):
+def export_gt(nc, user: dict, ground_truth: list):
+    # user data
+    un = user["username"]
+    pw = user["password"]
     name = u.time()
     lines = [[ground_truth[i][0], ground_truth[i][1],ground_truth[i][2]] for i in range(len(ground_truth))]
     output = "timestamp x y\n"
     for row in lines:
         output += f"{row[0]} {row[1]} {row[2]}\n"
-    # for export
-    with open(f"assets/exports/gt/gt_{name}.csv", "w") as f: f.write(output)
-    # for evaluation
-    with open(f"assets/groundtruth/gt_{name}.csv", "w") as f: f.write(output)
+    # save groundtruth
+    with open(f"assets/exports/results_{un}_{pw}/gt/gt_{name}.csv", "w") as f: f.write(output)  # exports
+    with open(f"assets/users/{un}_{pw}/groundtruth/gt_{name}.csv", "w") as f: f.write(output)   # online usage
+    u.update_user_data(nc, f"{un}_{pw}/groundtruth/gt_{name}.csv")

@@ -46,7 +46,7 @@ def floorplan2layer(geojson_style) -> list:
         i += 1
     return layers
 
-def save_drawings(data: dict):
+def save_drawings(user: dict, data: dict):
     """
     FUNCTION
     - formats received dictionary (replaces ' with ")
@@ -58,19 +58,22 @@ def save_drawings(data: dict):
     RETURN
     None
     """
+    # user data
+    un = user["username"]
+    pw = user["password"]
     # original export data must be formatted to proper geojson like string
     old = "'"
     new = """ " """
     # getting the current date and time for unique filename
     name = u.time()
     # storing data as geojson file
-    with open(f"assets/exports/draw/drawings_{name}.geojson", "w") as file:
+    with open(f"assets/exports/results_{un}_{pw}/draw/drawings_{name}.geojson", "w") as file:
         # formatting data-string
         data_str = str(data).replace(old, new[1])
         # ...saving
         file.write(data_str)
 
-def ref_tab(name: str) -> list:
+def ref_tab(user: dict, name: str) -> list:
     """
     FUNCTION
     - transforms reference data into table-rows and adds checkboxes
@@ -81,8 +84,11 @@ def ref_tab(name: str) -> list:
     RETURN
     tr_list : list of table rows with number, latitude, longitude and checkbox
     """
+    # user data
+    un = user["username"]
+    pw = user["password"]
     # loading data
-    data = np.loadtxt(f"assets/waypoints/{name}.csv", skiprows=1)[:, 1:3]
+    data = np.loadtxt(f"assets/users/{un}_{pw}/waypoints/{name}.csv", skiprows=1)[:, 1:3]
     # filling list with table-rows
     tr_list = []
     for i in range(1, data.shape[0]-1):
@@ -113,20 +119,23 @@ def ref_tab(name: str) -> list:
     tr_list.append(td2)
     return tr_list
 
-def ref_checked(name: str, check: tuple) -> list:
+def ref_checked(user: dict, filename: str, check: tuple) -> list:
     """
     FUNCTION
     - parses over reference data and just keeps checked data 
     -------
     PARAMETER
-    name : filename of reference data
+    filename : filename of reference data
     check : info about which checkbox is checked/unchecked
     -------
     RETURN
     data : ndarray with checked coordinates
     """
+    # user data
+    un = user["username"]
+    pw = user["password"]
     # loading data
-    data = np.loadtxt(f"assets/waypoints/{name}.csv", skiprows=1)
+    data = np.loadtxt(f"assets/users/{un}_{pw}/waypoints/{filename}.csv", skiprows=1)
     # creating ndarray to decide whether it is checked or not
     keep = np.ones(data.shape[0], dtype=bool)
     # looping over data and check tuple
@@ -180,7 +189,7 @@ def ref2marker(data: list, check: tuple) -> list:
 
     return dl.Overlay(dl.LayerGroup(markers), name="Waypoints", checked=True)
 
-def ant2marker() -> list:
+def ant2marker(user: dict) -> list:
     """
     FUNCTION
     - converts lat and lon from crs32632 (reference points) to crs4326
@@ -189,8 +198,11 @@ def ant2marker() -> list:
     RETURN
     markers : list of all created markers with converted lat and lon
     """
+    # user data
+    un = user["username"]
+    pw = user["password"]
     # data
-    ant = np.loadtxt("assets/antennas/antennas.csv", skiprows=1)
+    ant = np.loadtxt(f"assets/users/{un}_{pw}/antennas/antennas.csv", skiprows=1)
     # designing icon (from https://icons8.de/icons/set/marker)
     icon = {
         "iconUrl": "https://img.icons8.com/ios-filled/50/000000/radio-tower.png",

@@ -1,8 +1,5 @@
+import os
 
 
-def test(x):
-    liste = tuple([i for i in range(5)])
-    return *liste
-
-
-print(test(2))
+dir_list = os.listdir("assets/users")
+print(dir_list)

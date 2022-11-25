@@ -1,5 +1,5 @@
-##### Evaluator Tab -- Layout
-###IMPORTS
+##### Layout Evaluator
+### IMPORTS
 # dash
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
@@ -94,44 +94,130 @@ def modals():
     ### MODALs
     modals = html.Div(
         [
+            # login and registration
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            "Please login first!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(255, 0, 0, 0.3)", "border-radius": 5, "border": "1px solid #FF0000", "height": "70px"}
+                ),
+                id="eval_usr_warn1",
+                is_open=False
+            ),
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            "Please login first!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(255, 0, 0, 0.3)", "border-radius": 5, "border": "1px solid #FF0000", "height": "70px"}
+                ),
+                id="eval_usr_warn2",
+                is_open=False
+            ),
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            "Please login first!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(255, 0, 0, 0.3)", "border-radius": 5, "border": "1px solid #FF0000", "height": "70px"}
+                ),
+                id="eval_usr_warn3",
+                is_open=False
+            ),
             # upload warning
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/error_sign.svg"))),
-                dbc.ModalBody("Wrong file format! Upload denied.")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            "Wrong file format!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(255, 0, 0, 0.3)", "border-radius": 5, "border": "1px solid #FF0000", "height": "70px"}
+                ),
                 id="eval_ul_warn",
-                size="sm",
                 is_open=False
             ),
             # upload done
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/done_sign.svg"))),
-                dbc.ModalBody("Upload successful!")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            "Upload successful!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(0, 179, 0, 0.3)", "border-radius": 5, "border": "1px solid #00b300", "height": "70px"}
+                ),
                 id="eval_ul_done",
-                size="sm",
                 is_open=False
             ),
             # map warning
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/error_sign.svg"))),
-                dbc.ModalBody("Wrong file format! Upload denied.")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            "Wrong file format!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(255, 0, 0, 0.3)", "border-radius": 5, "border": "1px solid #FF0000", "height": "70px"}
+                ),
                 id="eval_map_warn",
-                size="sm",
                 is_open=False
             ),
             # map display done
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/done_sign.svg"))),
-                dbc.ModalBody("Successful!")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            "Successful!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(0, 179, 0, 0.3)", "border-radius": 5, "border": "1px solid #00b300", "height": "70px"}
+                ),
                 id="eval_display",
-                size="sm",
                 is_open=False
             ),
             # cdf warning
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/caution_sign.svg"))),
-                dbc.ModalBody("Please select data first!")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/caution_sign.svg"), style={"margin-right": "30px"}),
+                            "Please select data first!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(243, 156, 18, 0.3)", "border-radius": 5, "border": "1px solid #F39C12", "height": "70px"}
+                ),
                 id="cdf_warn",
-                size="sm",
                 is_open=False
             ),
             # cdf graph
@@ -164,19 +250,35 @@ def modals():
             # visual
             visual_modal(),
             # export warning
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/caution_sign.svg"))),
-                dbc.ModalBody("Nothing to export!")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/caution_sign.svg"), style={"margin-right": "30px"}),
+                            "Nothing to export!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(243, 156, 18, 0.3)", "border-radius": 5, "border": "1px solid #F39C12", "height": "70px"}
+                ),
                 id="eval_exp_warn",
-                size="sm",
                 is_open=False
             ),
             # export done
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/done_sign.svg"))),
-                dbc.ModalBody("Export successful!")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            "Export successful!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(0, 179, 0, 0.3)", "border-radius": 5, "border": "1px solid #00b300", "height": "70px"}
+                ),
                 id="eval_exp_done",
-                size="sm",
                 is_open=False
             )
         ]
@@ -326,7 +428,7 @@ def visual_modal():
                             dbc.Label("Format [2kx1k]", style={"color": "silver"}),
                             dcc.Dropdown(
                                 id="vis_format_select",
-                                options=[{"label": f, "value": f} for f in ["png", "svg", "jpeg", "webp"]],
+                                options=[{"label": f.upper(), "value": f} for f in ["png", "svg", "jpeg", "webp"]],
                                 value="png",
                                 placeholder="Select Format",
                                 clearable=True,
@@ -442,37 +544,37 @@ def help_canvas():
             [
                 dbc.Alert(
                     [
-                        html.Div(html.Img(src="assets/images/signs/focus_sign1.svg"), style={"marginRight": "10px"}),
+                        html.Div(html.Img(src="assets/images/signs/focus_sign1.svg"), style={"margin-right": "10px"}),
                         "Use the focus tool on the map to restore the last view!"
                     ],
                     className="d-flex align-items-center",
-                    style={"height": "75px", "color": "silver", "background": "#4598DB", "border-radius": 10}
+                    style={"height": "75px", "color": "silver", "background": "rgba(81, 155, 214, 0.3)", "border-radius": 10, "border": "1px solid #519bd6", "color": "gray"}
                 ),
                 dbc.Alert(
                     [
-                        html.Button(html.Img(src="assets/images/signs/download_sign.svg", style={"marginLeft": "-8px"}), id="eval_exdata", style={"marginRight": "10px", "width": "48px", "background": "transparent", "border": "0px"}),
+                        html.Button(html.Img(src="assets/images/signs/download_sign.svg", style={"margin-left": "-8px"}), id="eval_exdata", style={"margin-right": "10px", "width": "48px", "background": "transparent", "border": "0px"}),
                         html.Div(
                             [
-                                html.P("Not sure about the file formats?", style={"marginBottom": "0px"}),
-                                html.P("Download example data here!", style={"marginBottom": "0px"}),
+                                html.P("Not sure about the file formats?", style={"margin-bottom": "0px"}),
+                                html.P("Download example data here!", style={"margin-bottom": "0px"}),
                             ]
                         ),
                     ],
                     className="d-flex align-items-center",
-                    style={"height": "75px", "color": "silver", "background": "#008000", "border-radius": 10}
+                    style={"height": "75px", "color": "silver", "background": "rgba(0, 128, 0, 0.3)", "border-radius": 10, "border": "1px solid #008000", "color": "gray"}
                 ),
                 dbc.Alert(
                     [
-                        html.Div(html.Img(src="assets/images/signs/bug_sign.svg"), style={"marginRight": "10px"}),
+                        html.Div(html.Img(src="assets/images/signs/bug_sign.svg"), style={"margin-right": "10px"}),
                         html.Div(
                             [
-                                html.P("Are the layer names mixed up?", style={"marginBottom": "0px"}),
-                                html.P("Just switch tabs and come back!", style={"marginBottom": "0px"}),
+                                html.P("Are the layer names mixed up?", style={"margin-bottom": "0px"}),
+                                html.P("Just switch tabs and come back!", style={"margin-bottom": "0px"}),
                             ]
                         ),
                     ],
                     className="d-flex align-items-center",
-                    style={"height": "75px", "color": "silver", "background": "#70251B", "border-radius": 10}
+                    style={"height": "75px", "color": "silver", "background": "rgba(112, 37, 27, 0.3)", "border-radius": 10, "border": "1px solid #70251B", "color": "gray"}
                 ),
                 html.Div([
                     # info upload

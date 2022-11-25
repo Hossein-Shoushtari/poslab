@@ -1,4 +1,4 @@
-##### Simulator Tab -- Layout
+##### Layout Simulator
 ###IMPORTS
 # dash
 import dash_bootstrap_components as dbc
@@ -15,6 +15,8 @@ def storage():
     ### STORAGE
     # dcc.Store to store and share data between callbacks
     storage = html.Div([
+        # user register/login data
+        dcc.Store(id="usr_data", data={"username": "", "password": ""}, storage_type="memory"),
         # layers
         dcc.Store(id="sim_map_layers", data={"layers": None, "zoom": 0, "center": 0, "date": 0}, storage_type="memory"),
         dcc.Store(id="sim_ref_layers", data={"layers": None, "zoom": 0, "center": 0, "date": 0}, storage_type="memory"),
@@ -38,9 +40,10 @@ def tooltips():
         dbc.Tooltip("accelerator | csv",    target="sim_ul_acc",       placement="bottom"),
         dbc.Tooltip("barometer | csv",      target="sim_ul_bar",       placement="top"),
         dbc.Tooltip("magnetometer | csv",   target="sim_ul_mag",       placement="bottom"),
-        dbc.Tooltip("settings",             target="sim_set_img",      placement="right"),
+        dbc.Tooltip("settings",             target="sim_set_img",      placement="left"),
         dbc.Tooltip("save",                 target="sim_save_img",     placement="right"),
-        dbc.Tooltip("focus",                target="sim_zoom_img",     placement="right")
+        dbc.Tooltip("focus",                target="sim_zoom_img",     placement="right"),
+        dbc.Tooltip("info",                 target="usr_info_sign",    placement="left")
     ])
     return tooltips
 
@@ -81,98 +84,337 @@ def spinners():
         fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
         spinnerClassName="spinner"
     )
-    return html.Div([spin1, spin2, spin3, spin4, spin5])
+    spin6 = dbc.Spinner(
+        children=[html.Div(id="usr_spin1", style={"display": "none"})],
+        type=None,
+        fullscreen=True,
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
+        spinnerClassName="spinner"
+    )
+    spin7 = dbc.Spinner(
+        children=[html.Div(id="usr_spin2", style={"display": "none"})],
+        type=None,
+        fullscreen=True,
+        fullscreen_style={"opacity": "0.5", "z-index": "10000", "backgroundColor": "transparent"},
+        spinnerClassName="spinner"
+    )
+    return html.Div([spin1, spin2, spin3, spin4, spin5, spin6, spin7])
 
 def modals():
     ### MODALs
     modals = html.Div(
         [
+            # login and registration
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/info_sign1.svg"), style={"margin-right": "30px"}),
+                            "3-15 characters | no ?/!* etc. | start with a letter"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "#585858", "border-radius": 5, "border": "1px solid silver", "height": "70px"}
+                ),
+                id="usr_info",
+                is_open=False
+            ),
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            "Registration successful!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(0, 179, 0, 0.3)", "border-radius": 5, "border": "1px solid #00b300", "height": "70px"}
+                ),
+                id="reg_done",
+                is_open=False
+            ),
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/caution_sign.svg"), style={"margin-right": "30px"}),
+                            "This user already exists! Login instead."
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(243, 156, 18, 0.3)", "border-radius": 5, "border": "1px solid #F39C12", "height": "70px"}
+                ),
+                id="reg_warning",
+                is_open=False
+            ),
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            "Login successful!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(0, 179, 0, 0.3)", "border-radius": 5, "border": "1px solid #00b300", "height": "70px"}
+                ),
+                id="login_done",
+                is_open=False
+            ),
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/caution_sign.svg"), style={"margin-right": "30px"}),
+                            "This user doesn't exist! Register instead."
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(243, 156, 18, 0.3)", "border-radius": 5, "border": "1px solid #F39C12", "height": "70px"}
+                ),
+                id="login_warning",
+                is_open=False
+            ),
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            "Please login first!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(255, 0, 0, 0.3)", "border-radius": 5, "border": "1px solid #FF0000", "height": "70px"}
+                ),
+                id="sim_usr_warn1",
+                is_open=False
+            ),
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            "Please login first!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(255, 0, 0, 0.3)", "border-radius": 5, "border": "1px solid #FF0000", "height": "70px"}
+                ),
+                id="sim_usr_warn2",
+                is_open=False
+            ),
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            "Please login first!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(255, 0, 0, 0.3)", "border-radius": 5, "border": "1px solid #FF0000", "height": "70px"}
+                ),
+                id="sim_usr_warn3",
+                is_open=False
+            ),
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            "Please login first!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(255, 0, 0, 0.3)", "border-radius": 5, "border": "1px solid #FF0000", "height": "70px"}
+                ),
+                id="sim_usr_warn4",
+                is_open=False
+            ),
             # upload warning
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/error_sign.svg"))),
-                dbc.ModalBody("Wrong file format! Upload denied.")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            "Wrong file format!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(255, 0, 0, 0.3)", "border-radius": 5, "border": "1px solid #FF0000", "height": "70px"}
+                ),
                 id="sim_ul_warn",
-                size="sm",
                 is_open=False
             ),
             # upload done
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/done_sign.svg"))),
-                dbc.ModalBody("Upload successful!")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            "Upload successful!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(0, 179, 0, 0.3)", "border-radius": 5, "border": "1px solid #00b300", "height": "70px"}
+                ),
                 id="sim_ul_done",
-                size="sm",
                 is_open=False
             ),
             # map warning
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/error_sign.svg"))),
-                dbc.ModalBody("Wrong file format! Upload denied.")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            "Wrong file format!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(255, 0, 0, 0.3)", "border-radius": 5, "border": "1px solid #FF0000", "height": "70px"}
+                ),
                 id="sim_map_warn",
-                size="sm",
                 is_open=False
             ),
             # map display done
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/done_sign.svg"))),
-                dbc.ModalBody("Successful!")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            "Successful!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(0, 179, 0, 0.3)", "border-radius": 5, "border": "1px solid #00b300", "height": "70px"}
+                ),
                 id="sim_display",
-                size="sm",
                 is_open=False
             ),
             # data selection warning
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/caution_sign.svg"))),
-                dbc.ModalBody("Please select data first!")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/caution_sign.svg"), style={"margin-right": "30px"}),
+                            "Please select data first!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(243, 156, 18, 0.3)", "border-radius": 5, "border": "1px solid #F39C12", "height": "70px"}
+                ),
                 id="sel_warn",
-                size="sm",
                 is_open=False
             ),
             # gt calculation warning
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/error_sign.svg"))),
-                dbc.ModalBody("Something went wrong. Please check the formats.")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            "Something went wrong! Please check the formats."
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(255, 0, 0, 0.3)", "border-radius": 5, "border": "1px solid #FF0000", "height": "70px"}
+                ),
                 id="gen_warn",
-                size="sm",
                 is_open=False
             ),
             # gt calculation done
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/done_sign.svg"))),
-                dbc.ModalBody("Generation successful!")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            "Generation successful!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(0, 179, 0, 0.3)", "border-radius": 5, "border": "1px solid #00b300", "height": "70px"}
+                ),
                 id="gen_done",
-                size="sm",
                 is_open=False
             ),
             # simulation warning
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/caution_sign.svg"))),
-                dbc.ModalBody("Please select and enter the right data first!")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            "Required data is missing!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(255, 0, 0, 0.3)", "border-radius": 5, "border": "1px solid #FF0000", "height": "70px"}
+                ),
+                style={"margin-left": "-8px"},
                 id="sim_warn",
-                size="sm",
                 is_open=False
             ),
             # save drawings done
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/done_sign.svg"))),
-                dbc.ModalBody("Saved!")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            "Saved!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(0, 179, 0, 0.3)", "border-radius": 5, "border": "1px solid #00b300", "height": "70px"}
+                ),
                 id="sim_save_done",
-                size="sm",
                 is_open=False
             ),
             # export warning
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/caution_sign.svg"))),
-                dbc.ModalBody("Nothing to export!")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/caution_sign.svg"), style={"margin-right": "30px"}),
+                            "Nothing to export!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(243, 156, 18, 0.3)", "border-radius": 5, "border": "1px solid #F39C12", "height": "70px"}
+                ),
                 id="sim_exp_warn",
-                size="sm",
                 is_open=False
             ),
             # export done
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/done_sign.svg"))),
-                dbc.ModalBody("Export successful!")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            "Export successful!"
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(0, 179, 0, 0.3)", "border-radius": 5, "border": "1px solid #00b300", "height": "70px"}
+                ),
                 id="sim_exp_done",
-                size="sm",
                 is_open=False
             ),
             # simulate measurements - select ground truth
@@ -191,7 +433,7 @@ def modals():
                                     optionHeight=35,
                                     multi=False,
                                     searchable=True,
-                                    style={"marginBottom": "15px", "color": "black"},
+                                    style={"margin-bottom": "15px", "color": "black"},
                                 )
                             ]
                         )
@@ -301,42 +543,42 @@ def help_canvas():
             [   
                 dbc.Alert(
                     [
-                        html.Div(html.Img(src="assets/images/signs/focus_sign1.svg"), style={"marginRight": "10px"}),
+                        html.Div(html.Img(src="assets/images/signs/focus_sign1.svg"), style={"margin-right": "10px"}),
                         "Use the focus tool on the map to restore the last view!"
                     ],
                     className="d-flex align-items-center",
-                    style={"height": "75px", "color": "silver", "background": "#4598DB", "border-radius": 10}
+                    style={"height": "75px", "color": "silver", "background": "rgba(81, 155, 214, 0.3)", "border-radius": 10, "border": "1px solid #519bd6", "color": "gray"}
                 ),
                 dbc.Alert(
                     [
-                        html.Button(html.Img(src="assets/images/signs/download_sign.svg", style={"marginLeft": "-8px"}), id="sim_exdata", style={"marginRight": "10px", "width": "48px", "background": "transparent", "border": "0px"}),
+                        html.Button(html.Img(src="assets/images/signs/download_sign.svg", style={"margin-left": "-8px"}), id="sim_exdata", style={"margin-right": "10px", "width": "48px", "background": "transparent", "border": "0px"}),
                         html.Div(
                             [
-                                html.P("Not sure about the file formats?", style={"marginBottom": "0px"}),
-                                html.P("Download example data here!", style={"marginBottom": "0px"}),
+                                html.P("Not sure about the file formats?", style={"margin-bottom": "0px"}),
+                                html.P("Download example data here!", style={"margin-bottom": "0px"}),
                             ]
                         ),
                     ],
                     className="d-flex align-items-center",
-                    style={"height": "75px", "color": "silver", "background": "#008000", "border-radius": 10}
+                    style={"height": "75px", "color": "silver", "background": "rgba(0, 128, 0, 0.3)", "border-radius": 10, "border": "1px solid #008000", "color": "gray"}
                 ),
                 dbc.Alert(
                     [
-                        html.Div(html.Img(src="assets/images/signs/bug_sign.svg"), style={"marginRight": "10px"}),
+                        html.Div(html.Img(src="assets/images/signs/bug_sign.svg"), style={"margin-right": "10px"}),
                         html.Div(
                             [
-                                html.P("Are the layer names mixed up?", style={"marginBottom": "0px"}),
-                                html.P("Just switch tabs and come back!", style={"marginBottom": "0px"}),
+                                html.P("Are the layer names mixed up?", style={"margin-bottom": "0px"}),
+                                html.P("Just switch tabs and come back!", style={"margin-bottom": "0px"}),
                             ]
                         ),
                     ],
                     className="d-flex align-items-center",
-                    style={"height": "75px", "color": "silver", "background": "#70251B", "border-radius": 10}
+                    style={"height": "75px", "color": "silver", "background": "rgba(255, 0, 0, 0.3)", "border-radius": 10, "border": "1px solid #FF0000", "color": "gray"}
                 ),
                 html.Div([
                     # info upload
                     html.H5("UPLOAD", style={"text-align": "center", "color": "#3B5A7F"}),
-                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "3px"}),
+                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "margin-bottom": "3px"}),
                     html.P("All buttons are for uploading the data required for simulation. Each file needs the first line as a header. The delimiter is a single space.", style={"color": "gray"}),
                     dbc.Row([
                         dbc.Col(html.Div(html.P("Maps", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
@@ -354,18 +596,18 @@ def help_canvas():
                         dbc.Col(html.Div(html.P("Sensors", style={"color": "gray"}), style={"borderLeft": "2px solid #7C9D9C", "paddingLeft": "5px"}), width=4),
                         dbc.Col(html.P("acc&gyr used for ground truth, bar&mag optional; CSV", style={"color": "gray"}))
                     ], className="g-0")],
-                style={"border":"1px solid #3B5A7F", "border-radius": 10, "padding": "10px", "marginBottom": "16px"}),
+                style={"border":"1px solid #3B5A7F", "border-radius": 10, "padding": "10px", "margin-bottom": "16px"}),
                 html.Div([
                     # info simulation
                     html.H5("SIMULATION", style={"text-align": "center", "color": "silver"}),
-                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "marginBottom": "15px"}),
+                    html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "margin-bottom": "15px"}),
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/warning_sign.svg"), style={"marginRight": "10px"}),
+                            html.Div(html.Img(src="assets/images/signs/warning_sign.svg"), style={"margin-right": "10px"}),
                             "For performance reasons, only trajectories up to 500 points are displayed on the map.",
                         ],
                         className="d-flex align-items-center",
-                        style={"height": "90px", "color": "gray", "background": "#774E06"}
+                        style={"height": "90px", "background": "rgba(119, 78, 6, 0.3)", "border-radius": 10, "border": "1px solid #774E06", "color": "gray"}
                     ),
                     html.P("Instructions for simulating measurements:", style={"color": "gray"}),
                     dbc.Row([
@@ -398,7 +640,7 @@ def help_canvas():
                     ], className="g-0"),
                     html.Div(html.P("Ground truth trajectories, simulated measurements and drawings can be downloaded in a ZIP file!", style={"color": "gray"}),
                     style={"borderLeft": "2px solid #36BD8E", "paddingLeft": "5px"})],
-                style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"})
+                style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "margin-bottom": "10px"})
             ],
         id="sim_help_cv",
         scrollable=False,
@@ -414,13 +656,13 @@ def gt_canvas():
             # steps
             dbc.Alert(
                 [
-                    html.Div(html.Img(src="assets/images/signs/list_sign.svg"), style={"marginRight": "30px"}),
+                    html.Div(html.Img(src="assets/images/signs/list_sign.svg"), style={"margin-right": "30px"}),
                     html.Div(
                         [
-                            html.P("Select all data needed", style={"marginBottom": "0px"}),
-                            html.P("Show waypoints on the map", style={"marginBottom": "0px"}),
-                            html.P("Select required waypoints", style={"marginBottom": "0px"}),
-                            html.P("Generate ground truth", style={"marginBottom": "0px"}),
+                            html.P("Select all data needed", style={"margin-bottom": "0px"}),
+                            html.P("Show waypoints on the map", style={"margin-bottom": "0px"}),
+                            html.P("Select required waypoints", style={"margin-bottom": "0px"}),
+                            html.P("Generate ground truth", style={"margin-bottom": "0px"}),
                         ]
                     ),
                 ],
@@ -429,7 +671,7 @@ def gt_canvas():
             ),
             dbc.Alert(
                 [
-                    html.Div(html.Img(src="assets/images/signs/warning_sign.svg"), style={"marginRight": "30px"}),
+                    html.Div(html.Img(src="assets/images/signs/warning_sign.svg"), style={"margin-right": "30px"}),
                     "The first and the last waypoint should always be selected.",
                 ],
                 className="d-flex align-items-center",
@@ -441,7 +683,7 @@ def gt_canvas():
                     dbc.Col(dbc.Button("Show", id="show_btn", color="light", outline=True, style={"width": "160px"})),
                     dbc.Col(dbc.Button("Generate", id="gen_btn", color="light", outline=True, style={"width": "160px"}))
                 ], className="g-0"),
-                style={"text-align": "center", "marginBottom": "15px"}),
+                style={"text-align": "center", "margin-bottom": "15px"}),
                 # dropdown
                 html.Div(dbc.Row([
                     dbc.Col(dcc.Dropdown(
@@ -465,7 +707,7 @@ def gt_canvas():
                         style={"margin": "auto", "color": "black", "width": "160px"},
                     ))
                 ], className="g-0"),
-                style={"marginBottom": "8px"}),
+                style={"margin-bottom": "8px"}),
                 dcc.Dropdown(
                     id="ref_select",
                     options=[],
@@ -474,7 +716,7 @@ def gt_canvas():
                     optionHeight=35,
                     multi=False,
                     searchable=True,
-                    style={"margin": "auto", "marginBottom": "15px", "color": "black", "width": "324px"},
+                    style={"margin": "auto", "margin-bottom": "15px", "color": "black", "width": "324px"},
                 ),
                 # headline
                 html.Div(html.H5("Waypoints", style={"color": "#ADB5BD", "text-align": "center"}),
@@ -488,7 +730,7 @@ def gt_canvas():
                             html.Th("Longitude", style={"width": "112px", "color": "gray", "text-align": "center"}),
                             html.Th("Select", style={"width": "60px", "color": "gray", "text-align": "center"})
                         ])),
-                    style={"marginTop": "-7px", "marginBottom": "7px"},
+                    style={"margin-top": "-7px", "margin-bottom": "7px"},
                     size="sm",
                     bordered=True,
                     color="primary"),
@@ -517,36 +759,43 @@ def sim_set_canvas():
                 html.Div(
                     [
                     # Semantic Errors
-                    html.H5("Semantic Errors", style={"text-align": "left", "color": "silver"}),
-                    html.Div(dbc.Button(html.Img(src="assets/images/signs/reset_sign.svg", id="ss_reset_img"), id="ss_reset", style={"border": "0px", "background": "transparent"}),
-                        style={"text-align": "right","marginTop": "-39px", "marginRight": "-5px"}),
-                    html.Hr(style={"margin": "auto", "width": "100%", "color": "silver", "height": "3px", "marginBottom": "-10px"}),
+                    html.H5("Semantic Errors", style={"text-align": "center", "color": "silver"}),
+                    html.Div(
+                        html.Button(
+                            html.Img(
+                                src="assets/images/signs/reset_sign.svg",
+                                style={"margin-left": "-4px"}),
+                            id = "ss_reset",
+                            style={"height": "40px", "background": "transparent", "border": "0px"}
+                        ),
+                        style={"text-align": "right","margin-top": "-39px", "margin-right": "3px"}
+                    ),
+                    html.Hr(style={"margin": "auto", "width": "100%", "color": "silver", "height": "3px", "margin-bottom": "-10px"}),
                     html.Br(),
 
-                    html.P("Number of Intervals", style={"text-align": "center", "color": "silver", "marginBottom": "2px"}),
-                    html.Div(dbc.Input(id="num_int", placeholder="Type a number...", type="text", style={"color": "silver", "textAlign": "center"})),
+                    html.P("Number of Intervals", style={"text-align": "center", "color": "silver", "margin-bottom": "2px"}),
+                    html.Div(dbc.Input(id="num_int", placeholder="Type a number...", type="text", style={"color": "silver", "text-align": "center"})),
 
-                    html.P("Interval Range [sec]", style={"text-align": "center", "color": "silver", "marginBottom": "0px", "marginTop": "10px"}),
+                    html.P("Interval Range [sec]", style={"text-align": "center", "color": "silver", "margin-bottom": "0px", "margin-top": "10px"}),
                     dcc.RangeSlider(id="int_rang", min=0, max=30),
-                    html.Div(dbc.Row([dbc.Col(html.P(id="int_rang_min")), dbc.Col(html.P(id="int_rang_max", style={"text-align": "right"}))]), style={"margin": "auto", "marginTop": "-25px", "width": "280px"}),
+                    html.Div(dbc.Row([dbc.Col(html.P(id="int_rang_min")), dbc.Col(html.P(id="int_rang_max", style={"text-align": "right"}))]), style={"margin": "auto", "margin-top": "-25px", "width": "280px"}),
                     
-                    html.P("Semantic Error [m]", style={"text-align": "center", "color": "silver", "marginBottom": "0px", "marginTop": "-20px"}),
+                    html.P("Semantic Error [m]", style={"text-align": "center", "color": "silver", "margin-bottom": "0px", "margin-top": "-20px"}),
                     dcc.RangeSlider(id="sem_err_rang", min=0, max=20),
-                    html.Div(dbc.Row([dbc.Col(html.P(id="sem_err_rang_min")), dbc.Col(html.P(id="sem_err_rang_max", style={"text-align": "right"}))]), style={"margin": "auto", "marginTop": "-25px", "width": "280px"}),
+                    html.Div(dbc.Row([dbc.Col(html.P(id="sem_err_rang_min")), dbc.Col(html.P(id="sem_err_rang_max", style={"text-align": "right"}))]), style={"margin": "auto", "margin-top": "-25px", "width": "280px"}),
                     ],
-                style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
-                html.Br(),
+                style={"border":"1px solid silver", "border-top-left-radius": 10, "border-top-right-radius": 10, "padding": "10px", "margin-bottom": "-1px"}),
                 html.Div(
                     [
                     # Multiple Users
-                    html.H5("Multiple Users", style={"text-align": "left", "color": "silver"}),
-                    html.Hr(style={"margin": "auto", "width": "100%", "color": "silver", "height": "3px", "marginBottom": "-10px"}),
+                    html.H5("Multiple Users", style={"text-align": "center", "color": "silver"}),
+                    html.Hr(style={"margin": "auto", "width": "100%", "color": "silver", "height": "3px", "margin-bottom": "-10px"}),
                     html.Br(),
 
-                    html.P("Network Capacity [req/sec]", style={"text-align": "center", "color": "silver", "marginBottom": "2px"}),
-                    html.Div(dbc.Input(id="net_cap", placeholder="Type a number...", type="text", style={"color": "silver", "textAlign": "center"})),
+                    html.P("Network Capacity [req/sec]", style={"text-align": "center", "color": "silver", "margin-bottom": "2px"}),
+                    html.Div(dbc.Input(id="net_cap", placeholder="Type a number...", type="text", style={"color": "silver", "text-align": "center"})),
                     ],
-                style={"border":"1px solid silver", "border-radius": 10, "padding": "10px", "marginBottom": "10px"}),
+                style={"border":"1px solid silver", "border-bottom-left-radius": 10, "border-bottom-right-radius": 10, "padding": "10px"}),
             ],
         id="sim_set_cv",
         scrollable=False,
@@ -570,17 +819,17 @@ def sim_layout(geojson_style):
         dcc.Upload(
             id="sim_ul_map",
             children=html.Div(dbc.Button("Maps", id="sim_maps_upload", color="info", outline=True, style={"width": "148px"})),
-            style={"marginTop": "8px", "marginBottom": "5px"},
+            style={"margin-top": "8px", "margin-bottom": "5px"},
             multiple=True),
         dcc.Upload(
             id="ul_way",
             children=html.Div(dbc.Button("Waypoints", id="waypoints_upload", color="info", outline=True, style={"width": "148px"})),
-            style={"marginTop": "5px", "marginBottom": "5px"},
+            style={"margin-top": "5px", "margin-bottom": "5px"},
             multiple=True),
         dcc.Upload(
             id="ul_ant",
             children=html.Div(dbc.Button("Antennas", id="antennas_upload", color="info", outline=True, style={"width": "148px"})),
-            style={"marginTop": "5px", "marginBottom": "8px"},
+            style={"margin-top": "5px", "margin-bottom": "8px"},
             multiple=False)],
         style={"width": "150px"}
     )
@@ -591,23 +840,23 @@ def sim_layout(geojson_style):
                 id="sim_ul_gyr",
                 children=html.Div(dbc.Button("G", color="primary", size="lg", outline=True, style={"width": "86px"})),
                 multiple=True,
-                style={"marginBottom": "6px"}),
+                style={"margin-bottom": "6px"}),
             dcc.Upload(
                 id="sim_ul_acc",
                 children=html.Div(dbc.Button("A", color="primary", size="lg", outline=True, style={"width": "86px"})),
                 multiple=True)],
-            style={"textAlign": "left", "marginTop": "18px", "marginBottom": "18px"})),
+            style={"text-align": "left", "margin-top": "18px", "margin-bottom": "18px"})),
         dbc.Col(html.Div([  # right column
             dcc.Upload(
                 id="sim_ul_bar",
                 children=html.Div(dbc.Button("B", color="primary", size="lg", outline=True, style={"width": "86px"})),
                 multiple=True,
-                style={"marginBottom": "6px"}),
+                style={"margin-bottom": "6px"}),
             dcc.Upload(
                 id="sim_ul_mag",
                 children=html.Div(dbc.Button("M", color="primary", size="lg", outline=True, style={"width": "86px"})),
                 multiple=True)],
-            style={"textAlign": "right", "marginTop": "18px", "marginBottom": "18px"}))],
+            style={"text-align": "right", "margin-top": "18px", "margin-bottom": "18px"}))],
         className="g-0"),
         style={"width": "180px"}
     )
@@ -618,7 +867,7 @@ def sim_layout(geojson_style):
         "color": "gray",
         "width": "120px",
         "height": "60px",
-        "textAlign": "center",
+        "text-align": "center",
         "backgroundColor": "silver",
         "border": "1px solid gray"
     }
@@ -630,30 +879,113 @@ def sim_layout(geojson_style):
     "margin": "auto"
     }
     H5_style = {
-        "textAlign": "center",
+        "text-align": "center",
         "color": "gray",
-        "marginTop": "5px"
+        "margin-top": "5px"
     }
+    # user
+    usr_signin = html.Div(
+        [
+            dbc.Row(
+                [
+                    dbc.Col([
+                        html.Div(
+                            [
+                                dbc.Input(placeholder="1st name", id="login_un" , style={"color": "black", "width": "210px", "background": "silver"}),
+                                dbc.FormFeedback(type="valid"),
+                                dbc.FormFeedback(type="invalid")
+                            ], style={"margin-left": "15px", "margin-top": "5px", "margin-bottom": "3px"}
+                        ),
+                        html.Div(
+                            [
+                                dbc.Input(placeholder="2nd name", id="login_pw", style={"color": "black", "width": "210px", "background": "silver"}),
+                                dbc.FormFeedback(type="valid"),
+                                dbc.FormFeedback(type="invalid")
+                            ], style={"margin-left": "15px"}
+                        )
+                    ], width=8),
+                    dbc.Col([
+                        html.Button(
+                            html.Img(
+                                src="assets/images/signs/login_sign.svg",
+                                style={"margin-left": "-4px"},
+                                id="login_sign"),
+                            id="login_btn",
+                            style={"margin": "auto", "margin-top": "25px", "margin-left": "30px", "width": "44px", "background": "transparent", "border": "0px"}
+                        )
+                    ], width=4),
+                ], className="g-0"
+            )
+        ]
+    )
+    usr_signup = html.Div(
+        [
+            dbc.Row(
+                [
+                    dbc.Col([
+                        html.Div(
+                            [
+                                dbc.Input(placeholder="1st name", id="register_un" , style={"color": "black", "width": "210px", "background": "silver"}),
+                                dbc.FormFeedback(type="valid"),
+                                dbc.FormFeedback(type="invalid")
+                            ], style={"margin-left": "15px", "margin-top": "5px", "margin-bottom": "3px"}
+                        ),
+                        html.Div(
+                            [
+                                dbc.Input(placeholder="2nd name", id="register_pw", style={"color": "black", "width": "210px", "background": "silver"}),
+                                dbc.FormFeedback(type="valid"),
+                                dbc.FormFeedback(type="invalid")
+                            ], style={"margin-left": "15px"}
+                        )
+                    ], width=8),
+                    dbc.Col([
+                        html.Button(
+                            html.Img(
+                                src="assets/images/signs/register_sign.svg",
+                                style={"margin-left": "-4px"},
+                                id="register_sign"),
+                            id="register_btn",
+                            style={"margin": "auto", "margin-top": "25px", "margin-left": "30px", "width": "44px", "background": "transparent", "border": "0px"}
+                        )
+                    ], width=4),
+                ], className="g-0"
+            )
+        ]
+    )
     first_row = html.Div([dbc.Row(
         [
+            ### UPLOAD ### --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             dbc.Col(html.Div([
                 html.H5("Upload", style=H5_style),
                 html.Hr(style=hr_style),
                 dbc.Row([
-                    dbc.Col(html.Div(html.Div(ul_buttons1), style={"marginLeft": "40px"})),
+                    dbc.Col(html.Div(html.Div(ul_buttons1), style={"margin-left": "40px"})),
                     dbc.Col(html.Div(html.Div(ul_buttons2)))],
                 className="g-0")],
-            style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "marginBottom": "4px", "display": "inline-block"})),
-
+            style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "margin-bottom": "4px", "display": "inline-block"})),
+            ### SIMULATION ### --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             dbc.Col(html.Div([
                 html.Div(
                     [
-                        html.H5("Simulation", style=H5_style),
-                        html.Div(dbc.Button(html.Img(src="assets/images/signs/settings_sign.svg", id="sim_set_img"), id="sim_set", style={"border": "0px", "background": "transparent"}),
-                            style={"text-align": "right","marginTop": "-35px", "marginRight": "3px"})
+                        html.Div(
+                            [
+                                html.H5("Simulation", style=H5_style),
+                                html.Div(
+                                    html.Button(
+                                        html.Img(
+                                            src="assets/images/signs/settings_sign.svg",
+                                            style={"margin-left": "-4px"},
+                                            id="sim_set_img"),
+                                        id = "sim_set",
+                                        style={"height": "40px", "background": "transparent", "border": "0px"}
+                                    ),
+                                    style={"text-align": "right","margin-top": "-39px", "margin-right": "3px"}
+                                )
+                            ]
+                        ),
                     ]
                 ),
-                html.Hr(style=hr_style),
+                html.Hr(style={"width": "80%", "margin": "auto", "margin-top": "-1px"}),
                 dbc.Row(
                     [
                         dbc.Col(html.Div(dbc.Button(
@@ -662,8 +994,8 @@ def sim_layout(geojson_style):
                                 color="light",
                                 outline=False,
                                 style={"line-height": "1.5", "height": "70px", "width": "70px", "padding": "0px"}),
-                                style={"marginTop": "15px", "marginBottom": "15px"}),
-                            style={"text-align": "center", "width": "90px", "margin": "auto", "borderRight": "1px solid #494949"},
+                                style={"margin-top": "15px", "margin-bottom": "15px"}),
+                            style={"text-align": "center", "width": "90px", "margin": "auto", "border-right": "1px solid #494949"},
                             width=2
                         ),
 
@@ -674,7 +1006,7 @@ def sim_layout(geojson_style):
                                         dbc.Input(id="ms_freq", type="text", placeholder=0, style=input_style),
                                         dbc.Label("Frequency", style={"color": "gray"})
                                     ],
-                                    style={"marginBottom": "4px"}
+                                    style={"margin-bottom": "4px"}
                                 ),
                                 dbc.FormFloating(
                                     [    # User
@@ -683,7 +1015,7 @@ def sim_layout(geojson_style):
                                     ]
                                 )
                             ],
-                            style={"width": "120px", "margin": "auto", "marginTop": "8px", "marginLeft": "10px", "height": "126px"})
+                            style={"width": "120px", "margin": "auto", "margin-top": "8px", "margin-left": "10px", "height": "126px"})
                         ),
 
                         dbc.Col(html.Div(
@@ -695,54 +1027,117 @@ def sim_layout(geojson_style):
                                     [
                                         html.Div(html.P("Semantic Error"),
                                             style={"width": "118px", "height": "29px", "text-align": "center"}),
-                                        html.Div(dbc.Checklist(options=[{"value": 1}], value=[1], id="sem_err", style={"marginLeft": "50px"}),
+                                        html.Div(dbc.Checklist(options=[{"value": 1}], value=[1], id="sem_err", style={"margin-left": "50px"}),
                                             style={"width": "118px", "height": "29px" }
                                         )
                                     ],
-                                    style={"marginTop": "4px", "border": "1px solid #808080", "border-radius": "5px", "height": "60px",  "text-align": "center"}
+                                    style={"margin-top": "4px", "border": "1px solid #808080", "border-radius": "5px", "height": "60px",  "text-align": "center"}
                                 )
                             ],
-                            style={"width": "120px", "margin": "auto", "marginTop": "8px", "marginLeft": "0px", "height": "126px"})
+                            style={"width": "120px", "margin": "auto", "margin-top": "8px", "margin-left": "0px", "height": "126px"})
                         ),
 
                         dbc.Col(html.Div(dbc.Button(
-                                html.P("Simulate", style={"marginTop": "12px"}),
+                                html.P("Simulate", style={"margin-top": "12px"}),
                                 id="open_sim",
                                 color="light",
                                 outline=False,
                                 style={"line-height": "1.5", "height": "124px", "width": "70px", "padding": "0px"}),
-                                style={"marginTop": "6px", "marginLeft": "-17px"}),
+                                style={"margin-top": "6px", "margin-left": "-17px"}),
                             style={"text-align": "center", "margin": "auto"},
                         width=2
                         )
                     ],
                 className="g-0")],
-                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "marginBottom": "4px", "display": "inline-block"}
+                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "180px", "width": "435px", "margin-bottom": "4px", "display": "inline-block"}
             )),
-
-            dbc.Col(html.Div([
-                html.Div(
-                    [
-                        html.H5("Export", style={"textAlign": "center", "color": "gray", "marginTop": "5px"}),
-                        html.Hr(style=hr_style),
-                        html.Div(
+            ### EXPORT, HELP & ACCOUNT ### --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            dbc.Col(html.Div(dbc.Row(
+                [
+                    dbc.Col(html.Div(
+                        [
+                            html.Div(
+                                [
+                                    html.H5("Export", style={"text-align": "center", "color": "gray", "margin-top": "5px"}),
+                                    html.Hr(style=hr_style),
+                                    html.Div(
+                                        [
+                                            dbc.Button("Results",
+                                                color="success",
+                                                className="position-relative",
+                                                outline=True,
+                                                style={"width": "90px"},
+                                                id="sim_exp_btn",
+                                            )
+                                        ],
+                                        style={"text-align": "center", "margin-top": "10px"}
+                                    )
+                                ],            
+                                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "100px", "width": "140px"}
+                            ),
+                            html.Div(
+                                [
+                                html.Div(dbc.Button("Help", id="sim_help_btn", color="warning", outline=False, style={"width": "90px"}), style={"text-align": "center", "margin-top": "19px"})
+                                ],
+                                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "77px", "width": "140px", "margin-top": "3px", "margin-bottom": "4px"}
+                            )
+                        ])
+                    ),
+                    dbc.Col(html.Div(
                             [
-                                dbc.Button("Get results",
-                                    color="success",
-                                    className="position-relative",
-                                    outline=True,
-                                    style={"width": "150px"},
-                                    id="sim_exp_btn",
+                                html.Div(
+                                    [
+                                        html.H5(children=html.P("Register or Login", style={"margin": "0px"}), id="welcome_user", style=H5_style),
+                                        html.Div(
+                                            html.Button(
+                                                html.Img(
+                                                    src="assets/images/signs/info_sign2.svg",
+                                                    style={"margin-left": "-4px"},
+                                                    id="usr_info_sign"),
+                                                id = "info_btn",
+                                                style={"height": "40px", "background": "transparent", "border": "0px"}
+                                            ),
+                                            style={"text-align": "right","margin-top": "-39px", "margin-right": "3px"}
+                                        )
+                                    ]
+                                ),
+                                html.Hr(style={"width": "80%", "margin": "auto", "margin-top": "-1px", "margin-bottom": "-5px"}),
+                                html.Div(
+                                    [
+                                        dcc.Tabs(
+                                            id="usr_tabs",
+                                            value="usr_tab1",
+                                            children=
+                                                [
+                                                    dcc.Tab(
+                                                        value="usr_tab1",
+                                                        label="Sign In",
+                                                        className='user-tab',
+                                                        selected_className='user-tab--selected',
+                                                        selected_style={"color": "white", "background": "transparent"},
+                                                        children= usr_signin
+                                                    ),
+                                                    dcc.Tab(
+                                                        value="usr_tab2",
+                                                        label="Sign Up",
+                                                        className='user-tab',
+                                                        selected_className='user-tab--selected',
+                                                        selected_style={"color": "white", "background": "transparent"},
+                                                        children=usr_signup
+                                                    )
+                                                ],
+                                                colors={"background": "#222222"}
+                                        )
+                                    ],
+                                    style={"text-align": "center", "margin-top": "10px"}
                                 )
-                            ],
-                            style={"textAlign": "center", "marginTop": "10px"}
+                            ],            
+                            style={"border":"1px solid silver", "border-radius": 10, "color": "silver", "height": "180px", "width": "292px"}
                         )
-                    ],            
-                    style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "100px", "width": "435px"}
-                ),
-                html.Div([
-                    html.Div(dbc.Button("Help", id="sim_help_btn", color="warning", outline=False, style={"width": "150px"}), style={"textAlign": "center", "marginTop": "19px"})],
-                style={"border":"1px solid", "border-radius": 10, "color": "silver", "height": "76px", "width": "435px", "marginTop": "4px", "marginBottom": "4px"})], style={"display": "inline-block"}))
+                    )
+                ], className="g-0"),
+                style={"display": "inline-block", "height": "180px", "width": "435px"}) 
+            )
         ],
         className="g-0")
     ], style={"text-align": "center"})
@@ -777,7 +1172,7 @@ def sim_layout(geojson_style):
                     tooltips()
                 ]
             ),
-            dbc.CardFooter(f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})
+            dbc.CardFooter(f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved", style={"text-align": "center"})
         ]
     )
 

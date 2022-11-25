@@ -65,33 +65,36 @@ def semantic_error(number, error_range, intervall_range, time_stamps):
 
     return intervall_lengths, errors, intervall_starts
 
-def simulate_positions(groundtruth, error, measurement_freq, network_capacity, number_of_users, number_of_intervalls,
+def simulate_positions(user, groundtruth, error, measurement_freq, network_capacity, number_of_users, number_of_intervalls,
                        error_range, intervall_range, semantic):
     """
-        creating sample data points for 5G measurements
+    creating sample data points for 5G measurements
 
-        Parameters
-        ----------
-        groundtruth : time stamps and position coordinates of the ground truth data set - array of floats
-        error : desired error for 5G positions  - float
-        measurement_freq : frequency of 5G measurements in (number of measurements/second)  - float
-        query_freq : frequency of possible queries to receive the position information (number of queries/second)  - float
-        number_of_users : number of users connected to the %G network simultaneously  - int
-        number_of_intervalls : number of time intervalls where a semantic error is specified and used  - int
-        error_range : range to randomly draw the semantic error values from  - tuple (list) of floats
-        intervall_range : range to randomly draw duration of time intervalls from  - tuple (list) of floats
-        semantic : choose if semantic errors are used (True) or not (False) - Boolean
+    Parameters
+    ----------
+    groundtruth : time stamps and position coordinates of the ground truth data set - array of floats
+    error : desired error for 5G positions  - float
+    measurement_freq : frequency of 5G measurements in (number of measurements/second)  - float
+    query_freq : frequency of possible queries to receive the position information (number of queries/second)  - float
+    number_of_users : number of users connected to the %G network simultaneously  - int
+    number_of_intervalls : number of time intervalls where a semantic error is specified and used  - int
+    error_range : range to randomly draw the semantic error values from  - tuple (list) of floats
+    intervall_range : range to randomly draw duration of time intervalls from  - tuple (list) of floats
+    semantic : choose if semantic errors are used (True) or not (False) - Boolean
 
 
-        Returns
-        -------
-        positions : simulated positions from 5G measurements - array of arrays (tuples) of floats
-        time_stamps : timestamps of 5G measurements - array of floats
-        error_list : generated error values for every position - list of floats
-        qualities_list : estimated qualities for each measurement (as limits of a error intervall) - array of floats
-        """
+    Returns
+    -------
+    positions : simulated positions from 5G measurements - array of arrays (tuples) of floats
+    time_stamps : timestamps of 5G measurements - array of floats
+    error_list : generated error values for every position - list of floats
+    qualities_list : estimated qualities for each measurement (as limits of a error intervall) - array of floats
+    """
+    # user data
+    un = user["username"]
+    pw = user["password"]
     # getting selected ground truth data
-    groundtruth = np.loadtxt(f"assets/groundtruth/{groundtruth}.csv", skiprows=1)
+    groundtruth = np.loadtxt(f"assets/users/{un}_{pw}/groundtruth/{groundtruth}.csv", skiprows=1)
     error_list = []
     count = 0
     semantic_active = False
@@ -171,14 +174,6 @@ def simulate_positions(groundtruth, error, measurement_freq, network_capacity, n
 
         positions.append([x_temp + np.random.uniform(-current_error, current_error, 1)[0],
                           y_temp + np.random.uniform(-current_error, current_error, 1)[0]])
-
-
-
-
-
-
-
-
     qualities_list = []
     for e in error_list:
         quality = closest_value([error / 5, 2 * error / 5, 3 * error / 5, 4 * error / 5, 5 * error / 5],
@@ -197,9 +192,12 @@ def distance(point1: tuple, point2: tuple) -> float:
     '''distance between 2 points'''
     return np.sqrt((point2[0] - point1[0])**2 + (point2[1] - point1[1])**2)
 
-def export_sim(time_stamps: list, positions: list, errors: list, qualities: list, name: tuple):
+def export_sim(user: dict, time_stamps: list, positions: list, errors: list, qualities: list, name: tuple):
+    # user data
+    un = user["username"]
+    pw = user["password"]
     ### as new trajectory
-    with open(f"assets/trajectories/sim__freq{name[0]}_err{name[1]}_user{name[2]}.csv", "w") as f:
+    with open(f"assets/users/{un}_{pw}/trajectories/sim__freq{name[0]}_err{name[1]}_user{name[2]}.csv", "w") as f:
         lines = [[time_stamps[i], positions[i][0], positions[i][1]] for i in range(len(time_stamps))]
         output = "timestamp x y error quality \n"
         for row in lines:
@@ -207,10 +205,10 @@ def export_sim(time_stamps: list, positions: list, errors: list, qualities: list
         f.write(output)
     ### export
     # antennas
-    if len(os.listdir("assets/antennas")):
+    if len(os.listdir(f"assets/users/{un}_{pw}/antennas")):
         ant_header = ""
         ants = []
-        antennas = np.loadtxt("assets/antennas/antennas.csv", skiprows=1)
+        antennas = np.loadtxt(f"assets/users/{un}_{pw}/antennas/antennas.csv", skiprows=1)
         ant = []
         for i in range(antennas.shape[0]):
             ant_header += f"ant{i+1}_dist ant{i+1}_azim "
@@ -222,7 +220,7 @@ def export_sim(time_stamps: list, positions: list, errors: list, qualities: list
             for j in range(len(ant)):
                 line += ant[j][i]
             ants.append(line)
-        with open(f"assets/exports/sm/sim__freq{name[0]}_err{name[1]}_user{name[2]}.csv", "w") as f:
+        with open(f"assets/exports/results_{un}_{pw}/sm/sim__freq{name[0]}_err{name[1]}_user{name[2]}.csv", "w") as f:
             lines = [[time_stamps[i], positions[i][0], positions[i][1], errors[i], qualities[i], ants[i]] for i in range(len(time_stamps))]
             output = f"timestamp x y error quality {ant_header[:-1]}\n"
             for row in lines:
@@ -230,7 +228,7 @@ def export_sim(time_stamps: list, positions: list, errors: list, qualities: list
             f.write(output)
     # no antennas
     else:
-        with open(f"assets/exports/sm/sim__freq{name[0]}_err{name[1]}_user{name[2]}.csv", "w") as f:
+        with open(f"assets/exports/results_{un}_{pw}/sm/sim__freq{name[0]}_err{name[1]}_user{name[2]}.csv", "w") as f:
             lines = [[time_stamps[i], positions[i][0], positions[i][1], errors[i], qualities[i]] for i in range(len(time_stamps))]
             output = "timestamp x y error quality \n"
             for row in lines:

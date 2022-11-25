@@ -1,4 +1,4 @@
-##### Home Tab -- Layout
+##### Layout Home
 ###IMPORTS
 # dash
 from dash import html, dcc, Dash, Output, Input, State, no_update

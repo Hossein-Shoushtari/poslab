@@ -21,68 +21,87 @@ import utils as u
 
 
 
-def eval_calls(app):
+def eval_calls(app, nc):
     # upload maps =====================================================================================================================
     @app.callback(
         ### Outputs ###
         # modals
-        Output("eval_map_warn", "is_open"), # map upload warn
+        Output("eval_usr_warn1", "is_open"),  # user missing
+        Output("eval_map_warn", "is_open"),   # map upload warn
         # layers
         Output("eval_map_layers", "data"),
         # loading
-        Output("eval_spin1", "children"),   # loading status
+        Output("eval_spin1", "children"),     # loading status
         ### Inputs ###
         # modal
+        State("eval_usr_warn1", "is_open"),
         State("eval_map_warn", "is_open"),
         # maps
         Input("eval_ul_map", "contents"),
         State("eval_ul_map", "filename"),
+        # user
+        Input("usr_data", "data")
     )
     def upload(
         ## modal
+        usr_warn,
         map_warn,
         ## upload
         map_contents,
         map_filenames,
-        ): 
+        # user
+        user
+        ):
         # getting clicked button
         button = [p["prop_id"] for p in callback_context.triggered][0]
         # UPLOAD
         #============= MAP =====================================================================================================================
         if "eval_ul_map" in button:
-            file_check = [name.split(".")[-1] for name in map_filenames if name.split(".")[-1] not in ["geojson"]] # getting all wrong file formats
-            if len(file_check) > 0: return not map_warn, no_update, no_update # activating modal -> warn
-            for i in range(len(map_filenames)): # only right files were uploaded
-                decoded_content = u.upload_encoder(map_contents[i]) # decoding uploaded base64 file
-                gp_file = gp.read_file(decoded_content)
-                converted = gp.GeoDataFrame(gp_file, crs=gp_file.crs).to_crs(4326) # converting crs from uploaded file to WGS84
-                converted.to_file(f"assets/maps/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
-            lon, lat = u.extract_coordinates(gp_file)
-            bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
-            layers = {
-                "layers": True,
-                "quantity": i+1,
-                "bounds": bounds,
-                "date": time.time()
-            }
-            return map_warn, layers, no_update # returning uploaded layers
+            # checking if user is logged in
+            if user["username"]:
+                un = user["username"]
+                pw = user["password"]
+                # start upload
+                file_check = [name.split(".")[-1] for name in map_filenames if name.split(".")[-1] not in ["geojson"]] # getting all wrong file formats
+                if len(file_check) > 0: return usr_warn, not map_warn, no_update, no_update # activating modal -> warn
+                for i in range(len(map_filenames)): # only right files were uploaded
+                    decoded_content = u.upload_encoder(map_contents[i]) # decoding uploaded base64 file
+                    gp_file = gp.read_file(decoded_content)
+                    converted = gp.GeoDataFrame(gp_file, crs=gp_file.crs).to_crs(4326) # converting crs from uploaded file to WGS84
+                    converted.to_file(f"assets/users/{un}_{pw}/maps/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
+                    u.update_user_data(nc, f"{un}_{pw}/maps/{map_filenames[i]}") # push to cloud
+                lon, lat = u.extract_coordinates(gp_file)
+                bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
+                layers = {
+                    "layers": True,
+                    "quantity": i+1,
+                    "bounds": bounds,
+                    "date": time.time()
+                }
+                return usr_warn, map_warn, layers, no_update # returning uploaded layers
+            else:
+                return not usr_warn, map_warn, no_update, no_update # returning uploaded layers
         # ====== no button clicked =============================================================================================================
         # this else-section is always activated, when the page refreshes -> no warnings
-        else: return map_warn, no_update, no_update
+        else: return usr_warn, map_warn, no_update, no_update
 
     # upload rest =======================================================================================================================
     @app.callback(
         ### Outputs ###
         # modals
-        Output("eval_ul_warn", "is_open"),  # rest upload warn
+        Output("eval_usr_warn2", "is_open"),  # user missing
+        Output("eval_ul_warn", "is_open"),    # rest upload warn
+        Output("eval_ul_done", "is_open"),     # rest upload done
         # layers
         Output("eval_gt_layers", "data"),
         Output("eval_traj_layers", "data"),
         # loading
-        Output("eval_spin2", "children"),   # loading status
+        Output("eval_spin2", "children"),     # loading status
         ### Inputs ###
         # modals
+        State("eval_usr_warn2", "is_open"),
         State("eval_ul_warn", "is_open"),
+        State("eval_ul_done", "is_open"),
         # ground truth
         Input("ul_gt", "contents"),
         State("ul_gt", "filename"),
@@ -100,11 +119,15 @@ def eval_calls(app):
         State("eval_ul_bar", "filename"),
         # magnetometer
         Input("eval_ul_mag", "contents"),
-        State("eval_ul_mag", "filename")
+        State("eval_ul_mag", "filename"),
+        # user
+        Input("usr_data", "data")
     )
     def upload(
         ## modals
+        usr_warn,
         ul_warn,
+        ul_done,
         ## upload
         gt_contents,   # ground truth
         gt_filenames,
@@ -118,90 +141,112 @@ def eval_calls(app):
         bar_contents,  # barometer
         bar_filenames,
         mag_contents,  # magnetometer
-        mag_filenames
+        mag_filenames,
+        # user
+        user
         ):
         # getting clicked button
         button = [p["prop_id"] for p in callback_context.triggered][0]
+        un = user["username"]
+        pw = user["password"]
         # UPLOAD
         # ========== GROUND TRUTH ==================================================================================================================
         if "ul_gt" in button:
-            for i in range(len(gt_filenames)):
-                if gt_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                    gt_decoded = u.upload_encoder(gt_contents[i]) # decoding uploaded base64 file
-                    with open(f"assets/groundtruth/{gt_filenames[i]}", "w") as file: file.write(gt_decoded) # saving file
-                else: return not ul_warn, no_update, no_update, no_update # activating modal -> warn
-            # getting zoom lvl and center point
-            lon, lat = u.from_32632_to_4326(np.loadtxt(f"assets/groundtruth/{gt_filenames[i]}", skiprows=1)[:,1:3])
-            bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
-            layers = {
-                "layers": True,
-                "quantity": i+1,
-                "bounds": bounds,
-                "date": time.time()
-            }
-            # if everything went fine ...
-            return ul_warn, layers, no_update, no_update
+            if un:
+                for i in range(len(gt_filenames)):
+                    if gt_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
+                        gt_decoded = u.upload_encoder(gt_contents[i]) # decoding uploaded base64 file
+                        with open(f"assets/users/{un}_{pw}s/groundtruth/{gt_filenames[i]}", "w") as file: file.write(gt_decoded) # saving file
+                        u.update_user_data(nc, f"{un}_{pw}/groundtruth/{gt_filenames[i]}") # push to cloud
+                    else: return usr_warn, not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
+                # getting zoom lvl and center point
+                lon, lat = u.from_32632_to_4326(np.loadtxt(f"assets/users/{un}_{pw}/groundtruth/{gt_filenames[i]}", skiprows=1)[:,1:3])
+                bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
+                layers = {
+                    "layers": True,
+                    "quantity": i+1,
+                    "bounds": bounds,
+                    "date": time.time()
+                }
+                # if everything went fine ...
+                return usr_warn, ul_warn, not ul_done, layers, no_update, no_update
+            else: return not usr_warn, ul_warn, ul_done, no_update, no_update, no_update
         # ========== TRAJECTORIES =================================================================================================================
         elif "ul_tra" in button:
-            for i in range(len(tra_filenames)):
-                if tra_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                    decoded_content = u.upload_encoder(tra_contents[i]) # decoding uploaded base64 file
-                    with open(f"assets/trajectories/{tra_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, no_update, no_update, no_update # activating modal -> warn
-            # getting zoom lvl and center point
-            lon, lat = u.from_32632_to_4326(np.loadtxt(f"assets/trajectories/{tra_filenames[i]}", skiprows=1)[:,1:3])
-            bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
-            # getting number of points -> overflow True or False
-            if len(lon) > 500: overflow = True
-            else: overflow = False
-            layers = {
-                "layers": True,
-                "quantity": i+1,
-                "bounds": bounds,
-                "overflow": overflow,
-                "date": time.time()
-            }
-            # if everything went fine ...
-            return ul_warn, no_update, layers, no_update
+            if un:
+                for i in range(len(tra_filenames)):
+                    if tra_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
+                        decoded_content = u.upload_encoder(tra_contents[i]) # decoding uploaded base64 file
+                        with open(f"assets/users/{un}_{pw}/trajectories/{tra_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
+                        u.update_user_data(nc, f"{un}_{pw}/trajectories/{tra_filenames[i]}") # push to cloud
+                    else: return usr_warn, not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
+                # getting zoom lvl and center point
+                lon, lat = u.from_32632_to_4326(np.loadtxt(f"assets/users/{un}_{pw}/trajectories/{tra_filenames[i]}", skiprows=1)[:,1:3])
+                bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
+                # getting number of points -> overflow True or False
+                if len(lon) > 500: overflow = True
+                else: overflow = False
+                layers = {
+                    "layers": True,
+                    "quantity": i+1,
+                    "bounds": bounds,
+                    "overflow": overflow,
+                    "date": time.time()
+                }
+                # if everything went fine ...
+                return usr_warn, ul_warn, not ul_done, no_update, layers, no_update
+            else: return not usr_warn, ul_warn, ul_done, ul_done, no_update, no_update
         # ========== GYROSCOPE =================================================================================================================
         elif "eval_ul_gyr" in button:
-            for i in range(len(gyr_filenames)):
-                if gyr_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                    decoded_content = u.upload_encoder(gyr_contents[i]) # decoding uploaded base64 file
-                    with open(f"assets/sensors/gyr/{gyr_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, no_update, no_update, no_update # activating modal -> warn
-            # if everything went fine ...
-            return ul_warn, no_update, no_update, no_update
+            if un:
+                for i in range(len(gyr_filenames)):
+                    if gyr_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
+                        decoded_content = u.upload_encoder(gyr_contents[i]) # decoding uploaded base64 file
+                        with open(f"assets/users/{un}_{pw}/sensors/gyr/{gyr_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
+                        u.update_user_data(nc, f"{un}_{pw}/sensors/gyr/{gyr_filenames[i]}") # push to cloud
+                    else: return usr_warn, not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
+                # if everything went fine ...
+                return usr_warn, ul_warn, not ul_done, no_update, no_update, no_update
+            else: return not usr_warn, ul_warn, ul_done, ul_done, no_update, no_update
         # ========= ACCELERATION  ==============================================================================================================
         elif "eval_ul_acc" in button:
-            for i in range(len(acc_filenames)):
-                if acc_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                    decoded_content = u.upload_encoder(acc_contents[i]) # decoding uploaded base64 file
-                    with open(f"assets/sensors/acc/{acc_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, no_update, no_update, no_update # activating modal -> warn
-            # if everything went fine ...
-            return ul_warn, no_update, no_update, no_update, no_update
+            if un:
+                for i in range(len(acc_filenames)):
+                    if acc_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
+                        decoded_content = u.upload_encoder(acc_contents[i]) # decoding uploaded base64 file
+                        with open(f"assets/users/{un}_{pw}/sensors/acc/{acc_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
+                        u.update_user_data(nc, f"{un}_{pw}/sensors/acc/{acc_filenames[i]}") # push to cloud
+                    else: return usr_warn, not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
+                # if everything went fine ...
+                return usr_warn, ul_warn, not ul_done, no_update, no_update, no_update
+            else: return not usr_warn, ul_warn, ul_done, ul_done, no_update, no_update
         # ========= BAROMETER  =================================================================================================================
         elif "eval_ul_bar" in button:
-            for i in range(len(bar_filenames)):
-                if bar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                    decoded_content = u.upload_encoder(bar_contents[i]) # decoding uploaded base64 file
-                    with open(f"assets/sensors/bar/{bar_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, no_update, no_update, no_update # activating modal -> warn
-            # if everything went fine ...
-            return ul_warn, no_update, no_update, no_update
+            if un:
+                for i in range(len(bar_filenames)):
+                    if bar_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
+                        decoded_content = u.upload_encoder(bar_contents[i]) # decoding uploaded base64 file
+                        with open(f"assets/users/{un}_{pw}/sensors/bar/{bar_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
+                        u.update_user_data(nc, f"{un}_{pw}/sensors/bar/{bar_filenames[i]}") # push to cloud
+                    else: return usr_warn, not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
+                # if everything went fine ...
+                return usr_warn, ul_warn, not ul_done, no_update, no_update, no_update
+            else: return not usr_warn, ul_warn, ul_done, ul_done, no_update, no_update
         # ======== MAGNETOMETER  ===============================================================================================================
         elif "eval_ul_mag" in button:
-            for i in range(len(mag_filenames)):
-                if mag_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
-                    decoded_content = u.upload_encoder(mag_contents[i]) # decoding uploaded base64 file
-                    with open(f"assets/sensors/mag/{mag_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
-                else: return not ul_warn, no_update, no_update, no_update # activating modal -> warn
-            # if everything went fine ...
-            return ul_warn, no_update , no_update, no_update
+            if un:
+                for i in range(len(mag_filenames)):
+                    if mag_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
+                        decoded_content = u.upload_encoder(mag_contents[i]) # decoding uploaded base64 file
+                        with open(f"assets/users/{un}_{pw}/sensors/mag/{mag_filenames[i]}", "w") as file: file.write(decoded_content) # saving file
+                        u.update_user_data(nc, f"{un}_{pw}/sensors/mag/{mag_filenames[i]}") # push to cloud
+                    else: return usr_warn, not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
+                # if everything went fine ...
+                return usr_warn, ul_warn, not ul_done, no_update , no_update, no_update
+            else: return not usr_warn, ul_warn, ul_done, ul_done, no_update, no_update
         # ====== no button clicked =============================================================================================================
         # this else-section is always activated, when the page refreshes -> no warnings
-        else: return ul_warn, no_update, no_update, no_update
+        else: return usr_warn, ul_warn, ul_done, no_update, no_update, no_update
 
     # open cdf =======================================================================================================================
     @app.callback(
@@ -218,6 +263,8 @@ def eval_calls(app):
         # researcher login
         Input("eval_unlocked1", "data"),
         Input("eval_unlocked2", "data"),
+        # user
+        Input("usr_data", "data")
     )
     def open_cdf(
         # canvas status
@@ -226,16 +273,27 @@ def eval_calls(app):
         open_cdf,
         # unlocked
         unlocked1,
-        unlocked2
+        unlocked2,
+        # user
+        user
         ):
+        # getting clicked button
         button = [p["prop_id"] for p in callback_context.triggered][0]
+        un = user["username"]
+        pw = user["password"]
         if "open_cdf" in button:
-            gt_options   = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/groundtruth")]
-            traj_options = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/trajectories")]
-            map_options = [{"label": name[:-8], "value": f"assets/maps/{name[:-8]}"} for name in listdir("assets/maps")]
-            if unlocked1 or unlocked2:
-                map_options += [{"label": name[:-8], "value": f"assets/floorplans/{name[:-8]}"} for name in listdir("assets/floorplans")]
-            return not cdf_cv, gt_options, traj_options, map_options
+            if un: # user logged in
+                gt_options   = [{"label": name[:-4], "value": name[:-4]} for name in listdir(f"assets/users/{un}_{pw}/groundtruth")]
+                traj_options = [{"label": name[:-4], "value": name[:-4]} for name in listdir(f"assets/users/{un}_{pw}/trajectories")]
+                map_options = [{"label": name[:-8], "value": f"assets/users/{un}_{pw}/maps/{name[:-8]}"} for name in listdir(f"assets/users/{un}_{pw}/maps")]
+                if unlocked1 or unlocked2:
+                    map_options += [{"label": name[:-8], "value": f"assets/floorplans/{name[:-8]}"} for name in listdir("assets/floorplans")]
+                return not cdf_cv, gt_options, traj_options, map_options
+            else:
+                map_options = []
+                if unlocked1 or unlocked2:
+                    map_options = [{"label": name[:-8], "value": f"assets/floorplans/{name[:-8]}"} for name in listdir("assets/floorplans")]
+                return not cdf_cv, [], [], map_options
         else: return cdf_cv, [], [], []
 
     # cdf =======================================================================================================================
@@ -268,7 +326,9 @@ def eval_calls(app):
         Input("traj_select", "value"),
         Input("map_select", "value"),
         # button
-        Input("cdf_btn", "n_clicks")
+        Input("cdf_btn", "n_clicks"),
+        # user
+        Input("usr_data", "data")
     )
     def cdf(
         # modals
@@ -286,13 +346,18 @@ def eval_calls(app):
         map_select,
         # button
         cdf_btn,
+        # user
+        user
         ):
+        # getting clicked button
         button = [p["prop_id"] for p in callback_context.triggered][0]
+        un = user["username"]
+        pw = user["password"]
         if "cdf_btn" in button:
             if  gt_select and traj_select:
                 # data
-                gt  = np.loadtxt(f"assets/groundtruth/{gt_select}.csv", skiprows=1)
-                trajs = [np.loadtxt(f"assets/trajectories/{traj}.csv", skiprows=1) for traj in traj_select]
+                gt  = np.loadtxt(f"assets/users/{un}_{pw}/groundtruth/{gt_select}.csv", skiprows=1)
+                trajs = [np.loadtxt(f"assets/users/{un}_{pw}/trajectories/{traj}.csv", skiprows=1) for traj in traj_select]
                 cdf_list = []
                 # interpolation
                 interpolations = eu.interpolation(gt, trajs)
@@ -353,7 +418,9 @@ def eval_calls(app):
         # button
         Input("open_visual", "n_clicks"),
         # researcher login
-        Input("eval_unlocked3", "data")
+        Input("eval_unlocked3", "data"),
+        # user
+        Input("usr_data", "data")
     )
     def open_visual(
         # modal
@@ -361,18 +428,29 @@ def eval_calls(app):
         # button
         open_visual,
         # unlocked
-        unlocked
+        unlocked,
+        # user
+        user
         ):
+        # getting clicked button
         button = [p["prop_id"] for p in callback_context.triggered][0]
+        un = user["username"]
+        pw = user["password"]
         if "open_visual" in button:
-            map_options  = [{"label": name[:-8], "value": f"maps/{name[:-8]}"} for name in listdir("assets/maps")]
-            ref_options  = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/waypoints")]
-            gt_options   = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/groundtruth")]
-            traj_options = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/trajectories")]
-            ant_options  = [{"label": name[:-4], "value": name[:-4]} for name in listdir("assets/antennas")]
-            if unlocked:
-                map_options += [{"label": name[:-8], "value": f"floorplans/{name[:-8]}"} for name in listdir("assets/floorplans")]
-            return not visual_show, map_options, ref_options, gt_options, traj_options, ant_options
+            if un: # user logged in
+                map_options  = [{"label": name[:-8], "value": f"users/{un}_{pw}maps/{name[:-8]}"} for name in listdir(f"assets/users/{un}_{pw}/maps")]
+                ref_options  = [{"label": name[:-4], "value": name[:-4]} for name in listdir(f"assets/users/{un}_{pw}/waypoints")]
+                gt_options   = [{"label": name[:-4], "value": name[:-4]} for name in listdir(f"assets/users/{un}_{pw}/groundtruth")]
+                traj_options = [{"label": name[:-4], "value": name[:-4]} for name in listdir(f"assets/users/{un}_{pw}/trajectories")]
+                ant_options  = [{"label": name[:-4], "value": name[:-4]} for name in listdir(f"assets/users/{un}_{pw}/antennas")]
+                if unlocked:
+                    map_options += [{"label": name[:-8], "value": f"floorplans/{name[:-8]}"} for name in listdir("assets/floorplans")]
+                return not visual_show, map_options, ref_options, gt_options, traj_options, ant_options
+            else:
+                map_options = []
+                if unlocked:
+                    map_options = [{"label": name[:-8], "value": f"floorplans/{name[:-8]}"} for name in listdir("assets/floorplans")]
+                return not visual_show, map_options, [], [], [], []
         else: return visual_show, [], [], [], [], []
 
     # visual map =======================================================================================================================
@@ -389,11 +467,26 @@ def eval_calls(app):
         Input("vis_ant_select", "value"),
         Input("vis_bg_select", "value"),
         Input("vis_format_select", "value"),
-        Input("vis_map", "figure")
+        Input("vis_map", "figure"),
+        # user
+        Input("usr_data", "data")
     )
-    def update_fig(_map, refs, gts, trajs, ant, bg, _format, FIG):
+    def update_fig(
+        # files
+        _map,
+        refs,
+        gts,
+        trajs,
+        ant,
+        bg,
+        _format,
+        FIG,
+        # user
+        user):
         # refreshing configurations
         trigger = [p["prop_id"] for p in callback_context.triggered][0]
+        un = user["username"]
+        pw = user["password"]
         if "vis_format_select" in trigger:
             if not _format: _format = "png"
             config={
@@ -455,7 +548,7 @@ def eval_calls(app):
         if refs:
             # creating plotly layers
             for ref in refs:
-                data = np.loadtxt(f"assets/waypoints/{ref}.csv", skiprows=1)[:, 1:3]
+                data = np.loadtxt(f"assets/users/{un}_{pw}/waypoints/{ref}.csv", skiprows=1)[:, 1:3]
                 lon, lat = u.from_32632_to_4326(data)
                 fig.add_trace(go.Scattermapbox(
                     mode="markers",
@@ -471,7 +564,7 @@ def eval_calls(app):
         if gts:
             # creating plotly layers
             for gt in gts:
-                data = np.loadtxt(f"assets/groundtruth/{gt}.csv", skiprows=1)[:, 1:3]
+                data = np.loadtxt(f"assets/users/{un}_{pw}/groundtruth/{gt}.csv", skiprows=1)[:, 1:3]
                 lon, lat = u.from_32632_to_4326(data)
                 fig.add_trace(go.Scattermapbox(
                     mode="markers",
@@ -487,7 +580,7 @@ def eval_calls(app):
         if trajs:
             # creating plotly layers
             for traj in trajs:
-                data = np.loadtxt(f"assets/trajectories/{traj}.csv", skiprows=1)[:, 1:3]
+                data = np.loadtxt(f"assets/users/{un}_{pw}/trajectories/{traj}.csv", skiprows=1)[:, 1:3]
                 lon, lat = u.from_32632_to_4326(data)
                 fig.add_trace(go.Scattermapbox(
                     mode="markers",
@@ -502,7 +595,7 @@ def eval_calls(app):
             center = u.centroid(lon, lat)
         if ant:
             # creating plotly layers
-            data = np.loadtxt(f"assets/antennas/{ant}.csv", skiprows=1)
+            data = np.loadtxt(f"assets/users/{un}_{pw}/antennas/{ant}.csv", skiprows=1)
             lon, lat = u.from_32632_to_4326(data)
             fig.add_trace(go.Scattermapbox(
                 mode="markers",
@@ -558,6 +651,7 @@ def eval_calls(app):
     @app.callback(
         ### Outputs ###
         # modal
+        Output("eval_usr_warn3", "is_open"),   # user missing
         Output("eval_exp_done", "is_open"),    # export done status
         Output("eval_exp_warn", "is_open"),    # export warn status
         # download
@@ -566,23 +660,41 @@ def eval_calls(app):
         Output("eval_spin4", "children"),      # loading status
         ### Inputs ###
         # modal
+        State("eval_usr_warn3", "is_open"),    # user warn
         State("eval_exp_done", "is_open"),     # done
         State("eval_exp_warn", "is_open"),     # warn
         # button
         Input("eval_exp_btn", "n_clicks"),     # export button click status
+        # user
+        Input("usr_data", "data")
     )
     def export(
         # modal
+        usr_warn,
         exp_done,
         exp_warn,
         # button
-        exp_clicks
+        exp_clicks,
+        # user
+        user
         ):
+        un = user["username"]
+        pw = user["password"]
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "eval_exp_btn" in button:
-            return exp_done, not exp_warn, no_update, no_update # nothing to export yet
-        else:
-            return exp_done, exp_warn, no_update, no_update # no button clicked
+            if un: # user logged in
+                if len(listdir(f"assets/exports/results_{un}_{pw}/gt")) or len(listdir(f"assets/exports/results_{un}_{pw}/sm")) or len(listdir(f"assets/exports/results_{un}_{pw}/draw")):
+                    # zipping & downloading
+                    name = u.time()
+                    zip_folder = st.make_archive(f"assets/exports/results_{name}", 'zip', f"assets/exports/results_{un}_{pw}")
+                    download = dcc.send_file(f"assets/exports/results_{name}.zip", filename=f"L5IN_export_{name}.zip")
+                    return usr_warn, not exp_done, exp_warn, download, no_update # export successful
+                else: # nothing to export
+                    return usr_warn, exp_done, not exp_warn, no_update, no_update
+            else: # user isn't logged in
+                return not usr_warn, exp_done, exp_warn, no_update, no_update
+        else: # no button clicked
+            return usr_warn, exp_done, exp_warn, no_update, no_update
 
     # help canvas =======================================================================================================================
     @app.callback(

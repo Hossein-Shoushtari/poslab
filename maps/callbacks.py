@@ -6,13 +6,12 @@ from dash import Output, Input, State, no_update, callback_context
 import geopandas as gp
 # built in
 import time
-# utils
+# utils (general & simulator)
 import simulator.utils as su
-import evaluator.utils as eu
 import utils as u
 
 
-def map_display(app, geojson_style):
+def maps_calls(app, geojson_style):
     # open researcher login ==============================================================================================================
     @app.callback(
         Output("research", "is_open"),
@@ -30,8 +29,8 @@ def map_display(app, geojson_style):
     @app.callback(
         ### Outputs ###
         # return messages
-        Output("password", "valid"),
-        Output("password", "invalid"),
+        Output("hcu_pw", "valid"),
+        Output("hcu_pw", "invalid"),
         # unlock status
         Output("unlocked", "data"),
         Output("eval_unlocked1", "data"),
@@ -39,7 +38,7 @@ def map_display(app, geojson_style):
         Output("eval_unlocked3", "data"),
         ### Inputs ###
         Input("unlock", "n_clicks"),
-        Input("password", "value")
+        Input("hcu_pw", "value")
     )
     def unlock(unlock, password):
         button = [p["prop_id"] for p in callback_context.triggered][0]
@@ -95,7 +94,9 @@ def map_display(app, geojson_style):
         Input("eval_traj_layers", "data"),  # trajectories
         ## buttons ##
         Input("sim_zoom", "n_clicks"),
-        Input("eval_zoom", "n_clicks")
+        Input("eval_zoom", "n_clicks"),
+        ## user ##
+        Input("usr_data", "data")
     )
     def display(
         ## modal
@@ -117,10 +118,13 @@ def map_display(app, geojson_style):
         eval_traj_layers,
         ## buttons
         sim_zoom_btn,
-        eval_zoom_btn
+        eval_zoom_btn,
+        user
         ):
         # getting triggered element
         trigger = [p["prop_id"] for p in callback_context.triggered][0]
+        if "usr_data" in trigger:
+            return no_update
         # ============================================================================================================================================================== #
         ly_style = {"display": "None"}
         bounds=[[35.81781315869664, -47.90039062500001], [60.71619779357716, 67.67578125000001]] # center of Europe as centroid
@@ -162,22 +166,22 @@ def map_display(app, geojson_style):
         if unlocked["unlocked"] == True: # adding floorplans to map
             hcu_style = {"display": "block"}
             # adding floorplans
-            sim_layers += su.floorplan2layer(geojson_style)
-            eval_layers += eu.floorplan2layer(geojson_style)
+            sim_layers += u.floorplan2layer(geojson_style, "sim")
+            eval_layers += u.floorplan2layer(geojson_style, "eval")
             ly_style = {"display": "block"}
         if unlocked["unlocked"] == False: # removing floorplans from map
             hcu_style = {"display": "None"}
             ly_style = {"display": "None"}
         # maps ------------------------------------------------------------------------------
         if "sim_map_layers" in trigger:
-            maps = u.map2layer(sim_map_layers["quantity"], geojson_style)
+            maps = u.map2layer(user, sim_map_layers["quantity"], geojson_style)
             layers += maps
             sim_layers += maps
             eval_layers += maps
             ly_style = {"display": "block"}
             return not display_done, overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
         elif "eval_map_layers" in trigger:
-            maps = u.map2layer(eval_map_layers["quantity"], geojson_style)
+            maps = u.map2layer(user, eval_map_layers["quantity"], geojson_style)
             layers += maps
             sim_layers += maps
             eval_layers += maps
@@ -185,7 +189,7 @@ def map_display(app, geojson_style):
             return not display_done, overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
         # antennas --------------------------------------------------------------------------
         elif "sim_ant_layers" in trigger:
-            ants = su.ant2marker()
+            ants = su.ant2marker(user)
             layers.append(ants)
             sim_layers.append(ants)
             eval_layers.append(ants)
@@ -209,14 +213,14 @@ def map_display(app, geojson_style):
             return display_done, overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
         # ground truth ----------------------------------------------------------------------
         elif "sim_gt_layers" in trigger:
-            gts = u.gt2marker(sim_gt_layers["quantity"])
+            gts = u.gt2marker(user, sim_gt_layers["quantity"])
             layers += gts
             sim_layers += gts
             eval_layers += gts
             ly_style = {"display": "block"}
             return not display_done, overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
         elif "eval_gt_layers" in trigger:
-            gts = u.gt2marker(eval_gt_layers["quantity"])
+            gts = u.gt2marker(user, eval_gt_layers["quantity"])
             layers += gts
             sim_layers += gts
             eval_layers += gts
@@ -224,7 +228,7 @@ def map_display(app, geojson_style):
             return not display_done, overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
         # trajectories ----------------------------------------------------------------------
         elif "sim_traj_layers" in trigger:
-            trajs = u.traj2marker(sim_traj_layers["quantity"])
+            trajs = u.traj2marker(user, sim_traj_layers["quantity"])
             layers += trajs
             sim_layers += trajs
             eval_layers += trajs
@@ -234,7 +238,7 @@ def map_display(app, geojson_style):
             if sim_traj_layers["overflow"] == False: # less than 500 points
                 return not display_done, overflow, no_update, layers, ly_style, sim_layers, bounds, hcu_style, ly_style, eval_layers, bounds, hcu_style
         elif "eval_traj_layers" in trigger:
-            trajs = u.traj2marker(eval_traj_layers["quantity"])
+            trajs = u.traj2marker(user, eval_traj_layers["quantity"])
             layers += trajs
             sim_layers += trajs
             eval_layers += trajs

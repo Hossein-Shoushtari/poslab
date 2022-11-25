@@ -15,6 +15,7 @@ from base64 import b64decode
 import shutil as st
 import numpy as np
 import math as m
+import zipfile
 import smtplib
 import os
 # installed
@@ -22,7 +23,55 @@ import shapely.geometry as sh
 import geopandas as gp
 
 
-def map2layer(quantity, geojson_style) -> list:
+def signin_validation(entry):
+    # entry should exist
+    if entry == None: return False
+    # entry should start with a letter
+    is_first_lower = ord('a') <= ord(entry[0]) <= ord('z')
+    is_first_upper = ord('A') <= ord(entry[0]) <= ord('Z')
+    if not (is_first_lower or is_first_upper):
+        return False
+    # only consists of letters and numbers
+    for character in entry:
+        is_lower = ord('a') <= ord(character) <= ord('z')
+        is_upper = ord('A') <= ord(character) <= ord('Z')
+        is_number = ord('0') <= ord(character) <= ord('9')
+        if not (is_lower or is_upper or is_number):
+            return False
+    # length between 3 and 15 characters
+    if len(entry) < 3 or len(entry) > 15:
+        return False
+    return True
+
+def create_user(nc, username, password):
+    assets = ["antennas", "groundtruth", "maps", "sensors", "trajectories", "waypoints"]
+    sensors = ["acc", "bar", "gyr", "mag"]
+    nc.mkdir(f"L5IN/{username}_{password}")
+    for asset in assets:
+        nc.mkdir(f"L5IN/{username}_{password}/{asset}")
+    for sensor in sensors:
+        nc.mkdir(f"L5IN/{username}_{password}/sensors/{sensor}")
+
+def get_user(nc, username, password):
+    # get individual user data
+    nc.get_directory_as_zip(f"L5IN/{username}_{password}", f"assets/users/{username}_{password}.zip")
+    with zipfile.ZipFile(f"assets/users/{username}_{password}.zip", 'r') as zip_ref:
+        zip_ref.extractall("assets/users")
+    os.remove(f"assets/users/{username}_{password}.zip")
+    try: # create individual export dir, if not yet there
+        os.mkdir(f"assets/exports/results_{username}_{password}")
+        os.mkdir(f"assets/exports/results_{username}_{password}/draw")
+        os.mkdir(f"assets/exports/results_{username}_{password}/gt")
+        os.mkdir(f"assets/exports/results_{username}_{password}/sm")
+        st.copy("assets/README.txt", f"assets/exports/results_{username}_{password}/README.txt")
+    except: pass
+
+def update_user_data(nc, rel_file_path):
+    remote_path = f"L5IN/{rel_file_path}"
+    local_source_file = f"assets/users/{rel_file_path}"
+    nc.put_file(remote_path, local_source_file)
+
+def map2layer(user: dict, quantity, geojson_style) -> list:
     """
     FUNCTION
     - makes layers out of newly uploaded map files
@@ -33,10 +82,13 @@ def map2layer(quantity, geojson_style) -> list:
     RETURN
     layers : list of uploaded layers
     """
+    # user data
+    un = user["username"]
+    pw = user["password"]
     # getting list of all files only in the given directory
-    list_of_files = filter(lambda x: os.path.isfile(os.path.join("assets/maps", x)), os.listdir("assets/maps"))
+    list_of_files = filter(lambda x: os.path.isfile(os.path.join(f"assets/users/{un}_{pw}/maps", x)), os.listdir(f"assets/users/{un}_{pw}/maps"))
     # sorting list of files based on last modification time in ascending order
-    list_of_files = sorted(list_of_files, key = lambda x: os.path.getmtime(os.path.join("assets/maps", x)))
+    list_of_files = sorted(list_of_files, key = lambda x: os.path.getmtime(os.path.join(f"assets/users/{un}_{pw}/maps", x)))
     # taking only the latest uploaded files
     list_of_files = list_of_files[-quantity:]
     # initializing list to fill it with newly uploaded layers
@@ -44,11 +96,43 @@ def map2layer(quantity, geojson_style) -> list:
     for geojson_file in list_of_files:
         name = geojson_file.split(".")[0]  # getting name of geojson file
         geojson = dl.GeoJSON(
-            url=f"assets/maps/{geojson_file}",  # url to geojson file
+            url=f"assets/users/{un}_{pw}/maps/{geojson_file}",  # url to geojson file
             options=dict(style=geojson_style),  # style each polygon
             hoverStyle=arrow_function(dict(weight=1, color='orange')),  # style applied on hover
             hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""))
         layers.append(dl.Overlay(geojson, name=name, checked=True))
+    return layers
+
+def floorplan2layer(geojson_style, tab: str) -> list:
+    """
+    FUNCTION
+    - makes layers out of HCU floorplans (gejson)
+    -------
+    PARAMETER
+    geojson_style : geojson rendering logic in java script (assign)
+    tab           : sim or eval
+    -------
+    RETURN
+    layers : list of layered floorplans
+    """
+    # initializing list to fill it with default layers
+    layers = []
+    # list of all default floorplan names
+    floorplans = ["EG", "1OG", "4OG"]
+    # showing it or not
+    show = [False for _ in range(len(floorplans)-1)] + [True]
+    i = 0
+    # adding all floorplans as layers
+    for fp in floorplans:
+        geojson = dl.GeoJSON(
+            url=f"assets/floorplans/{fp}.geojson",  # url to geojson file
+            options=dict(style=geojson_style),  # style each polygon
+            hoverStyle=arrow_function(dict(weight=1, color="orange")),  # style applied on hover
+            hideout=dict(style={"weight": 0.2, "color": "blue"}, classes=[], colorscale=[], colorProp=""),
+            id=f"{fp}_{tab}")
+        layers.append(dl.Overlay(geojson, name=fp, checked=show[i]))
+        i += 1
+
     return layers
 
 def hover_info(feature=None) -> 'html.Div':
@@ -281,7 +365,7 @@ def from_32632_to_4326(data: list) -> tuple:
         lat.append(p.y)
     return [lon, lat]
 
-def gt2marker(quantity) -> list:
+def gt2marker(user: dict, quantity) -> list:
     """
     FUNCTION
     - converts lat and lon from crs32632 (groundtruth) to crs4326
@@ -290,23 +374,26 @@ def gt2marker(quantity) -> list:
     RETURN
     markers : list of all created markers with converted lat and lon
     """
+    # user data
+    un = user["username"]
+    pw = user["password"]
     # icon colors
     colors = ["red", "green", "yellow", "purple", "orange", "blue", "black", "brown"]
     # getting list of all files only in the given directory
-    list_of_files = filter(lambda x: os.path.isfile(os.path.join("assets/groundtruth", x)), os.listdir("assets/groundtruth"))
+    list_of_files = filter(lambda x: os.path.isfile(os.path.join(f"assets/users/{un}_{pw}/groundtruth", x)), os.listdir(f"assets/users/{un}_{pw}/groundtruth"))
     # sorting list of files based on last modification time in ascending order
-    list_of_files = sorted(list_of_files, key = lambda x: os.path.getmtime(os.path.join("assets/groundtruth", x)))
+    list_of_files = sorted(list_of_files, key = lambda x: os.path.getmtime(os.path.join(f"assets/users/{un}_{pw}/groundtruth", x)))
     # taking only the latest uploaded files
     list_of_files = list_of_files[-quantity:]
     # making layers out of all generated ground truth data
-    num_files = len(next(os.walk("assets/groundtruth"))[2])
+    num_files = len(next(os.walk(f"assets/users/{un}_{pw}/groundtruth"))[2])
     i = num_files - quantity
     layers = []
     for csv_file in list_of_files:
         # layer & data name
         name = csv_file.split(".")[:-1]
         # data
-        gt = np.loadtxt(f"assets/groundtruth/{csv_file}", skiprows=1)[:, 1:3]
+        gt = np.loadtxt(f"assets/users/{un}_{pw}/groundtruth/{csv_file}", skiprows=1)[:, 1:3]
         # designing icon (from https://icons8.de/icons/set/marker)
         icon = {
             "iconUrl": f"https://img.icons8.com/emoji/344/{colors[i%len(colors)]}-circle-emoji.png",
@@ -328,7 +415,7 @@ def gt2marker(quantity) -> list:
         i += 1
     return layers
 
-def traj2marker(quantity) -> list:
+def traj2marker(user: dict, quantity) -> list:
     """
     FUNCTION
     - converts lat and lon from crs32632 (trajectories) to crs4326
@@ -337,23 +424,26 @@ def traj2marker(quantity) -> list:
     RETURN
     markers : list of all created markers with converted lat and lon
     """
+    # user data
+    un = user["username"]
+    pw = user["password"]
     # icon colors
     colors = ["purple", "green", "blue", "red", "orange", "yellow","black", "brown"]
     # getting list of all files only in the given directory
-    list_of_files = filter(lambda x: os.path.isfile(os.path.join("assets/trajectories", x)), os.listdir("assets/trajectories"))
+    list_of_files = filter(lambda x: os.path.isfile(os.path.join(f"assets/users/{un}_{pw}/trajectories", x)), os.listdir(f"assets/users/{un}_{pw}/trajectories"))
     # sorting list of files based on last modification time in ascending order
-    list_of_files = sorted(list_of_files, key = lambda x: os.path.getmtime(os.path.join("assets/trajectories", x)))
+    list_of_files = sorted(list_of_files, key = lambda x: os.path.getmtime(os.path.join(f"assets/users/{un}_{pw}/trajectories", x)))
     # taking only the latest uploaded files
     list_of_files = list_of_files[-quantity:]
     # making layers out of all generated ground truth data
-    num_files = len(next(os.walk("assets/trajectories"))[2])
+    num_files = len(next(os.walk(f"assets/users/{un}_{pw}/trajectories"))[2])
     i = num_files - quantity
     layers = []
     for csv_file in list_of_files:
         # layer & data name
         name = csv_file.split(".")[:-1]
         # data
-        traj = np.loadtxt(f"assets/trajectories/{csv_file}", skiprows=1)[:, 1:3]
+        traj = np.loadtxt(f"assets/users/{un}_{pw}/trajectories/{csv_file}", skiprows=1)[:, 1:3]
         # displaying only trajectories with maximum 100 markers
         if traj.shape[0] < 500:
             # designing icon (from https://icons8.de/icons/set/marker)
@@ -381,37 +471,14 @@ def deleter():
     """
     - emptying all uploaded or generated files before the actuall app starts
     """
-    for filename in os.listdir("assets/antennas"): os.remove(f"assets/antennas/{filename}")
-    for filename in os.listdir("assets/exports/gt"): os.remove(f"assets/exports/gt/{filename}")
-    for filename in os.listdir("assets/exports/sm"): os.remove(f"assets/exports/sm/{filename}")
-    for filename in os.listdir("assets/exports/draw"): os.remove(f"assets/exports/draw/{filename}")
-    for filename in os.listdir("assets/groundtruth"): os.remove(f"assets/groundtruth/{filename}")
-    for filename in os.listdir("assets/maps"): os.remove(f"assets/maps/{filename}")
-    for filename in os.listdir("assets/sensors/acc"): os.remove(f"assets/sensors/acc/{filename}")
-    for filename in os.listdir("assets/sensors/bar"): os.remove(f"assets/sensors/bar/{filename}")
-    for filename in os.listdir("assets/sensors/gyr"): os.remove(f"assets/sensors/gyr/{filename}")
-    for filename in os.listdir("assets/sensors/mag"): os.remove(f"assets/sensors/mag/{filename}")
-    for filename in os.listdir("assets/trajectories"): os.remove(f"assets/trajectories/{filename}")
-    for filename in os.listdir("assets/waypoints"): os.remove(f"assets/waypoints/{filename}")
-    for filename in os.listdir("assets/mail"): os.remove(f"assets/mail/{filename}")
+    for folder in os.listdir("assets/exports"): st.rmtree(f"assets/exports/{folder}", ignore_errors=True)
+    for folder in os.listdir("assets/users"): st.rmtree(f"assets/users/{folder}", ignore_errors=True)
 
 def dummy():
-    with open("assets/antennas/dummy", "w") as f: f.write("")
-    with open("assets/exports/gt/dummy", "w") as f: f.write("")
-    with open("assets/exports/sm/dummy", "w") as f: f.write("")
-    with open("assets/exports/draw/dummy", "w") as f: f.write("")
-    with open("assets/maps/dummy", "w") as f: f.write("")
-    with open("assets/groundtruth/dummy", "w") as f: f.write("")
-    with open("assets/sensors/acc/dummy", "w") as f: f.write("")
-    with open("assets/sensors/bar/dummy", "w") as f: f.write("")
-    with open("assets/sensors/gyr/dummy", "w") as f: f.write("")
-    with open("assets/sensors/mag/dummy", "w") as f: f.write("")
-    with open("assets/trajectories/dummy", "w") as f: f.write("")
-    with open("assets/waypoints/dummy", "w") as f: f.write("")
-    with open("assets/mail/dummy", "w") as f: f.write("")
+    with open("assets/exports/dummy", "w") as f: f.write("")
+    with open("assets/users/dummy", "w") as f: f.write("")
 
 
 if __name__ == "__main__":
     deleter()
-    dummy()
-    # sending_email()
+    #dummy()
