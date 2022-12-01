@@ -11,7 +11,7 @@ def com_layout():
         [
             dbc.CardBody(
                 [
-                    html.P("Coming Soon", className="card-text")
+                    html.P("", className="card-text")
                 ]
             ),
             dbc.CardFooter(f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})

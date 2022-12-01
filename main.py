@@ -45,7 +45,7 @@ app.title = "L5IN⁺"
 app._favicon = "assets/images/signs/favicon.ico"
 
 ### LAYOUT ###
-## Home page ##
+## Homepage ##
 home_tab = home_layout()
 ## Simulator ##
 sim_tab = sim_layout(geojson_style)
@@ -88,12 +88,11 @@ app.layout = html.Div(
                     children=eval_tab),
                 dcc.Tab(
                     value="tab4",
-                    label="Coming Soon",
+                    label="L5IN⁺ Dataset: Release 26.02.2023",
                     className='custom-tab',
                     selected_className='custom-tab--selected',
                     selected_style={"color": "#AEB5BD", "background": "#303030"},
-                    children=cs_tab,
-                    disabled=True)
+                    children=cs_tab)
             ],
             colors={"background": "#222222"}
         )

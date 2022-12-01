@@ -7,15 +7,100 @@ import dash_bootstrap_components as dbc
 import datetime
 import os
 
-def tooltips():
-    # tooltips for more information
-    tooltips = html.Div([
-        dbc.Tooltip("open PDF", target="2022_9_5_IPIN2022_pdf_btn",      placement="left"),
-        dbc.Tooltip("open PDF", target="2021_11_29_IPIN2021_pdf_btn",      placement="left"),
-        dbc.Tooltip("open PDF", target="2022_4_25_sensors_pdf_btn",      placement="left"),
-        dbc.Tooltip("open PDF", target="2021_2_5_electronics_pdf_btn",   placement="left"),
+def modals():
+    modals = html.Div([
+        dbc.Modal(
+            dbc.ModalHeader(
+                html.Div(
+                    [
+                        html.P("@article{shoushtari2022l5in+,", style={"color": "silver", "margin-bottom": "0px"}),
+                        html.P("title={L5IN+: From an Analytical Platform to Optimization of Deep Inertial Odometry},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("author={Shoushtari, Hossein and Kassawat, Firas and Harder, Dorian and Venzke, Korvin and M{\"u}ller-Lietzkow, J{\"o}rg and Sternberg, Harald},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("year={2022}", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("}", style={"color": "silver", "margin-bottom": "0px"}),
+                    ],
+                    style={"margin-left": "20px"}
+                ),
+                style={"background": "#585858", "border-radius": 5, "border": "1px solid silver"}
+            ),
+            id="2022_9_5_IPIN2022_bibtex_modal",
+            size="xl",
+            is_open=False,
+            backdrop="static"
+        ),
+        dbc.Modal(
+            dbc.ModalHeader(
+                html.Div(
+                    [
+                        html.P("@article{harder2022real,", style={"color": "silver", "margin-bottom": "0px"}),
+                        html.P("title={Real-Time Map Matching with a Backtracking Particle Filter Using Geospatial Analysis},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("author={Harder, Dorian and Shoushtari, Hossein and Sternberg, Harald},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("journal={Sensors},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("volume={22},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("number={9},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("pages={3289},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("year={2022},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("publisher={MDPI}", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("}", style={"color": "silver", "margin-bottom": "0px"}),
+                    ],
+                    style={"margin-left": "20px"}
+                ),
+                style={"background": "#585858", "border-radius": 5, "border": "1px solid silver"}
+            ),
+            id="2022_4_25_sensors_bibtex_modal",
+            size="xl",
+            is_open=False,
+            backdrop="static"
+        ),
+        dbc.Modal(
+            dbc.ModalHeader(
+                html.Div(
+                    [
+                        html.P("@inproceedings{shoushtari20213d,", style={"color": "silver", "margin-bottom": "0px"}),
+                        html.P("title={3D Indoor Localization using 5G-based Particle Filtering and CAD Plans},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("author={Shoushtari, Hossein and Askar, Cigdem and Harder, Dorian and Willemsen, Thomas and Sternberg, Harald},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("booktitle={2021 International Conference on Indoor Positioning and Indoor Navigation (IPIN)},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("pages={1--8},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("year={2021},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("organization={IEEE}", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("}", style={"color": "silver", "margin-bottom": "0px"}),
+                    ],
+                    style={"margin-left": "20px"}
+                ),
+                style={"background": "#585858", "border-radius": 5, "border": "1px solid silver"}
+            ),
+            id="2021_11_29_IPIN2021_bibtex_modal",
+            size="xl",
+            is_open=False,
+            backdrop="static"
+        ),
+        dbc.Modal(
+            dbc.ModalHeader(
+                html.Div(
+                    [
+                        html.P("@article{shoushtari2021many,", style={"color": "silver", "margin-bottom": "0px"}),
+                        html.P("title={Many ways lead to the goal—Possibilities of autonomous and infrastructure-based indoor positioning},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("author={Shoushtari, Hossein and Willemsen, Thomas and Sternberg, Harald},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("journal={Electronics},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("volume={10},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("number={4},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("pages={397},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("year={2021},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("publisher={MDPI}", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("}", style={"color": "silver", "margin-bottom": "0px"}),
+                    ],
+                    style={"margin-left": "20px"}
+                ),
+                style={"background": "#585858", "border-radius": 5, "border": "1px solid silver"}
+            ),
+            id="2021_2_5_electronics_bibtex_modal",
+            size="xl",
+            is_open=False,
+            backdrop="static"
+        )
     ])
-    return tooltips
+    return modals
+    
 
 def header():
     header = html.Div([
@@ -106,121 +191,190 @@ def publications():
                 ], width=2, style={"width": "506px", "margin-top": "5px", "margin-bottom": "11px", "padding-left": "0px"}),
                 # papers
                 dbc.Col([
-                    dbc.Alert(
-                        [
-                            html.Div(
-                                html.A(
-                                    target="_blank",
-                                    href="https://www.researchgate.net/publication/362134877_L5IN_From_an_Analytical_Platform_to_Optimization_of_Deep_Inertial_Odometry",
-                                    children=html.Button(
-                                        html.Img(
-                                            src="assets/images/signs/pdf_sign2.svg",
-                                            id="2022_9_5_IPIN2022_pdf_sign",
-                                            style={"margin-left": "-8px"}),
-                                        id="2022_9_5_IPIN2022_pdf_btn",
-                                        style={"margin-left": "8px", "width": "44px", "background": "transparent", "border": "0px"})
-                                ),
-                                style={"width": "44px"}
-                            ),
+
+                    html.Div(
+                        html.Div(
                             html.Button(html.Div(
                                 [
                                     html.P(html.B(["L5IN", html.Sup("+"), ": From an Analytical Platform to Optimization of Deep Inertial Odometry (2022)"]), style={"margin-bottom": "7px"}),
-                                    html.P("Hossein Shoushtari, Firas Kassawat, Dorian Harder, Korvin Venzke, Jörg Müller-Lietzkow, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"})
+                                    html.P("Hossein Shoushtari, Firas Kassawat, Dorian Harder, Korvin Venzke, Jörg Müller-Lietzkow, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"}),
+                                    html.P(
+                                        [
+                                            html.P("|", style={"display": "inline-block"}),
+                                            html.Button(
+                                                "bibtex",
+                                                id="2022_9_5_IPIN2022_bibtex_btn",
+                                                style={"background": "transparent", "border": "0px", "text-decoration": "underline", "color": "#00BC8C", "padding": "0px", "width": "50px", "margin-left": "-1px", "margin-right": "-1px"}
+                                            ),
+                                            html.P("|", style={"display": "inline-block"}),
+                                            html.A(
+                                                "code",
+                                                target="_blank",
+                                                href="",
+                                                style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                            html.P("|", style={"display": "inline-block"}),
+                                            html.A(
+                                                "arxiv",
+                                                target="_blank",
+                                                href="",
+                                                style={"display": "inline-block"}),
+                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                            html.A(
+                                                "pdf",
+                                                target="_blank",
+                                                href="https://www.researchgate.net/publication/362134877_L5IN_From_an_Analytical_Platform_to_Optimization_of_Deep_Inertial_Odometry",
+                                                style={"display": "inline-block"}),
+                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                        ],
+                                        style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
+                                    )
                                 ]),
                                 id="2022_9_5_IPIN2022_show_btn",
-                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "110px", "color": "white", "text-align": "left", "padding": "0px"}
+                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "white", "text-align": "left", "padding": "0px"}
                             ),
-                        ],
+                            style={"margin": "auto"}                           
+                        ),
                         id="2022_9_5_IPIN2022_paper",
                         className="d-flex align-items-center",
-                        style={"padding": "0px", "color": "white", "height": "110px", "width": "500px", "background-color": "#737373", "border-left": "4px solid white", "border-radius": 0, "margin-left": "-10px"}
+                        style={"margin-bottom": "20px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid white", "border-radius": 0, "margin-left": "-10px"}
                     ),
-                    dbc.Alert(
-                        [
-                            html.Div(
-                                html.A(
-                                    target="_blank",
-                                    href="https://www.mdpi.com/1424-8220/22/9/3289",
-                                    children=html.Button(
-                                        html.Img(
-                                            src="assets/images/signs/pdf_sign1.svg",
-                                            id="2022_4_25_sensors_pdf_sign",
-                                            style={"margin-left": "-8px"}),
-                                        id="2022_4_25_sensors_pdf_btn",
-                                        style={"margin-left": "8px", "width": "44px", "background": "transparent", "border": "0px"})
-                                ),
-                                style={"width": "44px"}
-                            ),
+                    html.Div(
+                        html.Div(
                             html.Button(html.Div(
                                 [
                                     html.P(html.B("Real-Time Map Matching with a Backtracking Particle Filter Using Geospatial Analysis (2022)"), style={"margin-bottom": "7px"}),
-                                    html.P("Dorian Harder, Hossein Shoushtari, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"})
+                                    html.P("Dorian Harder, Hossein Shoushtari, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"}),
+                                    html.P(
+                                        [
+                                            html.P("|", style={"display": "inline-block"}),
+                                            html.Button(
+                                                "bibtex",
+                                                id="2022_4_25_sensors_bibtex_btn",
+                                                style={"background": "transparent", "border": "0px", "text-decoration": "underline", "color": "#00BC8C", "padding": "0px", "width": "50px", "margin-left": "-1px", "margin-right": "-1px"}
+                                            ),
+                                            html.P("|", style={"display": "inline-block"}),
+                                            html.A(
+                                                "code",
+                                                target="_blank",
+                                                href="",
+                                                style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                            html.P("|", style={"display": "inline-block"}),
+                                            html.A(
+                                                "arxiv",
+                                                target="_blank",
+                                                href="",
+                                                style={"display": "inline-block"}),
+                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                            html.A(
+                                                "pdf",
+                                                target="_blank",
+                                                href="https://www.mdpi.com/1424-8220/22/9/3289",
+                                                style={"display": "inline-block"}),
+                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                        ],
+                                        style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
+                                    )
                                 ]),
                                 id="2022_4_25_sensors_show_btn",
-                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "110px", "color": "silver", "text-align": "left", "padding": "0px"}
+                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "silver", "text-align": "left", "padding": "0px"}
                             ),
-                        ],
+                            style={"margin": "auto"}                           
+                        ),
                         id="2022_4_25_sensors_paper",
                         className="d-flex align-items-center",
-                        style={"padding": "0px", "color": "silver", "height": "110px", "width": "500px", "background-color": "#545454", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
+                        style={"margin-bottom": "20px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                     ),
-                    dbc.Alert(
-                        [
-                            html.Div(
-                                html.A(
-                                    target="_blank",
-                                    href="https://www.researchgate.net/publication/357594689_3D_Indoor_Localization_using_5G-based_Particle_Filtering_and_CAD_Plans",
-                                    children=html.Button(
-                                        html.Img(
-                                            src="assets/images/signs/pdf_sign1.svg",
-                                            id="2021_11_29_IPIN2021_pdf_sign",
-                                            style={"margin-left": "-8px"}),
-                                        id="2021_11_29_IPIN2021_pdf_btn",
-                                        style={"margin-left": "8px", "width": "44px", "background": "transparent", "border": "0px"})
-                                ),
-                                style={"width": "44px"}
-                            ),
+                    html.Div(
+                        html.Div(
                             html.Button(html.Div(
                                 [
                                     html.P(html.B("3D Indoor Localization using 5G-based Particle Filtering and CAD Plans (2021)"), style={"margin-bottom": "7px"}),
-                                    html.P("Hossein Shoushtari, Cigdem Askar, Dorian Harder, Thomas Willemsen, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"})
+                                    html.P("Hossein Shoushtari, Cigdem Askar, Dorian Harder, Thomas Willemsen, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"}),
+                                    html.P(
+                                        [
+                                            html.P("|", style={"display": "inline-block"}),
+                                            html.Button(
+                                                "bibtex",
+                                                id="2021_11_29_IPIN2021_bibtex_btn",
+                                                style={"background": "transparent", "border": "0px", "text-decoration": "underline", "color": "#00BC8C", "padding": "0px", "width": "50px", "margin-left": "-1px", "margin-right": "-1px"}
+                                            ),
+                                            html.P("|", style={"display": "inline-block"}),
+                                            html.A(
+                                                "code",
+                                                target="_blank",
+                                                href="",
+                                                style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                            html.P("|", style={"display": "inline-block"}),
+                                            html.A(
+                                                "arxiv",
+                                                target="_blank",
+                                                href="",
+                                                style={"display": "inline-block"}),
+                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                            html.A(
+                                                "pdf",
+                                                target="_blank",
+                                                href="https://www.researchgate.net/publication/357594689_3D_Indoor_Localization_using_5G-based_Particle_Filtering_and_CAD_Plans",
+                                                style={"display": "inline-block"}),
+                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                        ],
+                                        style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
+                                    )
                                 ]),
                                 id="2021_11_29_IPIN2021_show_btn",
-                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "110px", "color": "silver", "text-align": "left", "padding": "0px"}
+                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "silver", "text-align": "left", "padding": "0px"}
                             ),
-                        ],
+                            style={"margin": "auto"}                           
+                        ),
                         id="2021_11_29_IPIN2021_paper",
                         className="d-flex align-items-center",
-                        style={"padding": "0px", "color": "silver", "height": "110px", "width": "500px", "background-color": "#545454", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
+                        style={"margin-bottom": "20px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                     ),
-                    dbc.Alert(
-                        [
-                            html.Div(
-                                html.A(
-                                    target="_blank",
-                                    href="https://www.mdpi.com/2079-9292/10/4/397",
-                                    children=html.Button(
-                                        html.Img(
-                                            src="assets/images/signs/pdf_sign1.svg",
-                                            id="2021_2_5_electronics_pdf_sign",
-                                            style={"margin-left": "-8px"}),
-                                        id="2021_2_5_electronics_pdf_btn",
-                                        style={"margin-left": "8px", "width": "44px", "background": "transparent", "border": "0px"})
-                                ),
-                                style={"width": "44px"}
-                            ),
+                    html.Div(
+                        html.Div(
                             html.Button(html.Div(
                                 [
                                     html.P(html.B("Many Ways Lead to the Goal — Possibilities of Autonomous and Infrastructure-Based Indoor Positioning (2021)"), style={"margin-bottom": "7px"}),
-                                    html.P("Hossein Shoushtari, Thomas Willemsen, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"})
+                                    html.P("Hossein Shoushtari, Thomas Willemsen, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"}),
+                                    html.P(
+                                        [
+                                            html.P("|", style={"display": "inline-block"}),
+                                            html.Button(
+                                                "bibtex",
+                                                id="2021_2_5_electronics_bibtex_btn",
+                                                style={"background": "transparent", "border": "0px", "text-decoration": "underline", "color": "#00BC8C", "padding": "0px", "width": "50px", "margin-left": "-1px", "margin-right": "-1px"}
+                                            ),
+                                            html.P("|", style={"display": "inline-block"}),
+                                            html.A(
+                                                "code",
+                                                target="_blank",
+                                                href="",
+                                                style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                            html.P("|", style={"display": "inline-block"}),
+                                            html.A(
+                                                "arxiv",
+                                                target="_blank",
+                                                href="",
+                                                style={"display": "inline-block"}),
+                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                            html.A(
+                                                "pdf",
+                                                target="_blank",
+                                                href="https://www.mdpi.com/2079-9292/10/4/397",
+                                                style={"display": "inline-block"}),
+                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                        ],
+                                        style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
+                                    )
                                 ]),
                                 id="2021_2_5_electronics_show_btn",
-                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "110px", "color": "silver", "text-align": "left", "padding": "0px"}
+                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "silver", "text-align": "left", "padding": "0px"}
                             ),
-                        ],
+                            style={"margin": "auto"}                           
+                        ),
                         id="2021_2_5_electronics_paper",
                         className="d-flex align-items-center",
-                        style={"padding": "0px", "color": "silver", "height": "110px", "width": "500px", "background-color": "#545454", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
+                        style={"margin-bottom": "20px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                     )
                 ], width=2, style={"width": "506px", "margin-top": "5px", "margin-bottom": "11px"})
             ], justify="center"
@@ -315,7 +469,7 @@ def home_layout():
     return dbc.Card([
         dbc.CardBody(
             [
-                tooltips(),
+                modals(),
                 html.Br(),
                 header(),
                 html.Br(),
