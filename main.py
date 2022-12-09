@@ -24,8 +24,8 @@ import nextcloud_client
 
 
 # ------------- NEXTCLOUD -------------- #
-nc = nextcloud_client.Client('https://cloud.hcu-hamburg.de/nextcloud')
-nc.login('hne164', 'NivrokUni2022?')
+nc = nextcloud_client.Client("https://ann.nl.tab.digital/")
+nc.login("cpsimulation2022@gmail.com", "PosLabNEXTCLOUD?*")
 
 # -------------- GEOJSON --------------- #
 # Geojson rendering logic, must be JavaScript and only initialized once!
