@@ -195,7 +195,7 @@ def eval_calls(app, nc):
                 }
                 # if everything went fine ...
                 return usr_warn, ul_warn, not ul_done, no_update, layers, no_update
-            else: return not usr_warn, ul_warn, ul_done, ul_done, no_update, no_update
+            else: return not usr_warn, ul_warn, ul_done, no_update, no_update, no_update
         # ========== GYROSCOPE =================================================================================================================
         elif "eval_ul_gyr" in button:
             if un:
@@ -207,7 +207,7 @@ def eval_calls(app, nc):
                     else: return usr_warn, not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
                 # if everything went fine ...
                 return usr_warn, ul_warn, not ul_done, no_update, no_update, no_update
-            else: return not usr_warn, ul_warn, ul_done, ul_done, no_update, no_update
+            else: return not usr_warn, ul_warn, ul_done, no_update, no_update, no_update
         # ========= ACCELERATION  ==============================================================================================================
         elif "eval_ul_acc" in button:
             if un:
@@ -219,7 +219,7 @@ def eval_calls(app, nc):
                     else: return usr_warn, not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
                 # if everything went fine ...
                 return usr_warn, ul_warn, not ul_done, no_update, no_update, no_update
-            else: return not usr_warn, ul_warn, ul_done, ul_done, no_update, no_update
+            else: return not usr_warn, ul_warn, ul_done, no_update, no_update, no_update
         # ========= BAROMETER  =================================================================================================================
         elif "eval_ul_bar" in button:
             if un:
@@ -231,7 +231,7 @@ def eval_calls(app, nc):
                     else: return usr_warn, not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
                 # if everything went fine ...
                 return usr_warn, ul_warn, not ul_done, no_update, no_update, no_update
-            else: return not usr_warn, ul_warn, ul_done, ul_done, no_update, no_update
+            else: return not usr_warn, ul_warn, ul_done, no_update, no_update, no_update
         # ======== MAGNETOMETER  ===============================================================================================================
         elif "eval_ul_mag" in button:
             if un:
@@ -243,7 +243,7 @@ def eval_calls(app, nc):
                     else: return usr_warn, not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
                 # if everything went fine ...
                 return usr_warn, ul_warn, not ul_done, no_update , no_update, no_update
-            else: return not usr_warn, ul_warn, ul_done, ul_done, no_update, no_update
+            else: return not usr_warn, ul_warn, ul_done, no_update, no_update, no_update
         # ====== no button clicked =============================================================================================================
         # this else-section is always activated, when the page refreshes -> no warnings
         else: return usr_warn, ul_warn, ul_done, no_update, no_update, no_update

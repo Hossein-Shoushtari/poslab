@@ -61,7 +61,7 @@ def users_calls(app, nc):
         State("login_done", "is_open"),     # modal done
         State("login_warning", "is_open")   # modal warn
     )
-    def registrate(
+    def registrate_login(
         # register
         register_btn,
         register_un,
@@ -75,6 +75,14 @@ def users_calls(app, nc):
         login_done,
         login_warn
         ):
+        # get rid of white spaces at end of strings
+        try:
+            register_un = register_un.rstrip()
+            register_pw = register_pw.rstrip()
+            login_un = login_un.rstrip()
+            login_pw = login_pw.rstrip()
+        except: pass
+        # let's go
         button = [p["prop_id"] for p in callback_context.triggered][0]
         usr_data = {
             "username": "",

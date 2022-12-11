@@ -127,7 +127,7 @@
 
   
 
->  **.gitignore**, **Procfile**, **requirements.txt** : for heroku deploy
+>  **.gitignore**, **Procfile**, **requirements.txt**, **runtime.txt** : for heroku deploy
 
   
 

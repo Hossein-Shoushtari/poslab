@@ -7,7 +7,49 @@ import dash_bootstrap_components as dbc
 import datetime
 import os
 
+class CopyBibtexText():
+    def __init__(self):
+        pass
+    def copy_2022_9_5_IPIN2022(self):
+        return'''@article{shoushtari2022l5in+,
+  title={L5IN+: From an Analytical Platform to Optimization of Deep Inertial Odometry},
+  author={Shoushtari, Hossein and Kassawat, Firas and Harder, Dorian and Venzke, Korvin and M{\"u}ller-Lietzkow, J{\"o}rg and Sternberg, Harald},
+  year={2022}
+}'''
+    def copy_2022_4_25_sensors(self):
+        return'''@article{harder2022real,
+  title={Real-Time Map Matching with a Backtracking Particle Filter Using Geospatial Analysis},
+  author={Harder, Dorian and Shoushtari, Hossein and Sternberg, Harald},
+  journal={Sensors},
+  volume={22},
+  number={9},
+  pages={3289},
+  year={2022},
+  publisher={MDPI}
+}'''
+    def copy_2021_11_29_IPIN2021(self):
+        return'''@inproceedings{shoushtari20213d,
+  title={3D Indoor Localization using 5G-based Particle Filtering and CAD Plans},
+  author={Shoushtari, Hossein and Askar, Cigdem and Harder, Dorian and Willemsen, Thomas and Sternberg, Harald},
+  booktitle={2021 International Conference on Indoor Positioning and Indoor Navigation (IPIN)},
+  pages={1--8},
+  year={2021},
+  organization={IEEE}
+}'''
+    def copy_2021_2_5_electronics(self):
+        return'''@article{shoushtari2021many,
+  title={Many ways lead to the goal—Possibilities of autonomous and infrastructure-based indoor positioning},
+  author={Shoushtari, Hossein and Willemsen, Thomas and Sternberg, Harald},
+  journal={Electronics},
+  volume={10},
+  number={4},
+  pages={397},
+  year={2021},
+  publisher={MDPI}
+}'''
+
 def modals():
+    bibtex_text = CopyBibtexText()
     modals = html.Div([
         dbc.Modal(
             dbc.ModalHeader(
@@ -18,10 +60,19 @@ def modals():
                         html.P("author={Shoushtari, Hossein and Kassawat, Firas and Harder, Dorian and Venzke, Korvin and M{\"u}ller-Lietzkow, J{\"o}rg and Sternberg, Harald},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
                         html.P("year={2022}", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
                         html.P("}", style={"color": "silver", "margin-bottom": "0px"}),
-                    ],
-                    style={"margin-left": "20px"}
+                        dcc.Clipboard(
+                            content=bibtex_text.copy_2022_9_5_IPIN2022(),
+                            style={
+                                "color": "#9B9B9B",
+                                "position": "absolute",
+                                "top": 11,
+                                "right": 16,
+                                "fontSize": 20,
+                            },
+                        ),
+                    ], style={"padding": "0px", "height": "90%", "width": "95%", "margin": "auto"}
                 ),
-                style={"background": "#585858", "border-radius": 5, "border": "1px solid silver"}
+                style={"padding-left": "14px", "background": "#585858", "border-radius": 5, "border": "1px solid silver"}
             ),
             id="2022_9_5_IPIN2022_bibtex_modal",
             size="xl",
@@ -42,10 +93,19 @@ def modals():
                         html.P("year={2022},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
                         html.P("publisher={MDPI}", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
                         html.P("}", style={"color": "silver", "margin-bottom": "0px"}),
-                    ],
-                    style={"margin-left": "20px"}
+                        dcc.Clipboard(
+                            content=bibtex_text.copy_2022_4_25_sensors(),
+                            style={
+                                "color": "#9B9B9B",
+                                "position": "absolute",
+                                "top": 11,
+                                "right": 16,
+                                "fontSize": 20,
+                            },
+                        ),
+                    ], style={"padding": "0px", "height": "90%", "width": "95%", "margin": "auto"}
                 ),
-                style={"background": "#585858", "border-radius": 5, "border": "1px solid silver"}
+                style={"padding-left": "14px", "background": "#585858", "border-radius": 5, "border": "1px solid silver"}
             ),
             id="2022_4_25_sensors_bibtex_modal",
             size="xl",
@@ -64,10 +124,19 @@ def modals():
                         html.P("year={2021},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
                         html.P("organization={IEEE}", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
                         html.P("}", style={"color": "silver", "margin-bottom": "0px"}),
-                    ],
-                    style={"margin-left": "20px"}
+                        dcc.Clipboard(
+                            content=bibtex_text.copy_2021_11_29_IPIN2021(),
+                            style={
+                                "color": "#9B9B9B",
+                                "position": "absolute",
+                                "top": 11,
+                                "right": 16,
+                                "fontSize": 20,
+                            },
+                        ),
+                    ], style={"padding": "0px", "height": "90%", "width": "95%", "margin": "auto"}
                 ),
-                style={"background": "#585858", "border-radius": 5, "border": "1px solid silver"}
+                style={"padding-left": "14px", "background": "#585858", "border-radius": 5, "border": "1px solid silver"}
             ),
             id="2021_11_29_IPIN2021_bibtex_modal",
             size="xl",
@@ -88,10 +157,19 @@ def modals():
                         html.P("year={2021},", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
                         html.P("publisher={MDPI}", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
                         html.P("}", style={"color": "silver", "margin-bottom": "0px"}),
-                    ],
-                    style={"margin-left": "20px"}
+                        dcc.Clipboard(
+                            content=bibtex_text.copy_2021_2_5_electronics(),
+                            style={
+                                "color": "#9B9B9B",
+                                "position": "absolute",
+                                "top": 11,
+                                "right": 16,
+                                "fontSize": 20,
+                            },
+                        ),
+                    ], style={"padding": "0px", "height": "90%", "width": "95%", "margin": "auto"}
                 ),
-                style={"background": "#585858", "border-radius": 5, "border": "1px solid silver"}
+                style={"padding-left": "14px", "background": "#585858", "border-radius": 5, "border": "1px solid silver"}
             ),
             id="2021_2_5_electronics_bibtex_modal",
             size="xl",
@@ -137,7 +215,7 @@ def about():
                 were previously only known in the outdoor segment (through GNSS) but can now also be integrated into
                 existing smartphone systems and 5G as a ubiquitous alternative for the GNSS solutions in the context
                 of indoor navigation.""",
-                style={"color": "silver", "font-size": "16px", "padding-left": "10px", "padding-right": "10px"}),
+                style={"color": "silver", "font-size": "18px", "padding-left": "10px", "padding-right": "10px"}),
             style={"width": "80%", "margin": "auto"}
         ),
         html.Div(
@@ -145,10 +223,9 @@ def about():
                 the navigation possible at any time. The positioning team uses the benefits of interdisciplinary technologies developed
                 at L5IN and focuses on the approaches and methods such as Monte Carlo Simulation, state estimation filters, machine learning,
                 deep learning and 5G positioning to develop a practice-oriented solution.""",
-                style={"color": "silver", "width": "100%", "font-size": "16px", "padding-left": "10px", "padding-right": "10px"}),
+                style={"color": "silver", "width": "100%", "font-size": "18px", "padding-left": "10px", "padding-right": "10px"}),
             style={"width": "80%", "margin": "auto"}
         ),
-        html.Br(),
         html.Div(
             html.Img(
                 src="assets/images/L5INp_Workflow.png",
@@ -236,7 +313,7 @@ def publications():
                         ),
                         id="2022_9_5_IPIN2022_paper",
                         className="d-flex align-items-center",
-                        style={"margin-bottom": "20px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid white", "border-radius": 0, "margin-left": "-10px"}
+                        style={"margin-bottom": "15px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid white", "border-radius": 0, "margin-left": "-10px"}
                     ),
                     html.Div(
                         html.Div(
@@ -282,7 +359,7 @@ def publications():
                         ),
                         id="2022_4_25_sensors_paper",
                         className="d-flex align-items-center",
-                        style={"margin-bottom": "20px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
+                        style={"margin-bottom": "15px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                     ),
                     html.Div(
                         html.Div(
@@ -328,7 +405,7 @@ def publications():
                         ),
                         id="2021_11_29_IPIN2021_paper",
                         className="d-flex align-items-center",
-                        style={"margin-bottom": "20px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
+                        style={"margin-bottom": "15px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                     ),
                     html.Div(
                         html.Div(
@@ -374,7 +451,7 @@ def publications():
                         ),
                         id="2021_2_5_electronics_paper",
                         className="d-flex align-items-center",
-                        style={"margin-bottom": "20px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
+                        style={"margin-bottom": "15px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                     )
                 ], width=2, style={"width": "506px", "margin-top": "5px", "margin-bottom": "11px"})
             ], justify="center"

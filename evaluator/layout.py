@@ -574,7 +574,7 @@ def help_canvas():
                         ),
                     ],
                     className="d-flex align-items-center",
-                    style={"height": "75px", "color": "silver", "background": "rgba(112, 37, 27, 0.3)", "border-radius": 10, "border": "1px solid #70251B", "color": "gray"}
+                    style={"height": "75px", "color": "silver", "background": "rgba(255, 0, 0, 0.3)", "border-radius": 10, "border": "1px solid #FF0000", "color": "gray"}
                 ),
                 html.Div([
                     # info upload

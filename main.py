@@ -15,7 +15,7 @@ from simulator.layout import sim_layout
 from evaluator.callbacks import eval_calls
 from evaluator.layout import eval_layout
 # coming soon
-from coming_soon.layout import com_layout
+from datasets.layout import ds_layout
 # simulator & evaluator map
 from maps.callbacks import maps_calls
 from maps.layout import maps_layout
@@ -51,8 +51,8 @@ home_tab = home_layout()
 sim_tab = sim_layout(geojson_style)
 ## Evaluator ##
 eval_tab = eval_layout(geojson_style)
-## Comming Soon ##
-cs_tab = com_layout()
+## Datasets ##
+ds_tab = ds_layout()
 
 # putting all together
 app.layout = html.Div(
@@ -88,11 +88,11 @@ app.layout = html.Div(
                     children=eval_tab),
                 dcc.Tab(
                     value="tab4",
-                    label="L5IN⁺ Dataset: Release 26.02.2023",
+                    label="Datasets",
                     className='custom-tab',
                     selected_className='custom-tab--selected',
                     selected_style={"color": "#AEB5BD", "background": "#303030"},
-                    children=cs_tab)
+                    children=ds_tab)
             ],
             colors={"background": "#222222"}
         )
