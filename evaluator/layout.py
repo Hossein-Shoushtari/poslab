@@ -853,6 +853,8 @@ def eval_layout(geojson_style):
                     # card content
                     html.Div(
                         [
+                            html.Br(),
+                            html.Br(),
                             first_row,
                             html.Br(),
                             dbc.Row(eval_map(geojson_style))

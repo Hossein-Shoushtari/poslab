@@ -63,6 +63,7 @@ app.layout = html.Div(
         dcc.Tabs(
             id="tabs",
             value="tab1",
+            colors={"background": "#222222"},
             children=
             [
                 dcc.Tab(
@@ -71,30 +72,33 @@ app.layout = html.Div(
                     className='custom-tab',
                     selected_className='custom-tab--selected',
                     selected_style={"color": "#DC6000", "background": "#303030"},
-                    children=home_tab),
+                    children=home_tab
+                ),
                 dcc.Tab(
                     value="tab2",
                     label="Simulator",
                     className='custom-tab',
                     selected_className='custom-tab--selected',
                     selected_style={"color": "#DC6000", "background": "#303030"},
-                    children=sim_tab),
+                    children=sim_tab
+                ),
                 dcc.Tab(
                     value="tab3",
                     label="Evaluator",
                     className='custom-tab',
                     selected_className='custom-tab--selected',
                     selected_style={"color": "#DC6000", "background": "#303030"},
-                    children=eval_tab),
+                    children=eval_tab
+                ),
                 dcc.Tab(
                     value="tab4",
-                    label="Datasets",
+                    label="Dataset",
                     className='custom-tab',
                     selected_className='custom-tab--selected',
-                    selected_style={"color": "#AEB5BD", "background": "#303030"},
-                    children=ds_tab)
-            ],
-            colors={"background": "#222222"}
+                    selected_style={"color": "#DC6000", "background": "#303030"},
+                    children=ds_tab
+                )
+            ]
         )
     ]
 )

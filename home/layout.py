@@ -539,7 +539,7 @@ def contact():
                 ], width=3, style={"height": "101px", "width": "337px"})
             ], justify="center"
         )
-    ])
+    ], style={"margin-bottom": "20px"})
     return contact
 
 def home_layout():
@@ -547,6 +547,7 @@ def home_layout():
         dbc.CardBody(
             [
                 modals(),
+                html.Br(),
                 html.Br(),
                 header(),
                 html.Br(),
@@ -557,5 +558,14 @@ def home_layout():
                 contact()
             ]
         ),
-        dbc.CardFooter(f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})
+        dbc.CardFooter(
+            f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved",
+            style={
+                "width": "100%",
+                "text-align": "center",
+                "position": "fixed",
+                "bottom": "0px",
+                "z-index": "10000"
+            }
+        )
     ])

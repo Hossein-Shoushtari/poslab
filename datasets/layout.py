@@ -12,9 +12,30 @@ def ds_layout():
             dbc.CardBody(
                 [
                     html.Br(),
-                    html.H2(["L5IN", html.Sup("+"), " Dataset: Release 26.02.2023"], style={"color": "white", "text-align": "center"})
-                ]
+                    html.Br(),
+                    html.Br(),
+                    html.Iframe(
+                        src="https://docs.google.com/forms/d/e/1FAIpQLScn4-3eV_mh1giia81LE1S_gk-WJoEPVJnYwkBZzug3UP3TMw/viewform?embedded=true",
+                        style={
+                            "width": "100%",
+                            "height": "1300px"
+                        }
+                    )
+                ],
+                style={
+                    "padding": "0px",
+                    "background": "#FAE7D9"
+                }
             ),
-            dbc.CardFooter(f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})
+            dbc.CardFooter(
+                f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved",
+                style={
+                    "width": "100%",
+                    "text-align": "center",
+                    "position": "fixed",
+                    "bottom": "0px",
+                    "z-index": "10000"
+                }
+            )
         ]
     )

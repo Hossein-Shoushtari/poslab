@@ -1161,6 +1161,8 @@ def sim_layout(geojson_style):
                     # card content
                     html.Div(
                         [
+                            html.Br(),
+                            html.Br(),
                             first_row,
                             html.Br(),
                             dbc.Row(sim_map(geojson_style))

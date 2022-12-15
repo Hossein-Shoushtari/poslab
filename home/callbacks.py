@@ -29,14 +29,14 @@ def home_calls(app):
     def mark_paper(slide):
         n_papers = len(papers_list)
         show_btns = [{"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "silver", "text-align": "left", "padding": "0px"} for _ in range(n_papers)]
-        papers = [{"margin-bottom": "20px", "padding": "5px", "color": "silver", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"} for _ in range(n_papers)]
+        papers = [{"margin-bottom": "15px", "padding": "5px", "color": "silver", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"} for _ in range(n_papers)]
         outputs = show_btns + papers
         if slide:
             show_btns[slide] = {"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "white", "text-align": "left", "padding": "0px"}
-            papers[slide] = {"margin-bottom": "20px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid white", "border-radius": 0, "margin-left": "-10px"}
+            papers[slide] = {"margin-bottom": "15px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid white", "border-radius": 0, "margin-left": "-10px"}
         else:
             show_btns[0] = {"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "white", "text-align": "left", "padding": "0px"}
-            papers[0] = {"margin-bottom": "20px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid white", "border-radius": 0, "margin-left": "-10px"}
+            papers[0] = {"margin-bottom": "15px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid white", "border-radius": 0, "margin-left": "-10px"}
         outputs = show_btns + papers
         return outputs
 
