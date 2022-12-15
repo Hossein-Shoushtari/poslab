@@ -534,7 +534,7 @@ def sim_calls(app, nc):
             try:
                 simulation = simulate_positions(user, gt_select, float(err), float(ms_freq), float(net_cap), int(num_user), int(num_int), sem_err_rang, int_rang, sem_err)
                 # formatting and saving simulation data
-                export_sim(user, *simulation, (ms_freq, err, num_user))
+                export_sim(nc, user, *simulation, (ms_freq, err, num_user))
                 # getting zoom lvl and center point
                 lon, lat = u.from_32632_to_4326(np.loadtxt(f"assets/users/{un}_{pw}/trajectories/sim__freq{ms_freq}_err{err}_user{num_user}.csv", skiprows=1)[:,1:3])
                 bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map

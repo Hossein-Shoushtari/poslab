@@ -213,9 +213,8 @@ def extract_coordinates(data: list) -> list:
     return [lon, lat]
 
 def time() -> str:
-    # for Hossein's time confusion
     H, M, S = datetime.now().strftime('%H'), datetime.now().strftime('%M'), datetime.now().strftime('%S')
-    name = f"{int(H)+2}h-{M}min-{S}sec"
+    name = f"{int(H)+1}h-{M}min-{S}sec"
     return name
 
 def upload_encoder(content: str) -> str:

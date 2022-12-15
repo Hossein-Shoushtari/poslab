@@ -194,7 +194,7 @@ def distance(point1: tuple, point2: tuple) -> float:
     '''distance between 2 points'''
     return np.sqrt((point2[0] - point1[0])**2 + (point2[1] - point1[1])**2)
 
-def export_sim(user: dict, time_stamps: list, positions: list, errors: list, qualities: list, name: tuple):
+def export_sim(nc, user: dict, time_stamps: list, positions: list, errors: list, qualities: list, name: tuple):
     # user data
     un = user["username"]
     pw = user["password"]
@@ -239,7 +239,7 @@ def export_sim(user: dict, time_stamps: list, positions: list, errors: list, qua
                 output += f"{row[0]} {row[1]} {row[2]} {row[3]} {row[4]}\n"
             f.write(output)
         # push to cloud
-        u.update_user_data(nc, f"{un}_{pw}/trajectories/{output}")
+        u.update_user_data(nc, f"{un}_{pw}/trajectories/sim__freq{name[0]}_err{name[1]}_user{name[2]}.csv")
 
 
 if __name__ == "__main__":    

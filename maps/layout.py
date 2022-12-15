@@ -29,17 +29,25 @@ def modals():
                         className="d-flex align-items-center",
                         style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
                     ),
-                    style={"background": "rgba(20, 109, 44, 0.3)", "border-radius": 5, "border": "1px solid #146d2c", "height": "70px"}
+                    style={"background": "rgba(0, 179, 0, 0.3)", "border-radius": 5, "border": "1px solid #146d2c", "height": "70px"}
                 ),
                 id="display_done",
                 is_open=False
             ),
             # trajectory 500 points limit reached
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle(html.Img(src="assets/images/signs/caution_sign.svg"))),
-                dbc.ModalBody("500 points limit reached! Trajectory not shown on map but still in system.")],
+            dbc.Modal(
+                dbc.ModalHeader(
+                    dbc.Alert(
+                        [
+                            html.Div(html.Img(src="assets/images/signs/caution_sign.svg"), style={"margin-right": "30px"}),
+                            "Over 500 pts! Not displaying, but still in system."
+                        ],
+                        className="d-flex align-items-center",
+                        style={"padding-top": "20px", "margin-top": "12px", "margin-left": "-6px", "width": "500px", "color": "silver", "background": "transparent"}
+                    ),
+                    style={"background": "rgba(243, 156, 18, 0.3)", "border-radius": 5, "border": "1px solid #F39C12", "height": "70px"}
+                ),
                 id="overflow",
-                size="sm",
                 is_open=False
             ),
             # unlock hcu maps

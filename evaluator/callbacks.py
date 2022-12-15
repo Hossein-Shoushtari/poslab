@@ -156,7 +156,7 @@ def eval_calls(app, nc):
                 for i in range(len(gt_filenames)):
                     if gt_filenames[i].split(".")[-1] in ["csv"]: # assuming user uploaded right file format
                         gt_decoded = u.upload_encoder(gt_contents[i]) # decoding uploaded base64 file
-                        with open(f"assets/users/{un}_{pw}s/groundtruth/{gt_filenames[i]}", "w") as file: file.write(gt_decoded) # saving file
+                        with open(f"assets/users/{un}_{pw}/groundtruth/{gt_filenames[i]}", "w") as file: file.write(gt_decoded) # saving file
                         u.update_user_data(nc, f"{un}_{pw}/groundtruth/{gt_filenames[i]}") # push to cloud
                     else: return usr_warn, not ul_warn, ul_done, no_update, no_update, no_update # activating modal -> warn
                 # getting zoom lvl and center point
@@ -169,7 +169,7 @@ def eval_calls(app, nc):
                     "date": time.time()
                 }
                 # if everything went fine ...
-                return usr_warn, ul_warn, not ul_done, layers, no_update, no_update
+                return usr_warn, ul_warn, ul_done, layers, no_update, no_update
             else: return not usr_warn, ul_warn, ul_done, no_update, no_update, no_update
         # ========== TRAJECTORIES =================================================================================================================
         elif "ul_tra" in button:
@@ -194,7 +194,7 @@ def eval_calls(app, nc):
                     "date": time.time()
                 }
                 # if everything went fine ...
-                return usr_warn, ul_warn, not ul_done, no_update, layers, no_update
+                return usr_warn, ul_warn, ul_done, no_update, layers, no_update
             else: return not usr_warn, ul_warn, ul_done, no_update, no_update, no_update
         # ========== GYROSCOPE =================================================================================================================
         elif "eval_ul_gyr" in button:
