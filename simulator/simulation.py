@@ -239,7 +239,7 @@ def export_sim(nc, user: dict, time_stamps: list, positions: list, errors: list,
                 output += f"{row[0]} {row[1]} {row[2]} {row[3]} {row[4]}\n"
             f.write(output)
         # push to cloud
-        u.update_user_data(nc, f"assets/exports/results_{un}_{pw}/sm/sim__freq{name[0]}_err{name[1]}_user{name[2]}.csv")
+        u.update_user_data(nc, f"assets/users/{un}_{pw}/trajectories/sim__freq{name[0]}_err{name[1]}_user{name[2]}.csv")
 
 
 if __name__ == "__main__":    
