@@ -1,0 +1,151 @@
+/* FOOTER POP UP */
+.popup-row {
+    height: 50px;
+    margin-top: -20px;
+    width: 100%;
+}
+.popup-p {
+    margin-top: 18px;
+}
+.popup-col1 {
+    border-top: 2px solid transparent;
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    left: 180px;
+    padding-bottom: -20px;
+}
+.popup-icon {
+    background: transparent;
+    border: 0px;
+    height: 50px;
+}
+.popup-open-icon {
+    background: transparent;
+    border: 0px;
+    height: 50px;
+}
+.popup-icon-div {
+    margin-left: -7px;
+}
+.popup-col2 {
+    width: 500px;
+    height: 50px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+.popup-menu {
+    width: 30px;
+    height: 40px;
+    position: relative;
+    bottom: 0px;
+    right: 0px;
+}
+.popup-menu ol {
+    padding: 0;
+    margin: 0;
+}
+.popup-menu > ol {
+    display: flex;
+}
+.popup-menu > ol > li {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sub-popup-menu li {
+    list-style-type: none;
+    padding: 0;
+    margin: -5;
+}
+@media (min-width: 45rem) {
+    .popup-menu > ol {
+        justify-content: space-around;
+   }
+    .popup-menu > ol:hover > li:first-child > a, .popup-menu > ol:focus-within > li:first-child > a {
+        opacity: 0.6;
+   }
+    .popup-menu > ol > li {
+        flex: 1 1 0;
+   }
+    .popup-menu > ol > li > a {
+        position: relative;
+        width: 100%;
+        text-align: center;
+        opacity: 0.7;
+        transition: 250ms ease all;
+   }
+    .popup-menu > ol > li > ol {
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        width: 100%;
+        visibility: hidden;
+   }
+    .popup-menu > ol > li > ol > li {
+        margin-top: 3rem;
+        margin-bottom: 3rem;
+        transition: 250ms cubic-bezier(0.42, 0.83, 0.49, 1.35) transform;
+        transform: scale(0);
+   }
+    .popup-menu > ol > li > ol > li > a {
+        width: 90;
+        display: block;
+        text-align: center;
+        border-radius: 1000px;
+        color: rgba(255, 255, 255, 0.6);
+        transition: 250ms ease all;
+   }
+    .popup-menu > ol > li > ol > li > a:hover, .popup-menu > ol > li > ol > li > a:focus, .popup-menu > ol > li > ol > li > a:focus-within {
+        box-shadow: inset 0 0 0 3rem rgba(0, 0, 0, 0.1);
+        color: rgba(255, 255, 255, 1);
+   }
+    .popup-menu > ol > li:hover > a, .popup-menu > ol > li:focus > a, .popup-menu > ol > li:focus-within > a {
+        opacity: 1 !important;
+   }
+    .popup-menu > ol > li:hover > ol, .popup-menu > ol > li:focus > ol, .popup-menu > ol > li:focus-within > ol {
+        visibility: visible;
+   }
+    .popup-menu > ol > li:hover > ol > li, .popup-menu > ol > li:focus > ol > li, .popup-menu > ol > li:focus-within > ol > li {
+        transform: scale(1);
+   }
+    .popup-menu > ol > li:hover > ol > li:first-child, .popup-menu > ol > li:focus > ol > li:first-child, .popup-menu > ol > li:focus-within > ol > li:first-child {
+        transition-delay: 150ms;
+   }
+    .popup-menu > ol > li:hover > ol > li:nth-child( 1), .popup-menu > ol > li:focus > ol > li:nth-child( 1), .popup-menu > ol > li:focus-within > ol > li:nth-child( 1) {
+        transition-delay: 150ms;
+   }
+    .popup-menu > ol > li:hover > ol > li:nth-child( 2), .popup-menu > ol > li:focus > ol > li:nth-child( 2), .popup-menu > ol > li:focus-within > ol > li:nth-child( 2) {
+        transition-delay: 300ms;
+   }
+    .popup-menu > ol > li:hover > ol > li:nth-child( 3), .popup-menu > ol > li:focus > ol > li:nth-child( 3), .popup-menu > ol > li:focus-within > ol > li:nth-child( 3) {
+        transition-delay: 450ms;
+   }
+    .popup-menu > ol > li:hover > ol > li:nth-child( 4), .popup-menu > ol > li:focus > ol > li:nth-child( 4), .popup-menu > ol > li:focus-within > ol > li:nth-child( 4) {
+        transition-delay: 600ms;
+   }
+    .popup-menu > ol > li:hover > ol > li:nth-child( 5), .popup-menu > ol > li:focus > ol > li:nth-child( 5), .popup-menu > ol > li:focus-within > ol > li:nth-child( 5) {
+        transition-delay: 750ms;
+   }
+    .popup-menu > ol > li:hover > ol > li:nth-child( 6), .popup-menu > ol > li:focus > ol > li:nth-child( 6), .popup-menu > ol > li:focus-within > ol > li:nth-child( 6) {
+        transition-delay: 900ms;
+   }
+    .popup-menu > ol > li:hover > ol > li:nth-child( 7), .popup-menu > ol > li:focus > ol > li:nth-child( 7), .popup-menu > ol > li:focus-within > ol > li:nth-child( 7) {
+        transition-delay: 1050ms;
+   }
+    .popup-menu > ol > li:hover > ol > li:nth-child( 8), .popup-menu > ol > li:focus > ol > li:nth-child( 8), .popup-menu > ol > li:focus-within > ol > li:nth-child( 8) {
+        transition-delay: 1200ms;
+   }
+    .popup-menu > ol > li:hover > ol > li:nth-child( 9), .popup-menu > ol > li:focus > ol > li:nth-child( 9), .popup-menu > ol > li:focus-within > ol > li:nth-child( 9) {
+        transition-delay: 1350ms;
+   }
+    .popup-menu > ol > li:hover > ol > li:nth-child( 10), .popup-menu > ol > li:focus > ol > li:nth-child( 10), .popup-menu > ol > li:focus-within > ol > li:nth-child( 10) {
+        transition-delay: 1500ms;
+   }
+    .popup-menu > ol > li:hover > ol > li:nth-child( 11), .popup-menu > ol > li:focus > ol > li:nth-child( 11), .popup-menu > ol > li:focus-within > ol > li:nth-child( 11) {
+        transition-delay: 1650ms;
+   }
+}

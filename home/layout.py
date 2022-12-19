@@ -226,6 +226,7 @@ def about():
                 style={"color": "silver", "width": "100%", "font-size": "18px", "padding-left": "10px", "padding-right": "10px"}),
             style={"width": "80%", "margin": "auto"}
         ),
+        html.Br(),
         html.Div(
             html.Img(
                 src="assets/images/L5INp_Workflow.png",
@@ -542,6 +543,87 @@ def contact():
     ], style={"margin-bottom": "20px"})
     return contact
 
+def popup():
+    return html.Div(
+        className="popup-menu",
+        children=[
+            html.Ol(
+                [
+                    html.Li(
+                        className="popup-open-item",
+                        children=[
+                            html.Div(
+                                html.Button(
+                                    html.Img(
+                                        src="assets/images/svg/signs/bulb_sign.svg",
+                                        style={"margin-left": "-4px"}
+                                    ),
+                                    className="popup-icon"
+                                )
+                            ),
+                            html.Ol(
+                                className="sub-popup-menu",
+                                children=[
+                                    html.Li(
+                                        className="popup-item",
+                                        children=html.Div(
+                                            html.A(
+                                                target="_blank",
+                                                href="https://github.com/Hossein-Shoushtari/poslab",
+                                                children=html.Button(
+                                                    children=html.Img(
+                                                        src="assets/images/svg/signs/github_sign.svg",
+                                                        style={"margin-left": "-4px"}
+                                                    ),
+                                                    className="popup-icon"
+                                                )
+                                            ),
+                                            className="popup-icon-div"
+                                        )
+                                    ),
+                                    html.Li(
+                                        className="popup-item",
+                                        children=html.Div(
+                                            html.A(
+                                                target="_blank",
+                                                href="https://www.youtube.com/channel/UChIY2hB7pU8V2Sq577tYQ2w",
+                                                children=html.Button(
+                                                    children=html.Img(
+                                                        src="assets/images/svg/signs/youtube_sign.svg",
+                                                        style={"margin-left": "-4px"}
+                                                    ),
+                                                    className="popup-icon"
+                                                )
+                                            ),
+                                            className="popup-icon-div"
+                                        )
+                                    ),
+                                    html.Li(
+                                        className="popup-item",
+                                        children=html.Div(
+                                            html.A(
+                                                target="_blank",
+                                                href="https://www.hcu-hamburg.de/research/forschungsprojekte/level-5-indoor-navigation",
+                                                children=html.Button(
+                                                    children=html.Img(
+                                                        src="assets/images/svg/signs/www_sign.svg",
+                                                        style={"margin-left": "-4px"}
+                                                    ),
+                                                    className="popup-icon"
+                                                )
+                                            ),
+                                            className="popup-icon-div"
+                                        )
+                                    )
+                                ]
+                            )
+                        ]
+                    )
+                ]
+            )
+        ]
+    )
+
 def home_layout():
     return dbc.Card([
         dbc.CardBody(
@@ -551,21 +633,33 @@ def home_layout():
                 html.Br(),
                 header(),
                 html.Br(),
+                html.Br(),
                 about(),
                 html.Br(),
+                html.Br(),
                 publications(),
+                html.Br(),
                 html.Br(),
                 contact()
             ]
         ),
         dbc.CardFooter(
-            f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved",
-            style={
-                "width": "100%",
-                "text-align": "center",
-                "position": "fixed",
-                "bottom": "0px",
-                "z-index": "10000"
-            }
+            children=[
+                dbc.Row(
+                    [
+                        dbc.Col(popup(), className="popup-col1", width=3),
+                        dbc.Col(
+                            html.P(
+                                f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved",
+                                className="popup-p"
+                            ),
+                            className="popup-col2",
+                            width=3
+                        )
+                    ],
+                    className="popup-row"
+                )
+            ],
+            class_name="home-footer"
         )
     ])

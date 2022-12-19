@@ -42,7 +42,7 @@ server = app.server
 # title
 app.title = "L5IN⁺"
 # favicon
-app._favicon = "assets/images/signs/favicon.ico"
+app._favicon = "assets/images/favicon.ico"
 
 ### LAYOUT ###
 ## Homepage ##

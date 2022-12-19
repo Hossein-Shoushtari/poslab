@@ -1,11 +1,10 @@
+/* --------------- TABS NAVIGATION BAR --------------- */
 #tabs {
     position: fixed;
     top: 0;
     z-index: 100;
     width: 100%;
 }
-
-
 .custom-tabs-container {
     width: 85%;
     background-color: #222222;
@@ -17,7 +16,6 @@
     padding: 0px 24px;
     z-index: 0;
 }
-
 .custom-tab {
     color:#FFFFFF;
     z-index: 10000;
@@ -42,7 +40,7 @@
     z-index: 0;
 }
 
-
+/* --------------- USER LOGIN AND RAGISTRATION --------------- */
 .user-tabs-container {
     width: 85%;
     background-color: #303030;
@@ -54,8 +52,6 @@
     padding: 0px 24px;
     z-index: 0;
 }
-
-
 .user-tab {
     color: silver;
     z-index: 10000;
@@ -78,4 +74,54 @@
     border-right: 0px solid #444444 !important;
     border-top: 0px solid #535353 !important;
     z-index: 0;
+}
+
+/* --------------- FOOTERS --------------- */
+.home-footer {
+    background-image: url(/assets/images/svg/footers/home_footer.svg);
+    background-color: transparent;
+    padding: 0;
+    padding-top: 20px;
+    width: 100%;
+    border: 0px;
+    text-align: center;
+    bottom: 0px;
+    height: 50px;
+    z-index: 1000;
+}
+.sim-footer {
+    background-image: url(/assets/images/svg/footers/sim_footer.svg);
+    background-color: transparent;
+    padding: 0;
+    padding-top: 20px;
+    width: 100%;
+    border: 0px;
+    text-align: center;
+    bottom: 0px;
+    height: 50px;
+}
+.eval-footer {
+    background-image: url(/assets/images/svg/footers/eval_footer.svg);
+    background-color: transparent;
+    padding: 0;
+    padding-top: 20px;
+    width: 100%;
+    border: 0px;
+    text-align: center;
+    bottom: 0px;
+    height: 50px;
+}
+.ds-footer {
+    background-image: url(/assets/images/svg/footers/ds_footer.svg);
+    background-color: transparent;
+    padding: 0;
+    padding-top: 20px;
+    width: 100%;
+    border: 0px;
+    text-align: center;
+    bottom: 0px;
+    height: 50px;
+}
+.ds-card {
+    background: #FAE7D9
 }

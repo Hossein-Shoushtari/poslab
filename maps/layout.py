@@ -23,7 +23,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/done_sign.svg"), style={"margin-right": "30px"}),
                             "Successful!"
                         ],
                         className="d-flex align-items-center",
@@ -39,7 +39,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/caution_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/caution_sign.svg"), style={"margin-right": "30px"}),
                             "Over 500 pts! Not displaying, but still in system."
                         ],
                         className="d-flex align-items-center",

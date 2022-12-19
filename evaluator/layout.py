@@ -99,7 +99,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/error_sign.svg"), style={"margin-right": "30px"}),
                             "Please login first!"
                         ],
                         className="d-flex align-items-center",
@@ -114,7 +114,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/error_sign.svg"), style={"margin-right": "30px"}),
                             "Please login first!"
                         ],
                         className="d-flex align-items-center",
@@ -129,7 +129,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/error_sign.svg"), style={"margin-right": "30px"}),
                             "Please login first!"
                         ],
                         className="d-flex align-items-center",
@@ -145,7 +145,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/error_sign.svg"), style={"margin-right": "30px"}),
                             "Wrong file format!"
                         ],
                         className="d-flex align-items-center",
@@ -161,7 +161,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/done_sign.svg"), style={"margin-right": "30px"}),
                             "Upload successful!"
                         ],
                         className="d-flex align-items-center",
@@ -177,7 +177,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/error_sign.svg"), style={"margin-right": "30px"}),
                             "Wrong file format!"
                         ],
                         className="d-flex align-items-center",
@@ -193,7 +193,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/done_sign.svg"), style={"margin-right": "30px"}),
                             "Successful!"
                         ],
                         className="d-flex align-items-center",
@@ -209,7 +209,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/caution_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/caution_sign.svg"), style={"margin-right": "30px"}),
                             "Please select data first!"
                         ],
                         className="d-flex align-items-center",
@@ -254,7 +254,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/caution_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/caution_sign.svg"), style={"margin-right": "30px"}),
                             "Nothing to export!"
                         ],
                         className="d-flex align-items-center",
@@ -270,7 +270,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/done_sign.svg"), style={"margin-right": "30px"}),
                             "Export successful!"
                         ],
                         className="d-flex align-items-center",
@@ -338,8 +338,8 @@ def eval_map(geojson_style):
         dl.Map(
             [   
                 html.Div(id="eval_hcu_panel", children=info, style={"display": "None"}),
-                html.Button(html.Img(src="assets/images/signs/focus_sign2.svg", id="eval_zoom_img"), id="eval_zoom", style=focus_style),
-                html.Button(html.Img(src="assets/images/signs/research_sign.svg"), id="eval_hcu_maps", style=research_style),
+                html.Button(html.Img(src="assets/images/svg/signs/focus_sign2.svg", id="eval_zoom_img"), id="eval_zoom", style=focus_style),
+                html.Button(html.Img(src="assets/images/svg/signs/research_sign.svg"), id="eval_hcu_maps", style=research_style),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
                 html.Div(id="eval_div_lc", children=dl.LayersControl(id="eval_lc", children=eu.floorplan2layer(geojson_style)), style={"display": "None"}), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
@@ -544,7 +544,7 @@ def help_canvas():
             [
                 dbc.Alert(
                     [
-                        html.Div(html.Img(src="assets/images/signs/focus_sign1.svg"), style={"margin-right": "10px"}),
+                        html.Div(html.Img(src="assets/images/svg/signs/focus_sign1.svg"), style={"margin-right": "10px"}),
                         "Use the focus tool on the map to restore the last view!"
                     ],
                     className="d-flex align-items-center",
@@ -552,7 +552,7 @@ def help_canvas():
                 ),
                 dbc.Alert(
                     [
-                        html.Button(html.Img(src="assets/images/signs/download_sign.svg", style={"margin-left": "-8px"}), id="eval_exdata", style={"margin-right": "10px", "width": "48px", "background": "transparent", "border": "0px"}),
+                        html.Button(html.Img(src="assets/images/svg/signs/download_sign.svg", style={"margin-left": "-8px"}), id="eval_exdata", style={"margin-right": "10px", "width": "48px", "background": "transparent", "border": "0px"}),
                         html.Div(
                             [
                                 html.P("Not sure about the file formats?", style={"margin-bottom": "0px"}),
@@ -565,7 +565,7 @@ def help_canvas():
                 ),
                 dbc.Alert(
                     [
-                        html.Div(html.Img(src="assets/images/signs/bug_sign.svg"), style={"margin-right": "10px"}),
+                        html.Div(html.Img(src="assets/images/svg/signs/bug_sign.svg"), style={"margin-right": "10px"}),
                         html.Div(
                             [
                                 html.P("Are the layer names mixed up?", style={"margin-bottom": "0px"}),
@@ -866,7 +866,10 @@ def eval_layout(geojson_style):
                     tooltips()
                 ]
             ),
-            dbc.CardFooter(f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center"})
+            dbc.CardFooter(
+                f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved",
+                class_name="eval-footer"
+            )
         ]
     )
 

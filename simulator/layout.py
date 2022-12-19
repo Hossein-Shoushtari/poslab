@@ -109,7 +109,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/info_sign1.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/info_sign1.svg"), style={"margin-right": "30px"}),
                             "3-15 characters | no ?/!* etc. | start with a letter"
                         ],
                         className="d-flex align-items-center",
@@ -124,7 +124,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/done_sign.svg"), style={"margin-right": "30px"}),
                             "Registration successful!"
                         ],
                         className="d-flex align-items-center",
@@ -139,7 +139,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/caution_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/caution_sign.svg"), style={"margin-right": "30px"}),
                             "This user already exists! Login instead."
                         ],
                         className="d-flex align-items-center",
@@ -154,7 +154,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/done_sign.svg"), style={"margin-right": "30px"}),
                             "Login successful!"
                         ],
                         className="d-flex align-items-center",
@@ -169,7 +169,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/caution_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/caution_sign.svg"), style={"margin-right": "30px"}),
                             "This user doesn't exist! Register instead."
                         ],
                         className="d-flex align-items-center",
@@ -184,7 +184,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/error_sign.svg"), style={"margin-right": "30px"}),
                             "Please login first!"
                         ],
                         className="d-flex align-items-center",
@@ -199,7 +199,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/error_sign.svg"), style={"margin-right": "30px"}),
                             "Please login first!"
                         ],
                         className="d-flex align-items-center",
@@ -214,7 +214,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/error_sign.svg"), style={"margin-right": "30px"}),
                             "Please login first!"
                         ],
                         className="d-flex align-items-center",
@@ -229,7 +229,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/error_sign.svg"), style={"margin-right": "30px"}),
                             "Please login first!"
                         ],
                         className="d-flex align-items-center",
@@ -245,7 +245,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/error_sign.svg"), style={"margin-right": "30px"}),
                             "Wrong file format!"
                         ],
                         className="d-flex align-items-center",
@@ -261,7 +261,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/done_sign.svg"), style={"margin-right": "30px"}),
                             "Upload successful!"
                         ],
                         className="d-flex align-items-center",
@@ -277,7 +277,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/error_sign.svg"), style={"margin-right": "30px"}),
                             "Wrong file format!"
                         ],
                         className="d-flex align-items-center",
@@ -293,7 +293,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/done_sign.svg"), style={"margin-right": "30px"}),
                             "Successful!"
                         ],
                         className="d-flex align-items-center",
@@ -309,7 +309,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/caution_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/caution_sign.svg"), style={"margin-right": "30px"}),
                             "Please select data first!"
                         ],
                         className="d-flex align-items-center",
@@ -325,7 +325,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/error_sign.svg"), style={"margin-right": "30px"}),
                             "Something went wrong! Please check the formats."
                         ],
                         className="d-flex align-items-center",
@@ -341,7 +341,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/done_sign.svg"), style={"margin-right": "30px"}),
                             "Generation successful!"
                         ],
                         className="d-flex align-items-center",
@@ -357,7 +357,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/error_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/error_sign.svg"), style={"margin-right": "30px"}),
                             "Required data is missing!"
                         ],
                         className="d-flex align-items-center",
@@ -374,7 +374,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/done_sign.svg"), style={"margin-right": "30px"}),
                             "Saved!"
                         ],
                         className="d-flex align-items-center",
@@ -390,7 +390,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/caution_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/caution_sign.svg"), style={"margin-right": "30px"}),
                             "Nothing to export!"
                         ],
                         className="d-flex align-items-center",
@@ -406,7 +406,7 @@ def modals():
                 dbc.ModalHeader(
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/done_sign.svg"), style={"margin-right": "30px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/done_sign.svg"), style={"margin-right": "30px"}),
                             "Export successful!"
                         ],
                         className="d-flex align-items-center",
@@ -517,9 +517,9 @@ def sim_map(geojson_style):
         dl.Map(
             [   
                 html.Div(id="sim_hcu_panel", children=info, style={"display": "None"}),
-                html.Button(html.Img(src="assets/images/signs/save_sign.svg", id="sim_save_img"), id="sim_save", style=save_style),
-                html.Button(html.Img(src="assets/images/signs/focus_sign2.svg", id="sim_zoom_img"), id="sim_zoom", style=focus_style),
-                html.Button(html.Img(src="assets/images/signs/research_sign.svg"), id="sim_hcu_maps", style=research_style),
+                html.Button(html.Img(src="assets/images/svg/signs/save_sign.svg", id="sim_save_img"), id="sim_save", style=save_style),
+                html.Button(html.Img(src="assets/images/svg/signs/focus_sign2.svg", id="sim_zoom_img"), id="sim_zoom", style=focus_style),
+                html.Button(html.Img(src="assets/images/svg/signs/research_sign.svg"), id="sim_hcu_maps", style=research_style),
                 dl.TileLayer(url=url, maxZoom=20, attribution=attribution), # Base layer (OpenStreetMap)
                 html.Div(id="sim_div_lc", children=dl.LayersControl(id="sim_lc", children=su.floorplan2layer(geojson_style))), # is previously filled with invisible floorplans for initialization
                 dl.FullscreenControl(), # possibility to get map fullscreen
@@ -543,7 +543,7 @@ def help_canvas():
             [   
                 dbc.Alert(
                     [
-                        html.Div(html.Img(src="assets/images/signs/focus_sign1.svg"), style={"margin-right": "10px"}),
+                        html.Div(html.Img(src="assets/images/svg/signs/focus_sign1.svg"), style={"margin-right": "10px"}),
                         "Use the focus tool on the map to restore the last view!"
                     ],
                     className="d-flex align-items-center",
@@ -551,7 +551,7 @@ def help_canvas():
                 ),
                 dbc.Alert(
                     [
-                        html.Button(html.Img(src="assets/images/signs/download_sign.svg", style={"margin-left": "-8px"}), id="sim_exdata", style={"margin-right": "10px", "width": "48px", "background": "transparent", "border": "0px"}),
+                        html.Button(html.Img(src="assets/images/svg/signs/download_sign.svg", style={"margin-left": "-8px"}), id="sim_exdata", style={"margin-right": "10px", "width": "48px", "background": "transparent", "border": "0px"}),
                         html.Div(
                             [
                                 html.P("Not sure about the file formats?", style={"margin-bottom": "0px"}),
@@ -564,7 +564,7 @@ def help_canvas():
                 ),
                 dbc.Alert(
                     [
-                        html.Div(html.Img(src="assets/images/signs/bug_sign.svg"), style={"margin-right": "10px"}),
+                        html.Div(html.Img(src="assets/images/svg/signs/bug_sign.svg"), style={"margin-right": "10px"}),
                         html.Div(
                             [
                                 html.P("Are the layer names mixed up?", style={"margin-bottom": "0px"}),
@@ -603,7 +603,7 @@ def help_canvas():
                     html.Hr(style={"margin": "auto", "width": "80%", "color": "silver", "margin-bottom": "15px"}),
                     dbc.Alert(
                         [
-                            html.Div(html.Img(src="assets/images/signs/warning_sign.svg"), style={"margin-right": "10px"}),
+                            html.Div(html.Img(src="assets/images/svg/signs/warning_sign.svg"), style={"margin-right": "10px"}),
                             "For performance reasons, only trajectories up to 500 points are displayed on the map.",
                         ],
                         className="d-flex align-items-center",
@@ -656,7 +656,7 @@ def gt_canvas():
             # steps
             dbc.Alert(
                 [
-                    html.Div(html.Img(src="assets/images/signs/list_sign.svg"), style={"margin-right": "30px"}),
+                    html.Div(html.Img(src="assets/images/svg/signs/list_sign.svg"), style={"margin-right": "30px"}),
                     html.Div(
                         [
                             html.P("Select all data needed", style={"margin-bottom": "0px"}),
@@ -671,7 +671,7 @@ def gt_canvas():
             ),
             dbc.Alert(
                 [
-                    html.Div(html.Img(src="assets/images/signs/warning_sign.svg"), style={"margin-right": "30px"}),
+                    html.Div(html.Img(src="assets/images/svg/signs/warning_sign.svg"), style={"margin-right": "30px"}),
                     "The first and the last waypoint should always be selected.",
                 ],
                 className="d-flex align-items-center",
@@ -763,7 +763,7 @@ def sim_set_canvas():
                     html.Div(
                         html.Button(
                             html.Img(
-                                src="assets/images/signs/reset_sign.svg",
+                                src="assets/images/svg/signs/reset_sign.svg",
                                 style={"margin-left": "-4px"}),
                             id = "ss_reset",
                             style={"height": "40px", "background": "transparent", "border": "0px"}
@@ -907,7 +907,7 @@ def sim_layout(geojson_style):
                     dbc.Col([
                         html.Button(
                             html.Img(
-                                src="assets/images/signs/login_sign.svg",
+                                src="assets/images/svg/signs/login_sign.svg",
                                 style={"margin-left": "-4px"},
                                 id="login_sign"),
                             id="login_btn",
@@ -941,7 +941,7 @@ def sim_layout(geojson_style):
                     dbc.Col([
                         html.Button(
                             html.Img(
-                                src="assets/images/signs/register_sign.svg",
+                                src="assets/images/svg/signs/register_sign.svg",
                                 style={"margin-left": "-4px"},
                                 id="register_sign"),
                             id="register_btn",
@@ -973,7 +973,7 @@ def sim_layout(geojson_style):
                                 html.Div(
                                     html.Button(
                                         html.Img(
-                                            src="assets/images/signs/settings_sign.svg",
+                                            src="assets/images/svg/signs/settings_sign.svg",
                                             style={"margin-left": "-4px"},
                                             id="sim_set_img"),
                                         id = "sim_set",
@@ -1091,7 +1091,7 @@ def sim_layout(geojson_style):
                                         html.Div(
                                             html.Button(
                                                 html.Img(
-                                                    src="assets/images/signs/info_sign2.svg",
+                                                    src="assets/images/svg/signs/info_sign2.svg",
                                                     style={"margin-left": "-4px"},
                                                     id="usr_info_sign"),
                                                 id = "info_btn",
@@ -1174,7 +1174,10 @@ def sim_layout(geojson_style):
                     tooltips()
                 ]
             ),
-            dbc.CardFooter(f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved", style={"text-align": "center"})
+            dbc.CardFooter(
+                f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved",
+                class_name="sim-footer"
+            )
         ]
     )
 
