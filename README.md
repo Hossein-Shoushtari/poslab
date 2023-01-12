@@ -137,7 +137,7 @@
 
   
 
-<a  href="https://www.paypal.me/KorvinVenzke"><img  src="assets/images/signs/donate_sign.svg"  height="40"></a>
+<a  href="https://www.paypal.me/KorvinVenzke"><img  src="assets/images/svg/signs/donate_sign.svg"  height="40"></a>
 
   
 
