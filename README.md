@@ -1,144 +1,49 @@
 
-  
+#   L5IN⁺: Level 5 Indoor-Navigation Plus  
 
-# INDOOR NAVIGATION 5G | Simulation ⟷ Evaluation
-
-  
-
-  
-
-### official website: https://poslab.herokuapp.com/
-
-  
-
-  
+**Website**: https://poslab.herokuapp.com/  
+**Papers**:  
+**Demo**: https://youtu.be/ABc6WXrFHIs
 
 ---
+### Requirements   
+Website:
+```
+dash, dash-bootstrap-components, dash-core-components, dash-extensions,
+dash-html-components, dash-leaflet, dash-table, plotly, pyncclient
+```
+Simulation & Evaluation:
+```
+geojson, geopandas, numpy, pandas, scipy 
+```
 
-  
+### Data 
 
-## File Navigation -- Overview
+### Usage:
 
-  
+1.  Visit our website
+2. Example data can be downloaded in the ```help``` section!
+3.  In the **Simulator** tab, you can simulate measurements. To do this:
+    1.  Enter your first and last name during registration for easy identification and data restoration.
+    2.  Upload your data.
+    3.  Generate ground truth trajectories using your waypoints and sensor data.
+    4.  Simulate measurements.
+    5.  Download your results.
+    6.  Refer to the ```help``` section for more detailed instructions.
+    7.  Add on: Draw points, lines, polygons and shapes on the map, and access the geojson file in the results!
+4. In the **Evaluator** tab, you can evaluate the simulated data. For doing this:
+    1.  Either upload additional data or select the previously calculated data.
+    2.  Go to ```CDF``` to calculate the cumulative distribution function.
+    3.  Optionally select a map to get the percentage of points in corresponding polygons (=pip).
+    4.  Safe the plot as .png!
+    5.  Open the ```Visual``` modal -- it functions as a minimalistic GIS.
+    6. Select the prefered map background, file format and uploaded or generated files.
+    7. Safe the plot!
+5. In the **Dataset** tab, you can apply for our _L5IN⁺  Dataset_.
 
-### DIRECTORIES
+### Citation
 
-  
-
-#### assets
-
-  
-
->  **exports** : for each user generated ground truth, simulated measurements and drawn data
-
-  
-
->  **floorplans** : HCU floorplans (EG, 1OG, 4OG)
-
-  
-
->  **images** : images and icons for the website
-
-  
-
->  **users** : user data from nextcloud after logged in successfully
-
-  
-
-#### datasets
-
-  
-
-> Dataset tab with all its required python scripts
-
-  
-
-#### evaluator
-
-  
-
-> Evaluator tab with all its required python scripts
-
-  
-
-#### home
-
-  
-
-> Home tab with all its required python scripts
-
-  
-
-#### simulator
-
-  
-
-> Simulator tab with all its required python scripts
-
-  
-
-#### maps
-
-  
-
-> Dash-leaflet maps (simulator & evaluator tab) with all its required python scripts
-
-  
-
-  
-
-### FILES
-
-  
-
->  **main.py** : self-explanatory :)
-
-  
-
->  **maps.py** : all logic code related to the two maps in Simulator & Evaluator (unlock HCU maps, show all uploaded/generated, zoom, center etc.)
-
-  
-
->  **dashExtensions_default.js** : GeoJSON rendering logic. Must be in Java Script. It's used for dash-leaflet. It's only initialized once in the beginning.
-
-  
-
->  **spinner_styling.css** : CSS styling of the blue spinner/loading sign
-
-  
-
->  **tabs.css** : CSS styling of the four tabs
-
-  
-
->  **example_data.zip** : some example data for the user to know how to format his own data
-
-  
-
->  **util.py** : Required general functions from all tabs
-
-  
-
->  **user_handling.py** : callbacks for registration and login
-
-  
-
->  **README.txt** : readme file in exported results zip for user's info
-
-  
-
->  **.gitignore**, **Procfile**, **requirements.txt**, **runtime.txt** : for heroku deploy
-
-  
-
-  
-
-<br/>
-
-  
-
+---
 <a  href="https://www.paypal.me/KorvinVenzke"><img  src="assets/images/svg/signs/donate_sign.svg"  height="40"></a>
-
-  
 
 If you enjoyed this project — or just feel generous, consider supporting us!
