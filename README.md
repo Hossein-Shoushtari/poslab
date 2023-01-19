@@ -19,12 +19,12 @@ geojson, geopandas, numpy, pandas, scipy
 
 ### Dash
 [Dash](https://plotly.com/dash/) is a Python framework for building web-based data visualization applications. It is built on top of Flask and React.js, and it allows developers to easily create interactive visualizations and dashboards without the need for extensive web development knowledge. Dash applications are composed of two parts: the layout, which describes the overall structure of the application, and the callbacks, which handle the interactive elements of the application. Dash also provides built-in support for a wide range of data visualization libraries such as Plotly.js, making it easy to create highly interactive and customizable visualizations. Additionally, Dash supports deployment on various platforms such as Heroku and PythonAnywhere, providing an easy way to share the created application with others. Dash is widely used in data science, finance, and other industries for creating interactive dashboards and visualizations, and it's great for building applications that require real-time updates and user interactions.  
-In addition to its powerful data visualization capabilities, Dash also allows for the creation of fully-fledged web applications. Our website, for example, is built entirely using Dash and Python. This means that the entire website, including the layouts, callbacks, and visualizations, are all created and managed using Python. The use of Python also allows for efficient data processing and manipulation, making it an ideal choice for building data-driven websites.  
+Our website is built entirely using Dash and Python. This means that the entire website, including the layouts, callbacks, and visualizations, are all created and managed using Python. The use of Python also allows for efficient data processing and manipulation, making it an ideal choice for building data-driven websites.  
 Our website demonstrates the versatility of Dash by using it in the context of Geoinformatics and GIS, showing that it can be a valuable tool in these fields as well.
 
 
 ### Data
-The L5IN⁺ Dataset will be available for release on January 26, 2023. To apply for access to this dataset, please visit our website and navigate to the **Dataset** tab. For additional information, please refer to our website or contact [hossein.shoushtari@hcu-hamburg.de](mailto:hossein.shoushtari@hcu-hamburg.de) for further assistance.
+The  _L5IN⁺  Dataset_ will be available for release on January 26, 2023. To apply for access to this dataset, please visit our website and navigate to the **Dataset** tab. For additional information, please refer to our website or contact [hossein.shoushtari@hcu-hamburg.de](mailto:hossein.shoushtari@hcu-hamburg.de) for further assistance.
 
 ### Usage:
 1.  Visit our website
