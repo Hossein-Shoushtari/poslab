@@ -25,7 +25,7 @@ Our website is built entirely using Dash and Python. This means that the entire 
 ### Data
 The  _L5IN⁺  Dataset_ will be available for release on January 26, 2023. To apply for access to this dataset, please visit our website and navigate to the **Dataset** tab. For additional information, please refer to our website or contact [hossein.shoushtari@hcu-hamburg.de](mailto:hossein.shoushtari@hcu-hamburg.de) for further assistance.
 
-### Usage:
+### Usage
 1.  Visit our website
 2. Example data can be downloaded in the ```Help``` section!
 3.  In the **Simulator** tab, you can simulate measurements. To do this:
