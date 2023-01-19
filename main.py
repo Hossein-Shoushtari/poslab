@@ -62,6 +62,7 @@ app.layout = html.Div(
         # Tabs
         dcc.Tabs(
             id="tabs",
+            className="my-tabs",
             value="tab1",
             colors={"background": "#222222"},
             children=
@@ -100,7 +101,8 @@ app.layout = html.Div(
                 )
             ]
         )
-    ]
+    ],
+    className="main-div"
 )
 
 ### CALLBACKS ###

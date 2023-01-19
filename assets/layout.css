@@ -1,3 +1,13 @@
+/* ---------------------- MAIN ----------------------- */
+.main-div {
+    width: 100%;
+    min-width: 1000px;
+}
+
+.my-tabs {
+    min-width: 1000px;
+}
+
 /* --------------- TABS NAVIGATION BAR --------------- */
 #tabs {
     position: fixed;

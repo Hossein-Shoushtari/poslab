@@ -28,7 +28,7 @@ def ds_layout():
                 }
             ),
             dbc.CardFooter(
-                f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved",
+                f"© {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation Plus. All Rights Reserved",
                 class_name="ds-footer"
             )
         ],

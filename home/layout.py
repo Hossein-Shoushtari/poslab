@@ -650,7 +650,7 @@ def home_layout():
                         dbc.Col(popup(), className="popup-col1", width=3),
                         dbc.Col(
                             html.P(
-                                f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved",
+                                f"© {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation Plus. All Rights Reserved",
                                 className="popup-p"
                             ),
                             className="popup-col2",

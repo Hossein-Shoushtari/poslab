@@ -2,3 +2,5 @@ venv
 *.pyc
 .env
 .DS_Store
+test1.py
+test2.py

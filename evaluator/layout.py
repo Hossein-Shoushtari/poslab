@@ -528,7 +528,7 @@ def visual_modal():
                     className="six columns",
                     style={"height": "660px"})
             ]),
-            dbc.ModalFooter(html.Div(f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved", style={"textAlign": "center", "width": "100%"}))
+            dbc.ModalFooter(html.Div(f"© {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation Plus. All Rights Reserved", style={"textAlign": "center", "width": "100%"}))
         ],
         id="visual_show",
         fullscreen=True,
@@ -867,7 +867,7 @@ def eval_layout(geojson_style):
                 ]
             ),
             dbc.CardFooter(
-                f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation. All Rights Reserved",
+                f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation Plus. All Rights Reserved",
                 class_name="eval-footer"
             )
         ]

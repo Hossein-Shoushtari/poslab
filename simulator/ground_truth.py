@@ -3,9 +3,7 @@
 # built in
 import numpy as np
 # installed
-import shapely.geometry as sg
 import scipy.signal as signal
-import shapely
 # general utils
 import utils as u
 
