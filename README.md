@@ -47,8 +47,10 @@ The  _L5IN⁺  Dataset_ will be available for release on January 26, 2023. To ap
 5. In the **Dataset** tab, you can apply for our _L5IN⁺  Dataset_.
 
 ### Privacy
-By using our website and creating an account for uploading data, you consent to the collection, administration, and storage of your personal data as outlined in this Privacy Policy.  
-The data you provide, including personal data (the registration data may be your actual name), will be collected and managed by us using the Nextcloud platform. Your data will be securely stored on servers located in Holland. In exceptional cases, we may be required to disclose your data to judicial or data protection authorities. In such a case, we will inform you as the account holder, if legally permitted. The purpose of collecting your personal data is to create and manage your account, and for any other uses specifically outlined on our website. Should you wish to revoke your consent, we will promptly delete your data from our system.
+By using our website and creating an account for uploading data, you consent to the collection, administration, and storage of your data as outlined in this Privacy Policy.  
+The data you provide, including registration data, will be collected and managed by us using the Nextcloud platform. The purpose of collecting the data is to create and manage your account, and for any other uses specifically outlined on our website. Should you wish to revoke your consent, we will promptly delete your data from our system.  
+The data of all users is open-source and available under this link:  
+https://ann.nl.tab.digital/s/9jo9raqZ6p8m5X9
 
 ---
 <a  href="https://www.paypal.me/KorvinVenzke"><img  src="assets/images/svg/signs/donate_sign.svg"  height="40"></a>
