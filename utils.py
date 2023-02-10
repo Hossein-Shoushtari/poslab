@@ -44,7 +44,7 @@ def create_user(nc, username, password):
     # create directories and upload demo files
     nc.mkdir(f"L5IN/{username}_{password}")
     for asset in assets:
-        nc.put_directory(f"L5IN/{username}_{password}", f"assets/users/demo_data/{asset}")
+        nc.put_directory(f"L5IN/{username}_{password}", f"assets/demo_data_default/{asset}")
 
 def get_user(nc, username, password):
     # get individual user data
