@@ -437,4 +437,6 @@ def export_gt(nc, user: dict, ground_truth: list):
     # save groundtruth
     with open(f"assets/exports/results_{un}_{pw}/gt/gt_{name}.csv", "w") as f: f.write(output)  # exports
     with open(f"assets/users/{un}_{pw}/groundtruth/gt_{name}.csv", "w") as f: f.write(output)   # online usage
-    u.update_user_data(nc, f"{un}_{pw}/groundtruth/gt_{name}.csv")
+    # push to cloud if not demo data logged in
+    if f"{un}_{pw}" != "demo_data":
+        u.update_user_data(nc, f"{un}_{pw}/groundtruth/gt_{name}.csv")
