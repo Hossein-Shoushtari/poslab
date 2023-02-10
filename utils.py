@@ -40,13 +40,11 @@ def signin_validation(entry):
     return True
 
 def create_user(nc, username, password):
-    assets = ["antennas", "groundtruth", "maps", "sensors", "trajectories", "waypoints"]
-    sensors = ["acc", "bar", "gyr", "mag"]
+    assets = ["antennas", "groundtruth", "maps", "trajectories", "waypoints", "sensors"]
+    # create directories and upload demo files
     nc.mkdir(f"L5IN/{username}_{password}")
     for asset in assets:
-        nc.mkdir(f"L5IN/{username}_{password}/{asset}")
-    for sensor in sensors:
-        nc.mkdir(f"L5IN/{username}_{password}/sensors/{sensor}")
+        nc.put_directory(f"L5IN/{username}_{password}", f"assets/users/demo_data/{asset}")
 
 def get_user(nc, username, password):
     # get individual user data
@@ -428,11 +426,7 @@ def deleter():
     for folder in os.listdir("assets/exports"): st.rmtree(f"assets/exports/{folder}", ignore_errors=True)
     for folder in os.listdir("assets/users"): st.rmtree(f"assets/users/{folder}", ignore_errors=True)
 
-def dummy():
-    with open("assets/exports/dummy", "w") as f: f.write("")
-    with open("assets/users/dummy", "w") as f: f.write("")
 
 
 if __name__ == "__main__":
     deleter()
-    #dummy()

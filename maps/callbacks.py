@@ -123,11 +123,18 @@ def maps_calls(app, geojson_style):
         ):
         # getting triggered element
         trigger = [p["prop_id"] for p in callback_context.triggered][0]
-        if "usr_data" in trigger:
-            return no_update
+
         # ============================================================================================================================================================== #
+        # getting all different layers
+        sim_layers = []
+        eval_layers = []
+        sim_layers += (layers)
+        eval_layers += (layers)
+        if "usr_data" in trigger:
+            return no_update, no_update, no_update, no_update, no_update, sim_layers, no_update, no_update, no_update, eval_layers, no_update, no_update
+        
         ly_style = {"display": "None"}
-        bounds=[[35.81781315869664, -47.90039062500001], [60.71619779357716, 67.67578125000001]] # center of Europe as centroid
+        bounds=[[35.81781315869664, -47.90039062500001], [60.71619779357716, 67.67578125000001]] # center of Europe
         # getting bounds from latest change
         dates = [
             sim_map_layers["date"],
@@ -150,24 +157,18 @@ def maps_calls(app, geojson_style):
             elif date == 5: bounds = eval_map_layers["bounds"]
             elif date == 6: bounds = eval_gt_layers["bounds"]
             elif date == 7: bounds = eval_traj_layers["bounds"]
-            elif date == 8: bounds = [[53.53985942305863, 10.003506584890614], [53.54054129105324, 10.005749166803048]] # HCU boundaries
+            elif date == 8: bounds = [[53.53985942305863, 10.003506584890614], [53.54054129105324, 10.005749166803048]] # HCU boundaries | researcher login
         # ============================================================================================================================================================== #
         ## regain focus ##
         # focus
         if "sim_zoom" in trigger or "eval_zoom" in trigger:
             return display_done, overflow, no_update, no_update, no_update, no_update, bounds, no_update, no_update, no_update, bounds, no_update
         # ============================================================================================================================================================== #
-        # getting all different layers
-        sim_layers = []
-        eval_layers = []
-        sim_layers += (layers)
-        eval_layers += (layers)
         # hcu floorplans --------------------------------------------------------------------
         if unlocked["unlocked"] == True: # adding floorplans to map
-            hcu_style = {"display": "block"}
-            # adding floorplans
             sim_layers += u.floorplan2layer(geojson_style, "sim")
             eval_layers += u.floorplan2layer(geojson_style, "eval")
+            hcu_style = {"display": "block"}
             ly_style = {"display": "block"}
         if unlocked["unlocked"] == False: # removing floorplans from map
             hcu_style = {"display": "None"}

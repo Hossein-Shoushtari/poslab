@@ -478,7 +478,7 @@ def sim_calls(app, nc):
         pw = user["password"]
         if "open_sim" in button:
             if un: # user logged in, activate gt canvas and filling dropdown with data
-                options = [{"label":name[:-4], "value": name[:-4]} for name in listdir(f"assets/users/{un}_{pw}/groundtruth")]
+                options = [{"label": name[:-4], "value": name[:-4]} for name in listdir(f"assets/users/{un}_{pw}/groundtruth")]
                 return not sim_modal, options
             else: # user isn't logged in, just open canvas
                 return not sim_modal, []

@@ -438,7 +438,7 @@ def eval_calls(app, nc):
         pw = user["password"]
         if "open_visual" in button:
             if un: # user logged in
-                map_options  = [{"label": name[:-8], "value": f"users/{un}_{pw}maps/{name[:-8]}"} for name in listdir(f"assets/users/{un}_{pw}/maps")]
+                map_options  = [{"label": name[:-8], "value": f"users/{un}_{pw}/maps/{name[:-8]}"} for name in listdir(f"assets/users/{un}_{pw}/maps")]
                 ref_options  = [{"label": name[:-4], "value": name[:-4]} for name in listdir(f"assets/users/{un}_{pw}/waypoints")]
                 gt_options   = [{"label": name[:-4], "value": name[:-4]} for name in listdir(f"assets/users/{un}_{pw}/groundtruth")]
                 traj_options = [{"label": name[:-4], "value": name[:-4]} for name in listdir(f"assets/users/{un}_{pw}/trajectories")]

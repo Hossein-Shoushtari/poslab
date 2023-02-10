@@ -20,8 +20,8 @@ def users_calls(app, nc):
         Input("info_btn", "n_clicks")
     )
     def open_login(modal, btn):
-        button = [p["prop_id"] for p in callback_context.triggered][0]
-        if "info_btn" in button: return True
+        trigger = [p["prop_id"] for p in callback_context.triggered][0]
+        if "info_btn" in trigger: return True
         else: return no_update
 
     # registrate/login user ==============================================================================================================
@@ -83,14 +83,14 @@ def users_calls(app, nc):
             login_pw = login_pw.rstrip()
         except: pass
         # let's go
-        button = [p["prop_id"] for p in callback_context.triggered][0]
+        trigger = [p["prop_id"] for p in callback_context.triggered][0]
         usr_data = {
             "username": "",
             "password": ""
         }
         welcome = html.P("Register or Login", style={"margin": "0px"})
         # REGISTER --------------------------------------------------------------------------------------------------------
-        if "register_btn" in button:
+        if "register_btn" in trigger:
             # checking if username and password are acceptable
             register_un_valid = u.signin_validation(register_un)
             register_pw_valid = u.signin_validation(register_pw)
@@ -111,7 +111,7 @@ def users_calls(app, nc):
                     # same user already exists
                     return not register_un_valid, register_un_valid, not register_pw_valid, register_pw_valid, False, True, no_update, no_update, no_update, no_update, no_update, no_update, welcome, usr_data, no_update
         # LOGIN ------------------------------------------------------------------------------------------------------------
-        if "login_btn" in button:
+        if "login_btn" in trigger:
             # checking presence of username and password
             login_un_valid = True if login_un else False
             login_pw_valid = True if login_pw else False
@@ -130,6 +130,13 @@ def users_calls(app, nc):
             except:
                 # user doesn't exist
                 return no_update, no_update, no_update, no_update, no_update, no_update, not login_un_valid, login_un_valid, not login_pw_valid, login_pw_valid, False, True, welcome, usr_data, no_update
+        # LOAD DEMO DATA ----------------------------------------------------------------------------------------------------
+        if trigger == ".":
+            usr_data["username"] = "demo"
+            usr_data["password"] = "data"
+            # demo data loaded
+            return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, welcome, usr_data, no_update
+
         return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
 
 

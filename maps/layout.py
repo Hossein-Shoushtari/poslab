@@ -8,7 +8,7 @@ def storage():
     ### STORAGE
     # dcc.Store to store and share data between callbacks
     storage = html.Div([
-        dcc.Store(id="unlocked", data={"unlocked": False,"date": 0}, storage_type="memory"),
+        dcc.Store(id="unlocked", data={"unlocked": False, "date": 0}, storage_type="memory"),
         dcc.Store(id="layers", data=[], storage_type="memory")
     ])
     return storage

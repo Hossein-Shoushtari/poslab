@@ -867,7 +867,7 @@ def eval_layout(geojson_style):
                 ]
             ),
             dbc.CardFooter(
-                f"Copyright © {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation Plus. All Rights Reserved",
+                f"© {datetime.date.today().strftime('%Y')} Level 5 Indoor Navigation Plus. All Rights Reserved",
                 class_name="eval-footer"
             )
         ]
