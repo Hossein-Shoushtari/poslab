@@ -42,16 +42,31 @@ def eval_calls(app, nc):
         # user
         Input("usr_data", "data")
     )
-    def upload(
-        ## modal
-        usr_warn,
-        map_warn,
-        ## upload
-        map_contents,
-        map_filenames,
-        # user
-        user
+    def upload_maps(
+        usr_warn, map_warn, # modal
+        map_contents, map_filenames, # upload
+        user # user
         ):
+        """
+        This function handles the upload of map files in a geojson format.
+        The function first checks if a user is logged in, and if not, a warning modal is shown to prompt the user to log in.
+        If the user is logged in, the uploaded file is decoded from base64, converted to WGS84 (EPSG:4326) and saved as a geojson file.
+        The bounds of the uploaded layer are calculated and added to a dictionary along with some metadata.
+        The function returns the status of two modals, the uploaded layers and their metadata, and the loading status of the function.
+
+        Args:
+        map_contents (list): List of decoded contents of uploaded files
+        map_filenames (list): List of filenames of uploaded files
+        user (dict): Dictionary containing the username and password of the logged in user
+
+        Returns:
+        tuple: Returns a tuple of the following values:
+            usr_warn (bool): Boolean indicating whether the warning modal for missing user should be displayed or not
+            map_warn (bool): Boolean indicating whether the warning modal for incorrect map format should be displayed or not
+            layers (dict): Dictionary containing the uploaded layers, their metadata and the bounds of the latest uploaded layer
+            loading (None): None, indicating that the function is not in a loading state
+
+        """
         # getting clicked button
         button = [p["prop_id"] for p in callback_context.triggered][0]
         # UPLOAD
@@ -123,27 +138,18 @@ def eval_calls(app, nc):
         # user
         Input("usr_data", "data")
     )
-    def upload(
-        ## modals
-        usr_warn,
-        ul_warn,
-        ul_done,
+    def upload_rest(
+        usr_warn, ul_warn, ul_done, # modals
         ## upload
-        gt_contents,   # ground truth
-        gt_filenames,
-        tra_contents,  # trajectory
-        tra_filenames,
+        gt_contents, gt_filenames,   # ground truth
+        tra_contents, tra_filenames,  # trajectory
         #--- sensors
-        gyr_contents,  # gyroscope
-        gyr_filenames,
-        acc_contents,  # acceleration
-        acc_filenames,
-        bar_contents,  # barometer
-        bar_filenames,
-        mag_contents,  # magnetometer
-        mag_filenames,
-        # user
-        user
+        gyr_contents, gyr_filenames,  # gyroscope
+        acc_contents, acc_filenames,  # acceleration
+        bar_contents, bar_filenames,  # barometer
+        mag_contents, mag_filenames,  # magnetometer
+        #---
+        user # user
         ):
         # getting clicked button
         button = [p["prop_id"] for p in callback_context.triggered][0]
@@ -267,15 +273,10 @@ def eval_calls(app, nc):
         Input("usr_data", "data")
     )
     def open_cdf(
-        # canvas status
-        cdf_cv,
-        # button
-        open_cdf,
-        # unlocked
-        unlocked1,
-        unlocked2,
-        # user
-        user
+        cdf_cv, # canvas status
+        open_cdf, # button
+        unlocked1, unlocked2, # unlocked
+        user # user
         ):
         # getting clicked button
         button = [p["prop_id"] for p in callback_context.triggered][0]
@@ -331,23 +332,11 @@ def eval_calls(app, nc):
         Input("usr_data", "data")
     )
     def cdf(
-        # modals
-        cdf_warn,
-        cdf_show,
-        # checkboxes
-        norm_box,
-        histo_box,
-        norm_status,
-        histo_status,
-        percent,
-        # data
-        gt_select,
-        traj_select,
-        map_select,
-        # button
-        cdf_btn,
-        # user
-        user
+        cdf_warn, cdf_show, # modals
+        norm_box, histo_box, norm_status, histo_status, percent, # checkboxes
+        gt_select, traj_select, map_select, # data
+        cdf_btn, # button
+        user # user
         ):
         # getting clicked button
         button = [p["prop_id"] for p in callback_context.triggered][0]
@@ -422,16 +411,7 @@ def eval_calls(app, nc):
         # user
         Input("usr_data", "data")
     )
-    def open_visual(
-        # modal
-        visual_show,
-        # button
-        open_visual,
-        # unlocked
-        unlocked,
-        # user
-        user
-        ):
+    def open_visual(visual_show, open_visual, unlocked, user):
         # getting clicked button
         button = [p["prop_id"] for p in callback_context.triggered][0]
         un = user["username"]
@@ -472,17 +452,9 @@ def eval_calls(app, nc):
         Input("usr_data", "data")
     )
     def update_fig(
-        # files
-        _map,
-        refs,
-        gts,
-        trajs,
-        ant,
-        bg,
-        _format,
-        FIG,
-        # user
-        user):
+        _map, refs, gts, trajs, ant, bg, _format, FIG, # files
+        user # user
+        ):
         # refreshing configurations
         trigger = [p["prop_id"] for p in callback_context.triggered][0]
         un = user["username"]
@@ -639,7 +611,17 @@ def eval_calls(app, nc):
         # button
         Input("eval_exdata", "n_clicks"), # export button click status
     )
-    def example_data(btn):
+    def example_data(btn: int):
+        """
+        Callback function to handle the download of example data.
+
+        Parameters:
+        btn (int) : The number of clicks on the export button.
+
+        Returns:
+        download (obj) : The file to download, `example_data.zip` if the export button is clicked,
+                             else `no_update` indicating no action should be taken.
+        """
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "eval_exdata" in button:
             download = dcc.send_file("assets/example_data.zip", filename="example_data.zip")
@@ -669,14 +651,9 @@ def eval_calls(app, nc):
         Input("usr_data", "data")
     )
     def export(
-        # modal
-        usr_warn,
-        exp_done,
-        exp_warn,
-        # button
-        exp_clicks,
-        # user
-        user
+        usr_warn, exp_done, exp_warn, # modal
+        exp_clicks, # button
+        user # user
         ):
         un = user["username"]
         pw = user["password"]
@@ -704,12 +681,17 @@ def eval_calls(app, nc):
         State("eval_help_cv", "is_open"),     # canvas status
         Input("eval_help_btn", "n_clicks")    # button
     )
-    def help(
-        # canvas status
-        eval_help_cv,
-        # button
-        help_clicks
-        ):
+    def help(eval_help_cv, help_clicks):
+        """
+        Open and close the help offcanvas when the help button is clicked.
+
+        Parameters:
+        eval_help_cv (bool) : The current status of the help offcanvas.
+        help_clicks (int) : The number of times the help button has been clicked.
+
+        Returns:
+        eval_help_cv (bool) : The updated status of the help offcanvas.
+        """
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "eval_help_btn" in button: return not eval_help_cv     # activate help offcanvas
         else: return eval_help_cv

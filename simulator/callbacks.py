@@ -41,15 +41,10 @@ def sim_calls(app, nc):
         # user
         Input("usr_data", "data")
     )
-    def upload(
-        ## modal
-        usr_warn,
-        map_warn,
-        ## upload
-        map_contents,
-        map_filenames,
-        # user
-        user
+    def upload_maps(
+        usr_warn, map_warn, ## modal
+        map_contents, map_filenames, ## upload
+        user ## user
         ): 
         # getting clicked button
         button = [p["prop_id"] for p in callback_context.triggered][0]
@@ -121,25 +116,17 @@ def sim_calls(app, nc):
         # user
         Input("usr_data", "data")
     )
-    def upload(
+    def upload_rest(
         ## modals
-        usr_warn,
-        ul_warn,
-        ul_done,
+        usr_warn, ul_warn, ul_done,
         ## upload
-        way_contents,  # waypoints
-        way_filenames,
-        ant_content,  # antennas
-        ant_filename,
+        way_contents, way_filenames,  # waypoints
+        ant_content, ant_filename,    # antennas
         #--- sensors
-        gyr_contents,  # gyroscope
-        gyr_filenames,
-        acc_contents,  # acceleration
-        acc_filenames,
-        bar_contents,  # barometer
-        bar_filenames,
-        mag_contents,  # magnetometer
-        mag_filenames,
+        gyr_contents, gyr_filenames,  # gyroscope
+        acc_contents, acc_filenames,  # acceleration
+        bar_contents, bar_filenames,  # barometer
+        mag_contents, mag_filenames,  # magnetometer
         # user
         user
         ): 
@@ -230,7 +217,6 @@ def sim_calls(app, nc):
         # ====== no button clicked =============================================================================================================
         else: return usr_warn, ul_warn, ul_done, no_update, no_update
 
-
     # ground truth canvas ===============================================================================================================
     @app.callback(
         ### Outputs ###
@@ -244,14 +230,7 @@ def sim_calls(app, nc):
         # user
         Input("usr_data", "data")
     )
-    def gt_canvas(
-        # canvas status
-        gt_cv,
-        # button
-        gt_clicks,
-        # user
-        user
-        ):
+    def gt_canvas(gt_cv, gt_clicks, user):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         un = user["username"]
         pw = user["password"]
@@ -342,20 +321,10 @@ def sim_calls(app, nc):
         Input("usr_data", "data")
     )
     def ref_gt_gen(
-        ## modals
-        gen_warn,
-        gen_done,
-        sel_warn,
-        # gt generator
-        gen_btn,
-        # ref points
-        show_btn,
-        ref_data,
-        acc_data,
-        gyr_data,
-        check,
-        # user
-        user
+        gen_warn, gen_done, sel_warn, # modals
+        gen_btn, # gt generator
+        show_btn, ref_data, acc_data, gyr_data, check, # ref points
+        user # user
         ):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         un = user["username"]
@@ -411,12 +380,7 @@ def sim_calls(app, nc):
         State("sim_set_cv", "is_open"),   # canvas status
         Input("sim_set", "n_clicks")      # button
     )
-    def sim_set_canvas(
-        # canvas status
-        sim_set_cv,
-        # button
-        sim_set_clicks
-        ):
+    def sim_set_canvas(sim_set_cv, sim_set_clicks):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "sim_set" in button: return not sim_set_cv     # activate sim_set canvas
         else: return sim_set_cv                      # canvas is closed
@@ -465,14 +429,7 @@ def sim_calls(app, nc):
         # user
         Input("usr_data", "data")
     )
-    def open_sim(
-        # modal status
-        sim_modal,
-        # button
-        open_sim,
-        # user
-        user
-        ):
+    def open_sim(sim_modal, open_sim, user):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         un = user["username"]
         pw = user["password"]
@@ -510,22 +467,11 @@ def sim_calls(app, nc):
         Input("usr_data", "data")         
     )
     def simulation(
-        # canvas status
-        sim_warn,
-        # button
-        sim_btn,
-        # data
-        gt_select,
-        err,
-        ms_freq,
-        net_cap,
-        num_user,
-        num_int,
-        sem_err_rang,
-        int_rang,
-        sem_err,
-        # user
-        user
+        sim_warn, # canvas status
+        sim_btn, # button
+        ## data
+        gt_select, err, ms_freq, net_cap, num_user, num_int, sem_err_rang, int_rang, sem_err,
+        user # user
         ):
         un = user["username"]
         pw = user["password"]
@@ -571,15 +517,10 @@ def sim_calls(app, nc):
         Input("usr_data", "data")   
     )
     def save(
-        # modal
-        usr_warn,
-        save_done,
-        # drawings
-        drawings,
-        # button
-        save_btn,
-        # user
-        user
+        usr_warn,save_done, # modal
+        drawings, # drawings
+        save_btn, # button
+        user # user
         ):
         un = user["username"]
         pw = user["password"]
@@ -635,14 +576,9 @@ def sim_calls(app, nc):
         Input("usr_data", "data")
     )
     def export(
-        # modal
-        usr_warn,
-        exp_done,
-        exp_warn,
-        # button
-        exp_clicks,
-        # user
-        user
+        usr_warn, exp_done, exp_warn, # modal
+        exp_clicks, # button
+        user # user
         ):
         un = user["username"]
         pw = user["password"]
@@ -670,12 +606,7 @@ def sim_calls(app, nc):
         State("sim_help_cv", "is_open"),     # canvas status
         Input("sim_help_btn", "n_clicks")    # button
     )
-    def help(
-        # canvas status
-        sim_help_cv,
-        # button
-        help_clicks
-        ):
+    def help(sim_help_cv, help_clicks):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "sim_help_btn" in button: return not sim_help_cv     # activate help canvas
         else: return sim_help_cv
@@ -689,11 +620,8 @@ def sim_calls(app, nc):
         Input("1OG_sim", "hover_feature"),     # 1OG
         Input("4OG_sim", "hover_feature"),     # 4OG
     )
-    def hovering(
-        # geojson info of all three layers
-        feature_eg, feature_1og, feature_4og
-        ):
-        if feature_eg: return u.hover_info(feature_eg)       # if EG is clicked
-        elif feature_1og: return u.hover_info(feature_1og)   # if 1OG is clicked
-        elif feature_4og: return u.hover_info(feature_4og)   # if 4OGG is clicked
-        else: return u.hover_info()                          # if nothing is clicked
+    def hovering(feature_eg, feature_1og, feature_4og):    # geojson info of all three layers
+        if feature_eg: return u.hover_info(feature_eg)     # if EG is clicked
+        elif feature_1og: return u.hover_info(feature_1og) # if 1OG is clicked
+        elif feature_4og: return u.hover_info(feature_4og) # if 4OGG is clicked
+        else: return u.hover_info()                        # if nothing is clicked

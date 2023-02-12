@@ -522,7 +522,7 @@ def contact():
             [
                 dbc.Col([
                     html.P(html.B("Georg Fjodorow", style={"color": "silver", "margin-top": "-12px"})),
-                    html.P("Master Student at HafenCity University Hamburg (HCU)",
+                    html.P("Former Master Student at HafenCity University Hamburg (HCU)",
                         style={"line-height": "110%", "color": "silver", "margin-top": "-18px"}),
                     html.P(
                         html.A("georg.fjodorow@hcu-hamburg.de", href="mailto: georg.fjodorow@hcu-hamburg.de", style={"color": "silver"}),

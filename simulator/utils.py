@@ -3,11 +3,9 @@
 # dash
 from dash_extensions.javascript import arrow_function
 import dash_bootstrap_components as dbc
-import dash_leaflet.express as dlx
 import dash_leaflet as dl
 from dash import html
 # built in
-from datetime import datetime
 import numpy as np
 # installed
 import shapely.geometry as sh
@@ -16,16 +14,15 @@ import geopandas as gp
 import utils as u
 
 
-def floorplan2layer(geojson_style) -> list:
+def floorplan2layer(geojson_style: dict) -> list:
     """
-    FUNCTION
-    - makes layers out of HCU floorplans (gejson)
-    -------
-    PARAMETER
-    geojson_style : geojson rendering logic in java script (assign)
-    -------
-    RETURN
-    layers : list of layered floorplans
+    Converts floorplan to layer by loading it from a geojson file and styling it with a provided style.
+    
+    Parameters:
+    geojson_style (dict) : The style to apply to each floorplan.
+    
+    Returns:
+    layers (list) : A list of Overlay objects representing each floorplan.
     """
     # initializing list to fill it with default layers
     layers = []
@@ -46,16 +43,15 @@ def floorplan2layer(geojson_style) -> list:
         i += 1
     return layers
 
-def save_drawings(user: dict, data: dict):
+def save_drawings(user: dict, data: dict) -> None:
     """
-    FUNCTION
-    - formats received dictionary (replaces ' with ")
-    - saves formatted file as geojson file (>assets/export/draw<)
-    -------
-    PARAMETER
-    data : data to export/save
-    -------
-    RETURN
+    This function saves the drawn geometries in a .geojson file with a unique filename.
+    
+    Parameters:
+    user (dict) : A dictionary containing the username and password of the user.
+    data (dict) : A dictionary containing the data of the drawn geometries in the format of a geojson.
+    
+    Returns:
     None
     """
     # user data
@@ -75,14 +71,14 @@ def save_drawings(user: dict, data: dict):
 
 def ref_tab(user: dict, name: str) -> list:
     """
-    FUNCTION
-    - transforms reference data into table-rows and adds checkboxes
-    -------
-    PARAMETER
-    name : filename of reference data
-    -------
-    RETURN
-    tr_list : list of table rows with number, latitude, longitude and checkbox
+    This function loads waypoint data from a .csv file for a specific user and returns a list of table rows.
+    
+    Parameters:
+    user (dict) : A dictionary that contains the "username" and "password" of the user.
+    name (str) : The name of the .csv file (without extension) to be loaded.
+    
+    Returns:
+    tr_list (list) : A list of table rows, where each table row is a dash html component, representing a row in the waypoint table.
     """
     # user data
     un = user["username"]
@@ -121,15 +117,15 @@ def ref_tab(user: dict, name: str) -> list:
 
 def ref_checked(user: dict, filename: str, check: tuple) -> list:
     """
-    FUNCTION
-    - parses over reference data and just keeps checked data 
-    -------
-    PARAMETER
-    filename : filename of reference data
-    check : info about which checkbox is checked/unchecked
-    -------
-    RETURN
-    data : ndarray with checked coordinates
+    Returns a list of filtered data based on checkbox selections.
+
+    Parameters:
+    user (dict) : A dictionary that contains the user's `username` and `password`.
+    filename (str) : A string that represents the name of the file to be loaded.
+    check (tuple):  A tuple that contains the checkbox selections.
+        
+    Returns:
+    data (list) : A list of filtered data.
     """
     # user data
     un = user["username"]
@@ -149,16 +145,14 @@ def ref_checked(user: dict, filename: str, check: tuple) -> list:
 
 def ref2marker(data: list, check: tuple) -> list:
     """
-    FUNCTION
-    - converts lat and lon from crs32632 (reference points) to crs4326
-    - makes leaflet markers out of coordinates
-    -------
-    PARAMETER
-    data  : reference points data
-    check : checkboxes 
-    -------
-    RETURN
-    markers : list of all created markers with converted lat and lon
+    Returns a list of waypoint markers based on checkbox selections.
+
+    Parameters:
+    data (list) : A list of waypoint data to be transformed into markers.
+    check (tuple) : A tuple that contains the checkbox selections.
+        
+    Returns:
+    overlay (list) : A list of waypoint markers.
     """
     # determing whether checked or unchecked
     keep = np.ones(data.shape[0], dtype=bool)
@@ -191,12 +185,13 @@ def ref2marker(data: list, check: tuple) -> list:
 
 def ant2marker(user: dict) -> list:
     """
-    FUNCTION
-    - converts lat and lon from crs32632 (reference points) to crs4326
-    - makes leaflet markers out of antenna coordinates
-    -------
-    RETURN
-    markers : list of all created markers with converted lat and lon
+    Returns a list of markers for antennas.
+
+    Parameters:
+    user (dict) : A dictionary that contains the user's `username` and `password`.
+        
+    Returns:
+    markers (list) : A list of markers for antennas.
     """
     # user data
     un = user["username"]
@@ -222,3 +217,6 @@ def ant2marker(user: dict) -> list:
         markers.append(marker)
 
     return dl.Overlay(dl.LayerGroup(markers), name="Antennas", checked=True)
+
+if __name__ == "__main__":
+    pass

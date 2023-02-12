@@ -19,7 +19,22 @@ import shapely.geometry as sh
 import geopandas as gp
 
 
-def signin_validation(entry):
+def signin_validation(entry: str) -> bool:
+    """
+    Validate an entry for sign-in purposes.
+
+    The function checks if the entry meets the following requirements:
+    1. The entry should exist (not None).
+    2. The entry should start with a letter (upper or lower case).
+    3. The entry should only consist of letters and numbers.
+    4. The length of the entry should be between 3 and 15 characters.
+
+    Parameters:
+    entry (str) : The entry to be validated.
+
+    Returns:
+    bool : True if the entry is valid, False otherwise.
+    """
     # entry should exist
     if entry == None: return False
     # entry should start with a letter
@@ -39,14 +54,49 @@ def signin_validation(entry):
         return False
     return True
 
-def create_user(nc, username, password):
+def create_user(nc: object, username: str, password: str) -> None:
+    """
+    Create a user by making a directory and uploading demo files.
+
+    The function creates a directory named `L5IN/<username>_<password>` and uploads demo files for each asset into the directory.
+    The assets included are:
+    - antennas
+    - groundtruth
+    - maps
+    - trajectories
+    - waypoints
+    - sensors
+
+    Parameters:
+    nc (obj) : Object representing the connection to the network storage.
+    username (str) : The username of the user to be created.
+    password (str) : The password of the user to be created.
+
+    Returns:
+    None
+    """
     assets = ["antennas", "groundtruth", "maps", "trajectories", "waypoints", "sensors"]
     # create directories and upload demo files
     nc.mkdir(f"L5IN/{username}_{password}")
     for asset in assets:
-        nc.put_directory(f"L5IN/{username}_{password}", f"assets/demo_data_default/{asset}")
+        nc.put_directory(f"L5IN/{username}_{password}", f"assets/demo_data_template/{asset}")
 
-def get_user(nc, username, password):
+def get_user(nc: object, username: str, password: str) -> None:
+    """
+    Get the user data from the network storage and extract it.
+
+    The function retrieves the user data from the network storage, saves it as a zip file, extracts it, and removes the zip file.
+    If the directory for the individual export of results does not exist, the function creates it with subdirectories for draw, gt, and sm.
+    The function also copies a README.txt file to the individual export directory.
+
+    Parameters:
+    nc (obj) : Object representing the connection to the network storage.
+    username (str) : The username of the user.
+    password (str) : The password of the user.
+
+    Returns:
+    None
+    """
     # get individual user data
     nc.get_directory_as_zip(f"L5IN/{username}_{password}", f"assets/users/{username}_{password}.zip")
     with zipfile.ZipFile(f"assets/users/{username}_{password}.zip", 'r') as zip_ref:
@@ -60,21 +110,34 @@ def get_user(nc, username, password):
         st.copy("assets/README.txt", f"assets/exports/results_{username}_{password}/README.txt")
     except: pass
 
-def update_user_data(nc, rel_file_path):
+def update_user_data(nc: object, rel_file_path: str) -> None:
+    """
+    Update the user data in the network storage.
+
+    The function updates the user data in the network storage with the contents of the specified local file.
+
+    Parameters:
+    nc (obj) : Object representing the connection to the network storage.
+    rel_file_path (str) : The relative file path of the file to be updated in the network storage.
+
+    Returns:
+    None
+    """
     remote_path = f"L5IN/{rel_file_path}"
     local_source_file = f"assets/users/{rel_file_path}"
     nc.put_file(remote_path, local_source_file)
 
-def map2layer(user: dict, quantity, geojson_style) -> list:
+def map2layer(user: dict, quantity: int, geojson_style: dict) -> list:
     """
-    FUNCTION
-    - makes layers out of newly uploaded map files
-    -------
-    PARAMETER
-    geojson_style : geojson rendering logic in java script
-    -------
-    RETURN
-    layers : list of uploaded layers
+    Converts a specified number of newly uploaded map files into map layers.
+
+    Parameters:
+    user (dict) : A dictionary containing the username and password of the user.
+    quantity (int) : The number of most recently uploaded map files to be converted into layers.
+    geojson_style (dict) : A dictionary containing the styles to be applied to each polygon in the GeoJSON file.
+
+    Returns:
+    layers (list) : A list of the uploaded map layers, each represented as a `deck.gl` Overlay object.
     """
     # user data
     un = user["username"]
@@ -97,17 +160,16 @@ def map2layer(user: dict, quantity, geojson_style) -> list:
         layers.append(dl.Overlay(geojson, name=name, checked=True))
     return layers
 
-def floorplan2layer(geojson_style, tab: str) -> list:
+def floorplan2layer(geojson_style: dict, tab: str) -> list:
     """
-    FUNCTION
-    - makes layers out of HCU floorplans (gejson)
-    -------
-    PARAMETER
-    geojson_style : geojson rendering logic in java script (assign)
-    tab           : sim or eval
-    -------
-    RETURN
-    layers : list of layered floorplans
+    Create layers of HCU floorplans (geojson) and return as a list.
+
+    Parameters:
+    geojson_style (dict) : The geojson rendering logic in JavaScript
+    tab (str) : 'sim' or 'eval'
+
+    Returns:
+    list : A list of layered floorplans
     """
     # initializing list to fill it with default layers
     layers = []
@@ -129,18 +191,17 @@ def floorplan2layer(geojson_style, tab: str) -> list:
 
     return layers
 
-def hover_info(feature=None) -> 'html.Div':
+def hover_info(feature: dict = None) -> 'html.Div':
     """
-    FUNCTION
-    - builds info panel (right corner on map)
-    - fills table with geojson properties when hovering
-    -------
-    PARAMETER
-    feature : default None (no hover)
-              MultiPolygon (while hover)
-    -------
-    RETURN
-    info panel : html.Div
+    Returns a Div component that contains the information of a selected floorplan segment when hovered.
+    
+    Parameters:
+    feature (dict, optional) : A dictionary containing the properties of the selected floorplan segment. Default is None.
+    
+    Returns:
+    html.Div : A Div component that contains the information of the selected floorplan segment. The component consists of a header
+               and a table with the properties and values of the selected segment. When no segment is selected, a message is
+               displayed asking the user to select a floorplan and hover over a segment.
     """
     # creating header (always on)
     header = [html.H4("Space Information", style={"textAlign": "center"}), html.Hr(style={"width": "60%", "margin": "auto", "marginBottom": "10px"})]
@@ -190,14 +251,14 @@ def hover_info(feature=None) -> 'html.Div':
 
 def extract_coordinates(data: list) -> list:
     """
-    FUNCTION
-    - extracts lon and lat coordinates from given goejson file
-    -------
-    PARAMETER
-    data : geojson file
-    -------
-    RETURN
-    lon_lat : list with lat and lon coordinates
+    Extracts the longitude and latitude coordinates from a GeoJSON or Shapely object.
+
+    Parameters:
+    data (list) : A list of GeoJSON or Shapely objects.
+
+    Returns:
+    list : A list containing two lists, the first one with longitude coordinates and the
+           second one with latitude coordinates.
     """
     # getting all coordinates
     lon = []
@@ -211,38 +272,43 @@ def extract_coordinates(data: list) -> list:
     return [lon, lat]
 
 def time() -> str:
+    """
+    Returns the current time with format '{hour}h-{minute}min-{second}sec' in
+    the timezone of Heroku serverswhich are 1 hour behind Germany.
+    """
     H, M, S = datetime.now().strftime('%H'), datetime.now().strftime('%M'), datetime.now().strftime('%S')
     name = f"{int(H)+1}h-{M}min-{S}sec"
     return name
 
 def upload_encoder(content: str) -> str:
     """
-    FUNCTION
-    - encodes uploaded base64 file to originally uploaded file
-    -------
-    PARAMETER
-    content : decoded content
-    -------
-    RETURN
-    encoded content
+    This function decodes base64 encoded string to the original content.
+
+    Parameters:
+    content (str) : base64 encoded string
+
+    Returns:
+    decoded_content (str) : decoded string, expected to be a geojson like string
+    
+    Note:
+    The function assumes that the input content is in the format: 'data:<MIME-type>;base64,<encoded-string>'
     """
     # decoding base64 to geojson
     encoded_content = content.split(",")[1]
     decoded_content = b64decode(encoded_content).decode("latin-1")  # should be a geojson like string
-
     return decoded_content
 
 def centroid(lon_raw: list, lat_raw: list) -> tuple:
     """
-    FUNCTION
-    - calculates center of given geojson file
-    -------
-    PARAMETER
-    lon_raw : longitude
-    lat_raw : latitude
-    -------
-    RETURN
-    center : tuple with lat and lon of center
+    Returns the centroid of a set of coordinates.
+
+    Parameters:
+    lon_raw (list) : A list of longitudes
+    lat_raw (list) : A list of latitudes
+
+    Returns:
+    tuple: The centroid of the set of coordinates, represented as a longitude and latitude tuple.
+
     """
     # calculating mean of lat and lon
     center = (sum(lat_raw)/len(lat_raw), sum(lon_raw)/len(lon_raw))
@@ -250,15 +316,15 @@ def centroid(lon_raw: list, lat_raw: list) -> tuple:
 
 def zoom_lvl(lon_raw: list, lat_raw: list) -> int:
     """
-    FUNCTION
-    - calculates zoom level of given geojson file
-    -------
-    PARAMETER
-    lon_raw : longitude
-    lat_raw : latitude
-    -------
-    RETURN
-    zoom : zoom lvl (integer)
+    Calculate the zoom level for a map display, based on the longitudes and latitudes of the input data.
+
+    Parameters:
+    lon_raw (list) : A list of longitudes
+    lat_raw (list) : A list of latitudes
+
+    Returns:
+    zoom (int) : An integer representing the calculated zoom level
+
     """
     df = gp.GeoDataFrame({"geometry": [sh.Point(lon, lat) for lon, lat in zip(lon_raw, lat_raw)]})
     minx, miny, maxx, maxy = df.geometry.total_bounds
@@ -277,16 +343,17 @@ def zoom_lvl(lon_raw: list, lat_raw: list) -> int:
 
 def boundaries(lon_raw: list, lat_raw: list) -> list:
     """
-    FUNCTION
-    - calculates the to bondary points (most southwestern and
-      most northeastern point) of given shapes
-    -------
-    PARAMETER
-    lon_raw : longitude
-    lat_raw : latitude
-    -------
-    RETURN
-    bounds : boundaries (List[list])
+    This function calculates the boundaries of a set of coordinates by finding the
+    most southwestern and the most northeastern point.
+
+    Parameters:
+    lon_raw (list) : List of longitudes
+    lat_raw (list) : List of latitudes
+
+    Returns:
+    list : List of the southwestern and northeastern point in the form
+           [[southwestern_latitude, southwestern_longitude],
+            [northeastern_latitude, northeastern_longitude]]
     """
     # making shapely points out of given coordinates
     df = gp.GeoDataFrame({"geometry": [sh.Point(lon, lat) for lon, lat in zip(lon_raw, lat_raw)]})
@@ -298,14 +365,13 @@ def boundaries(lon_raw: list, lat_raw: list) -> list:
 
 def from_32632_to_4326(data: list) -> tuple:
     """
-    FUNCTION
-    - makes shapely points out of given data and converts it to crs:4326 
-    -------
-    PARAMETER
-    data : data
-    -------
-    RETURN
-    list of lon and lat of converted points
+    Convert points from crs:32632 to crs:4326.
+    
+    Parameters:
+    data (list) : list of tuples, each tuple represents a point in (lon, lat) format (crs:32632)
+
+    Returns:
+    tuple : list of longitude values and list of latitude values in crs:4326 format
     """
     # making points out of data and converting it (crs:32632 to crs:4326)
     points = {"geometry": [sh.Point(lat, lon) for lat, lon in data]}
@@ -317,14 +383,16 @@ def from_32632_to_4326(data: list) -> tuple:
         lat.append(p.y)
     return [lon, lat]
 
-def gt2marker(user: dict, quantity) -> list:
+def gt2marker(user: dict, quantity: int) -> list:
     """
-    FUNCTION
-    - converts lat and lon from crs32632 (groundtruth) to crs4326
-    - makes leaflet markers out of coordinates
-    -------
-    RETURN
-    markers : list of all created markers with converted lat and lon
+    This function generates marker layers based on the latest `quantity` number of ground truth data in a given directory.
+
+    Parameters:
+    user (dict) : A dictionary object containing username and password of the user.
+    quantity (int) : An integer specifying the number of the latest ground truth files to be used for marker generation.
+
+    Returns:
+    layers (list) : A list of marker layers with added tooltips and popups.
     """
     # user data
     un = user["username"]
@@ -367,14 +435,21 @@ def gt2marker(user: dict, quantity) -> list:
         i += 1
     return layers
 
-def traj2marker(user: dict, quantity) -> list:
+def traj2marker(user: dict, quantity: int) -> list:
     """
-    FUNCTION
-    - converts lat and lon from crs32632 (trajectories) to crs4326
-    - makes leaflet markers out of coordinates
-    -------
-    RETURN
-    markers : list of all created markers with converted lat and lon
+    Convert trajectories data to markers and organize them in layers.
+
+    Parameters:
+    user (dict) : A dictionary containing the username and password.
+    quantity (int) : The number of latest files to be considered.
+
+    Returns:
+    layers (list) : A list of map overlays, each consisting of a layer group of markers.
+
+    The function takes in user data (username and password) and the number of latest files to be considered. It then
+    filters the list of all files in the directory corresponding to the user and sorts them based on their last modification
+    time. The latest `quantity` files are then selected and used to create markers for the trajectories. The markers are
+    then organized into layer groups and returned as a list of overlays.
     """
     # user data
     un = user["username"]
@@ -419,14 +494,6 @@ def traj2marker(user: dict, quantity) -> list:
             i += 1
     return layers
 
-def deleter():
-    """
-    - emptying all uploaded or generated files before the actuall app starts
-    """
-    for folder in os.listdir("assets/exports"): st.rmtree(f"assets/exports/{folder}", ignore_errors=True)
-    for folder in os.listdir("assets/users"): st.rmtree(f"assets/users/{folder}", ignore_errors=True)
-
-
 
 if __name__ == "__main__":
-    deleter()
+    pass

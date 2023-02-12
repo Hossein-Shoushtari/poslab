@@ -19,7 +19,18 @@ def maps_calls(app, geojson_style):
         Input("eval_hcu_maps", "n_clicks"),
         State("research", "is_open")
     )
-    def sim_hcu(sim, eval, is_open):
+    def sim_hcu(sim: int, eval: int, is_open: bool) -> bool:
+        """
+        Callback function for opening and closing the "research" modal in response to clicking on the "sim_hcu_maps" or "eval_hcu_maps" buttons.
+
+        Parameters:
+        sim (int): The number of clicks on the "sim_hcu_maps" button.
+        eval (int): The number of clicks on the "eval_hcu_maps" button.
+        is_open (bool): A boolean indicating the current state of the "research" modal (open or closed).
+
+        Returns:
+        bool: A boolean indicating the new state of the "research" modal (open or closed).
+        """
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "sim_hcu_maps" in button or "eval_hcu_maps" in button:
             return not is_open
@@ -40,7 +51,21 @@ def maps_calls(app, geojson_style):
         Input("unlock", "n_clicks"),
         Input("hcu_pw", "value")
     )
-    def unlock(unlock, password):
+    def unlock(unlock: int, password: str) -> tuple:
+        """
+        Callback function for unlocking access to HCU layers in response to clicking the "unlock" button and entering a password.
+
+        Parameters:
+        unlock (int): The number of clicks on the "unlock" button.
+        password (str): The password entered by the user.
+
+        Returns:
+        tuple: A tuple containing six values indicating the validity of the password and the unlock status of various features of the app.
+            valid (bool): A boolean indicating whether the entered password is valid.
+            invalid (bool): A boolean indicating whether the entered password is invalid.
+            unlocked (dict): A dictionary containing the unlock status and the date of unlocking.
+            data (bool): Four booleans indicating the unlock status of four features of the app.
+        """
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "unlock" in button:
             if str(password) == "cpsimulation2022":
@@ -99,27 +124,13 @@ def maps_calls(app, geojson_style):
         Input("usr_data", "data")
     )
     def display(
-        ## modal
-        display_done,
-        overflow,
-        ## HCU
-        unlocked,
-        ## layers
-        layers,
-        # simulator
-        sim_map_layers,
-        sim_ant_layers,
-        sim_ref_layers,
-        sim_gt_layers,
-        sim_traj_layers,
-        # evaluator
-        eval_map_layers,
-        eval_gt_layers,
-        eval_traj_layers,
-        ## buttons
-        sim_zoom_btn,
-        eval_zoom_btn,
-        user
+        
+        display_done, overflow, # modal
+        unlocked, # HCU
+        layers, # layers
+        sim_map_layers, sim_ant_layers, sim_ref_layers, sim_gt_layers, sim_traj_layers, # simulator
+        eval_map_layers, eval_gt_layers, eval_traj_layers, # evaluator
+        sim_zoom_btn, eval_zoom_btn, user # buttons
         ):
         # getting triggered element
         trigger = [p["prop_id"] for p in callback_context.triggered][0]

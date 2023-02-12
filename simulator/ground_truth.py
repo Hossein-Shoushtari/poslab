@@ -1,4 +1,4 @@
-##### Ground Truth Generation class!!!
+##### Ground Truth Generation
 ### IMPORTS
 # built in
 import numpy as np
@@ -101,7 +101,6 @@ def compute_steps(acce_datas):
         acce_mag_pre = acce_mag_filt_detrend
 
     return step_timestamps, step_indexs, step_acce_max_mins
-
 
 def compute_stride_length(step_acce_max_mins):
     K = 0.4
@@ -208,14 +207,6 @@ def get_orientation(R):
     values = np.zeros((3,))
     if np.size(flat_R) == 9:
         values[0] = np.arctan2(flat_R[1], flat_R[4])
-    #  if flat_R[1] < 0:
-        # values[0] = -2*np.pi + np.arctan2(flat_R[1], flat_R[4])
-    # else:
-        # values[0] =  np.arctan2(flat_R[1], flat_R[4])
-    # if flat_R[1]<0 and flat_R[4] < 0:
-        # values[0] =  np.arctan2(flat_R[1], flat_R[4])
-    # else:
-        # values[0] =  np.arctan2(flat_R[1], flat_R[4])
         values[1] = np.arcsin(-flat_R[7])
         values[2] = np.arctan2(-flat_R[6], flat_R[8])
     else:
@@ -231,7 +222,7 @@ def compute_headings(ahrs_datas):
         ahrs_data = ahrs_datas[i, :]
         rot_mat = get_rotation_matrix_from_vector(ahrs_data[1:])
         azimuth, pitch, roll = get_orientation(rot_mat)
-        around_z = (-azimuth) # % (2 * np.pi)
+        around_z = (-azimuth)
         headings[i, :] = ahrs_data[0], around_z
     return headings
 
@@ -253,7 +244,7 @@ def compute_rel_positions(stride_lengths, step_headings):
     rel_positions = np.zeros((stride_lengths.shape[0], 3))
     for i in range(0, stride_lengths.shape[0]):
         rel_positions[i, 0] = stride_lengths[i, 0]
-        rel_positions[i, 1] = -stride_lengths[i, 1] * np.sin(step_headings[i, 1]) ########## Why - minus?!!!
+        rel_positions[i, 1] = -stride_lengths[i, 1] * np.sin(step_headings[i, 1])
         rel_positions[i, 2] = stride_lengths[i, 1] * np.cos(step_headings[i, 1])
 
     return rel_positions
@@ -269,24 +260,15 @@ def compute_step_positions(acce_datas, ahrs_datas, posi_datas):
     return step_positions
 
 def correct_positions(rel_positions, reference_positions):
-    """
-
-    :param rel_positions:
-    :param reference_positions:
-    :return:
-    """
     rel_positions_list = split_ts_seq(rel_positions, reference_positions[:, 0])
     if len(rel_positions_list) != reference_positions.shape[0] - 1:
-        # print(f'Rel positions list size: {len(rel_positions_list)}, ref positions size: {reference_positions.shape[0]}')
         del rel_positions_list[-1]
-    # assert len(rel_positions_list) == reference_positions.shape[0] - 1
     corrected_positions = np.zeros((0, 3))
     for i, rel_ps in enumerate(rel_positions_list):
         start_position = reference_positions[i]
         end_position = reference_positions[i + 1]
         abs_ps = np.zeros(rel_ps.shape)
         abs_ps[:, 0] = rel_ps[:, 0]
-        # abs_ps[:, 1:3] = rel_ps[:, 1:3] + start_position[1:3]
         abs_ps[0, 1:3] = rel_ps[0, 1:3] + start_position[1:3]
         for j in range(1, rel_ps.shape[0]):
             abs_ps[j, 1:3] = abs_ps[j-1, 1:3] + rel_ps[j, 1:3]
@@ -303,12 +285,6 @@ def correct_positions(rel_positions, reference_positions):
     return corrected_positions
 
 def split_ts_seq(ts_seq, sep_ts):
-    """
-
-    :param ts_seq:
-    :param sep_ts:
-    :return:
-    """
     tss = ts_seq[:, 0].astype(float)
     unique_sep_ts = np.unique(sep_ts)
     ts_seqs = []
@@ -326,12 +302,6 @@ def split_ts_seq(ts_seq, sep_ts):
     return ts_seqs
 
 def correct_trajectory(original_xys, end_xy):
-    """
-
-    :param original_xys: numpy ndarray, shape(N, 2)
-    :param end_xy: numpy ndarray, shape(1, 2)
-    :return:
-    """
     corrected_xys = np.zeros((0, 2))
 
     A = original_xys[0, :]
@@ -377,10 +347,6 @@ def heading_thomas_without_zupt(acc,gyr,freq):
         Ryx = np.matmul(Rx,Ry)
         G_eben = np.matmul(Ryx,gyr[i,1:].transpose())
         W = W + G_eben[2]/freq
-        #W = W +  G_eben.transpose()/freq
-        #aroundz = W[i,2]
-        #W_save.append(W)
-        #A_eben = np.matmul(Ryx,A_geg.transpose())
         headings[i, :] = gyr[i,0], W
     return headings
 
@@ -403,16 +369,24 @@ def heading_thomas(acc, gyr, freq):
         Ryx = np.matmul(Rx,Ry)
         G_eben = np.matmul(Ryx,gyrnew[i,1:].transpose())
         W = W + G_eben[2]/freq
-        #W = W +  G_eben.transpose()/freq
-        #aroundz = W[i,2]
-        #W_save.append(W)
-        #A_eben = np.matmul(Ryx,A_geg.transpose())
         headings[i, :] = gyr[i,0], W
         
         
     return headings
 
-def generate_gt(ref: list, acc: list, gyr: list):
+def generate_gt(ref: list, acc: list, gyr: list) -> "ndarray":
+    """
+    This function generates Ground Truth data using the input acceleration, gyroscope and reference data.
+    
+    Parameters:
+    ref (list) : A list of reference data.
+    acc (list) : A list of acceleration data.
+    gyr (list) : A list of gyroscope data.
+    
+    Returns:
+    GroundTruth (np.ndarray) : An array of relative positions with format [timestamp, x, y]. 
+    Returns None if something went wrong during the computation.
+    """
     try:
         # calculation
         step_timestamps, step_indexs, step_acce_max_mins = compute_steps(acc)
@@ -425,7 +399,20 @@ def generate_gt(ref: list, acc: list, gyr: list):
     except:
         return None  # something went wrong
 
-def export_gt(nc, user: dict, ground_truth: list):
+def export_gt(nc: object, user: dict, ground_truth: list) -> None:
+    """
+    Exports the given ground truth data into a .csv file and saves it to the
+    assets/exports/results_{username}_{password}/gt/ directory.
+    If the user logging in is not demo_data, it will also push the file to the cloud.
+    
+    Parameters:
+    nc (obj) : Object representing the connection to the network storage.
+    user (dict) : A dictionary containing the username and password of the user.
+    ground_truth (list) : A list of tuples containing the timestamp, x, and y coordinates of the ground truth data.
+    
+    Returns:
+    None
+    """
     # user data
     un = user["username"]
     pw = user["password"]
@@ -440,3 +427,7 @@ def export_gt(nc, user: dict, ground_truth: list):
     # push to cloud if not demo data logged in
     if f"{un}_{pw}" != "demo_data":
         u.update_user_data(nc, f"{un}_{pw}/groundtruth/gt_{name}.csv")
+
+
+if __name__ == "__main__":
+    pass

@@ -13,6 +13,15 @@ import math as m
 import json
 
 def plotly_map_traces(filename: str) -> list:
+    """
+    This function reads a geojson file and returns a list of polygon and marker coordinates.
+
+    Parameters:
+    filename (str) : The name of the geojson file (without '.geojson' extension).
+    
+    Returns:
+    list : A list of polygon and marker coordinates.
+    """
     # data
     polygons = []
     markers = []
@@ -40,14 +49,13 @@ def plotly_map_traces(filename: str) -> list:
 
 def floorplan2layer(geojson_style) -> list:
     """
-    FUNCTION
-    - makes layers out of HCU floorplans (gejson)
-    -------
-    PARAMETER
-    geojson_style : geojson rendering logic in java script (assign)
-    -------
-    RETURN
-    layers : list of layered floorplans
+    Converts floorplan to layer by loading it from a geojson file and styling it with a provided style.
+    
+    Parameters:
+    geojson_style (dict) : The style to apply to each floorplan.
+    
+    Returns:
+    layers (list) : A list of Overlay objects representing each floorplan.
     """
     # initializing list to fill it with default layers
     layers = []
@@ -69,7 +77,20 @@ def floorplan2layer(geojson_style) -> list:
 
     return layers
 
-def interpolation(gt: "ndarray", trajectories: list) -> list:
+def interpolation(gt: list, trajectories: list) -> list:
+    """
+    Interpolates the ground truth and trajectories to match the same time stamps and store the result as 2D arrays.
+
+    Parameters:
+    gt (ndarray) : 2D array containing ground truth data with timestamps as the first column, x-coordinate as the second
+                   column, and y-coordinate as the third column.
+    trajectories (list) : List of 2D arrays containing trajectory data with timestamps as the first column, x-coordinate as
+                          the second column, and y-coordinate as the third column.
+
+    Returns:
+    list : List of 2D arrays containing the interpolated ground truth and trajectory data. Each sublist contains two arrays
+           with first array being the interpolated ground truth and second array being the interpolated trajectory.
+    """
     # data
     data = []
     t_gt  = gt[:,0]
@@ -94,7 +115,19 @@ def interpolation(gt: "ndarray", trajectories: list) -> list:
         data.append([np.column_stack((ip_x_gt, ip_y_gt)), np.column_stack((ip_x_traj, ip_y_traj))])
     return data
 
-def normCDF(gt: "ndarray", traj: "ndarray") -> "ndarray":
+def normCDF(gt: list, traj: list) -> list:
+    """
+    This function calculates the normal cumulative distribution function (CDF)
+    of the errors between ground truth (gt) and trajectory (traj).
+    
+    Parameters:
+    gt (list) : Ground truth data with x and y coordinates.
+    traj (list) : Trajectory data with x and y coordinates.
+    
+    Returns:
+    xy (list) : A 2D array with columns for error and cdf values, sorted by error values.
+    
+    """
     # data
     gt_x = gt[:,0]
     gt_y = gt[:,1]
@@ -113,6 +146,18 @@ def normCDF(gt: "ndarray", traj: "ndarray") -> "ndarray":
     return xy
 
 def histoCDF(gt: "ndarray", traj: "ndarray") -> "ndarray":
+    """
+    This function calculates the histogram cumulative distribution function (CDF)
+    of the error between the ground truth and a given trajectory.
+    
+    Parameters:
+    gt (ndarray) : A list containing the ground truth values, where each value is represented as a tuple of x and y coordinates.
+    traj (ndarray) : A list containing the values of the trajectory, where each value is represented as a tuple of x and y coordinates.
+    
+    Returns:
+    ndarray : A list containing the CDF of the error between the ground truth and the given trajectory, represented as tuples of bin edges and cumulative probability.
+    
+    """
     # # data
     gt_x = gt[:,0]
     gt_y = gt[:,1]
@@ -127,6 +172,19 @@ def histoCDF(gt: "ndarray", traj: "ndarray") -> "ndarray":
     return np.column_stack((dens_bins[1:], cdf))
 
 def dataframe4graph(data: "ndarray", name: str) -> "DataFrame":
+    """
+    Transform input data into a pandas DataFrame format for plotting.
+
+    Parameters:
+    data (ndarray) : The input data, a two-dimensional array where each row represents
+                     the error and cumulative density function values.
+    name (str) : The name of the input data.
+
+    Returns:
+    data_fram (DataFrame) : The transformed data in pandas DataFrame format. The data contains three columns: "trajectory", 
+                            "RMSE [m]", and "CDF". The "trajectory" column is the name of the input data, "RMSE [m]" is the error 
+                            values, and "CDF" is the cumulative density function values.
+    """
     err = data[:,0]
     cdf = data[:,1]
     n = int(m.log(cdf.shape[0]/15000, 2))
@@ -140,6 +198,18 @@ def dataframe4graph(data: "ndarray", name: str) -> "DataFrame":
     return data_frame
 
 def percentage(plan: "GeoDataFrame", gt: "GeoDataFrame", traj: "GeoDataFrame") -> float:
+    """
+    Calculates the percentage of trajectory points that are in the same polygon
+    as their corresponding ground truth points.
+    
+    Parameters:
+    plan (GeoDataFrame) : The map to compare the points against.
+    gt (GeoDataFrame) : The ground truth data, represented as a GeoDataFrame with 'latitude' and 'longitude' columns.
+    traj (GeoDataFrame) : The trajectory data, represented as a GeoDataFrame with 'latitude' and 'longitude' columns.
+    
+    Returns:
+    perc (float): The percentage of similarity between the ground truth and trajectory points in relation to the map.
+    """
     # getting polygons out of map
     polygons = plan["geometry"]
     # ground truth points (converted)
@@ -158,7 +228,18 @@ def percentage(plan: "GeoDataFrame", gt: "GeoDataFrame", traj: "GeoDataFrame") -
     perc = 1 - sum(abs(gt_amount - traj_amount))/traj_amount.shape[0]
     return perc
 
-def csv2geojson(coordinates: list) -> str:
+def csv2geojson(coordinates: list) -> dict:
+    """
+    This function takes in a list of coordinates in the form of [(lat1, lon1), (lat2, lon2), ..., (latn, lonn)].
+    The function converts the coordinates to a GeoJSON representation, which is a geographic data format
+    commonly used for encoding a variety of geographic data structures, including points, lines, and polygons.
+    
+    Parameters:
+    coordinates (list): A list of coordinates in the form of [(lat1, lon1), (lat2, lon2), ..., (latn, lonn)].
+
+    Returns:
+    geojson (dict): A GeoJSON representation of the input coordinates in the form of a dictionary.
+    """
     # making points out of ground truth data for converting it (crs:32632 to crs:4326)
     points = {"GroundTruth": [i for i in range(1, coordinates.shape[0]+1)], "geometry": [sh.Point(lat, lon) for lat, lon in coordinates]}
     converted_points = gp.GeoDataFrame(points, crs=32632).to_crs(4326)

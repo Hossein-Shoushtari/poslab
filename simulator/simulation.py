@@ -13,6 +13,18 @@ import utils as u
 
 
 def find_nearest(array, value):
+    """
+    Find the nearest value in a numpy array.
+
+    Parameters:
+    -----------
+    array (np.array): A 1D numpy array.
+    value (float): The value to find the nearest match of.
+
+    Returns:
+    --------
+    int, float: The index of the nearest match, and the value of the nearest match.
+    """
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
     return idx, array[idx]
@@ -38,22 +50,22 @@ def closest_value(input_list, input_value):
 
 def semantic_error(number, error_range, intervall_range, time_stamps):
     """
-        creating semantic error values. the number of occurences, the error values and the length of each intervall of
-        semantic errors is randomly chosen from a given range
+    creating semantic error values. the number of occurences, the error values and the length of each intervall of
+    semantic errors is randomly chosen from a given range
 
-        Parameters
-        ----------
-        number_range : range of number of accurances of semantic errors - tuple of integers
-        error_range : range of possible error values for the semantic error - tuple of floats
-        intervall_range : range of possible lengths for the semantic errors - tuple of floats
-        time_stamps : time stamps from the ground truth data - list of floats
+    Parameters
+    ----------
+    number_range : range of number of accurances of semantic errors - tuple of integers
+    error_range : range of possible error values for the semantic error - tuple of floats
+    intervall_range : range of possible lengths for the semantic errors - tuple of floats
+    time_stamps : time stamps from the ground truth data - list of floats
 
-        Returns
-        -------
-        intervall_lengths : length of all intervalls with semantic error - list of floats
-        errors : standard deviations for each semantic error intervall - list of floats
-        intervall_starts : start time of each semantic error intervall - list of floats
-        """
+    Returns
+    -------
+    intervall_lengths : length of all intervalls with semantic error - list of floats
+    errors : standard deviations for each semantic error intervall - list of floats
+    intervall_starts : start time of each semantic error intervall - list of floats
+    """
     number_of_intervalls = number
     intervall_lengths = []
     intervall_starts = []
@@ -121,7 +133,6 @@ def simulate_positions(user, groundtruth, error, measurement_freq, network_capac
     while ts <= rows[-1][0]:
         simulatd_timestamps.append(ts)
         ts += dt
-    # print('simulatd_timestamps',len(simulatd_timestamps))
 
     intervall_lengths, semantic_errors, intervall_starts = semantic_error(number_of_intervalls, error_range,
                                                                           intervall_range, simulatd_timestamps)
@@ -147,30 +158,8 @@ def simulate_positions(user, groundtruth, error, measurement_freq, network_capac
         y_error = np.random.normal(0, current_error)
         error_list.append(np.sqrt(x_error ** 2 + y_error ** 2))
 
-        # closestValue = closest_value(gt_time_stamps, t)
         id, closest_GT_time =find_nearest(gt_time_stamps, t)
 
-        '''if closest_GT_time > t:
-
-            dx = ((rows[id][1] - rows[id - 1][1]) / (rows[id][0] - rows[id - 1][0])) * dt
-            dy = ((rows[id][2] - rows[id - 1][2]) / (rows[id][0] - rows[id - 1][0])) * dt
-            # dz = ((rows[r-1][3] - rows[r][3])/(rows[r-1][0] - rows[r][0]))*dt
-
-            x_temp = rows[id][1] - dx
-            y_temp = rows[id][2] - dy
-
-
-        elif closest_GT_time < t:
-
-
-            dx = ((rows[id + 1][1] - rows[id][1]) / (rows[id + 1][0] - rows[id][0])) * dt
-            dy = ((rows[id + 1][2] - rows[id][2]) / (rows[id + 1][0] - rows[id][0])) * dt
-            # dz = ((rows[r-1][3] - rows[r][3])/(rows[r-1][0] - rows[r][0]))*dt
-
-            x_temp = rows[id][1] + dx
-            y_temp = rows[id][2] + dy
-
-        elif closest_GT_time == t:'''
         x_temp = rows[id][1]
         y_temp = rows[id][2]
 
@@ -186,15 +175,48 @@ def simulate_positions(user, groundtruth, error, measurement_freq, network_capac
     return time_stamps, positions, error_list, qualities_list
 
 def azimuth(point1: tuple, point2: tuple) -> float:
-    '''azimuth between 2 points (interval 0 - 360)'''
+    """
+    Calculate the azimuth angle between two points on a plane.
+    
+    Parameters:
+    point1 (tuple): Tuple of x and y coordinates of the first point.
+    point2 (tuple): Tuple of x and y coordinates of the second point.
+    
+    Returns:
+    float: The azimuth angle in degrees, where 0 <= angle < 360.
+    """
     angle = np.arctan2(point2[0] - point1[0], point2[1] - point1[1])
     return np.degrees(angle) if angle >= 0 else np.degrees(angle) + 360
 
 def distance(point1: tuple, point2: tuple) -> float:
-    '''distance between 2 points'''
+    """
+    Calculates the Euclidean distance between two points in 2-dimensional space.
+    
+    Parameters:
+    point1 (tuple) : A tuple representing the first point in 2-dimensional space.
+    point2 (tuple) : A tuple representing the second point in 2-dimensional space.
+    
+    Returns:
+    float : The Euclidean distance between the two points.
+    """
     return np.sqrt((point2[0] - point1[0])**2 + (point2[1] - point1[1])**2)
 
-def export_sim(nc, user: dict, time_stamps: list, positions: list, errors: list, qualities: list, name: tuple):
+def export_sim(nc: object, user: dict, time_stamps: list, positions: list, errors: list, qualities: list, name: tuple) -> None:
+    """
+    Exports simulation data for a user to a CSV file.
+
+    Parameters:
+    nc (obj) : Object for cloud storage connection.
+    user (dict) : Dictionary containing the user's login information.
+    time_stamps (list) : List of timestamps for the simulation data.
+    positions (list) : List of positions for the simulation data.
+    errors (list) : List of errors for the simulation data.
+    qualities (list) : List of qualities for the simulation data.
+    name (tuple) : Tuple of parameters (frequency, error, user) that describe the simulation.
+
+    Returns:
+    None
+    """
     # user data
     un = user["username"]
     pw = user["password"]
@@ -245,54 +267,4 @@ def export_sim(nc, user: dict, time_stamps: list, positions: list, errors: list,
 
 
 if __name__ == "__main__":    
-    ####Coordinate Simulation
-    """
-    check if the simulate_positions function is working
-    """
-    groundtruth = "gt_traj__17+49+23"
-    error = 1
-    measurement_freq = 1
-    number_range = 1 # range of number of occurencies for segments with semantic error
-    error_range = [1, 15] # range of possible values for the semantic errors
-    intervall_range = [1 * 1000, 20 * 1000] # range of intervall lengths where semantic errors are generated
-    semantic_is_used = False # set this to True if semantic errors are used
-    network_capacity = 500
-    number_of_users = 1
-
-    simulation = simulate_positions(groundtruth, error, measurement_freq, network_capacity, number_of_users, 1,error_range, intervall_range,semantic_is_used)
-    export_sim(*simulation, (measurement_freq, error, number_of_users))
-    
-    # filename = 'assets/groundtruth/GroundTruthEight.csv'
-
-    # with open(filename, newline='') as f:
-
-    #     reader = csv.reader(f)
-
-    #     rows = []
-
-    #     error_list = []
-    #     for row in reader:
-    #         rows.append([float(row[0].split(' ')[0]), float(row[0].split(' ')[1]), float(row[0].split(' ')[2])])
-    # grundtruth = rows
-
-    # error = 2
-    # measurement_freq = 1
-    # number_range = [1, 10] # range of number of occurencies for segments with semantic error
-    # error_range = [1, 15] # range of possible values for the semantic errors
-    # intervall_range = [1 * 1000, 20 * 1000] # range of intervall lengths where semantic errors are generated
-    # semantic_is_used = False # set this to True if semantic errors are used
-
-    # time_stamps, positions, errors, qualities = simulate_positions(grundtruth, error, measurement_freq, 500, 1, 1,[1, 15], [1 * 1000, 20 * 1000],semantic_is_used)
-    
-
-    # print('qualities',qualities)
-    # print('errors', errors)
-
-    # points_positions = []
-    # for p in positions:
-    #     points_positions.append(Point(p))
-
-    # # print(points_positions)
-    # GeoSeries(points_positions).plot(figsize=(10, 10), color='red', markersize=100, label='5G positions')
-    # plt.pause('60)
-
+    pass
