@@ -22,7 +22,7 @@ import utils as u
 
 
 def eval_calls(app, nc):
-    # upload maps =====================================================================================================================
+    # upload maps ======================================================================================================================
     @app.callback(
         ### Outputs ###
         # modals
@@ -100,7 +100,7 @@ def eval_calls(app, nc):
         # this else-section is always activated, when the page refreshes -> no warnings
         else: return usr_warn, map_warn, no_update, no_update
 
-    # upload rest =======================================================================================================================
+    # upload rest ======================================================================================================================
     @app.callback(
         ### Outputs ###
         # modals
@@ -254,7 +254,7 @@ def eval_calls(app, nc):
         # this else-section is always activated, when the page refreshes -> no warnings
         else: return usr_warn, ul_warn, ul_done, no_update, no_update, no_update
 
-    # open cdf =======================================================================================================================
+    # open cdf =========================================================================================================================
     @app.callback(
         ### Outputs ###
         Output("cdf_cv", "is_open"),         # canvas
@@ -297,7 +297,7 @@ def eval_calls(app, nc):
                 return not cdf_cv, [], [], map_options
         else: return cdf_cv, [], [], []
 
-    # cdf =======================================================================================================================
+    # cdf ==============================================================================================================================
     @app.callback(
         ### Outputs ###
         # checkboxes
@@ -392,7 +392,7 @@ def eval_calls(app, nc):
             else:
                 return no_update, no_update, no_update, no_update, cdf_warn, cdf_show, {}, no_update     # nothing happend
 
-    # open visual =======================================================================================================================
+    # open visual ======================================================================================================================
     @app.callback(
         ### Outputs ###
         Output("visual_show", "is_open"),
@@ -629,7 +629,7 @@ def eval_calls(app, nc):
         else:
             return no_update # no button clicked
 
-    # export ============================================================================================================================
+    # export ===========================================================================================================================
     @app.callback(
         ### Outputs ###
         # modal
@@ -660,7 +660,7 @@ def eval_calls(app, nc):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "eval_exp_btn" in button:
             if un: # user logged in
-                if len(listdir(f"assets/exports/results_{un}_{pw}/gt")) or len(listdir(f"assets/exports/results_{un}_{pw}/sm")) or len(listdir(f"assets/exports/results_{un}_{pw}/draw")):
+                if len(listdir(f"assets/exports/results_{un}_{pw}/gt")) > 1 or len(listdir(f"assets/exports/results_{un}_{pw}/sm")) > 1 or len(listdir(f"assets/exports/results_{un}_{pw}/draw")) > 1:
                     # zipping & downloading
                     name = u.time()
                     zip_folder = st.make_archive(f"assets/exports/results_{name}", 'zip', f"assets/exports/results_{un}_{pw}")
@@ -673,7 +673,7 @@ def eval_calls(app, nc):
         else: # no button clicked
             return usr_warn, exp_done, exp_warn, no_update, no_update
 
-    # help canvas =======================================================================================================================
+    # help canvas ======================================================================================================================
     @app.callback(
         ### Outputs ###
         Output("eval_help_cv", "is_open"),    # canvas
@@ -696,7 +696,7 @@ def eval_calls(app, nc):
         if "eval_help_btn" in button: return not eval_help_cv     # activate help offcanvas
         else: return eval_help_cv
 
-    # hovering tooltips in hcu floorplans ===============================================================================================
+    # hovering tooltips in hcu floorplans ==============================================================================================
     @app.callback(
         ### Outputs ###
         Output("eval_hover_info", "children"),  # info panel

@@ -537,7 +537,7 @@ def sim_calls(app, nc):
         else:
             return usr_warn, save_done # no button clicked
 
-    # example data =====================================================================================================================
+    # example data ======================================================================================================================
     @app.callback(
         ### Outputs ###
         # download
@@ -585,7 +585,7 @@ def sim_calls(app, nc):
         button = [p["prop_id"] for p in callback_context.triggered][0]
         if "sim_exp_btn" in button:
             if un: # user logged in
-                if len(listdir(f"assets/exports/results_{un}_{pw}/gt")) or len(listdir(f"assets/exports/results_{un}_{pw}/sm")) or len(listdir(f"assets/exports/results_{un}_{pw}/draw")):
+                if len(listdir(f"assets/exports/results_{un}_{pw}/gt")) > 1 or len(listdir(f"assets/exports/results_{un}_{pw}/sm")) > 1 or len(listdir(f"assets/exports/results_{un}_{pw}/draw")) > 1:
                     # zipping & downloading
                     name = u.time()
                     zip_folder = st.make_archive(f"assets/exports/results_{name}", 'zip', f"assets/exports/results_{un}_{pw}")
