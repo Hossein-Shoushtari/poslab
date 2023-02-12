@@ -96,7 +96,7 @@ def users_calls(app, nc):
             register_pw_valid = u.signin_validation(register_pw)
             # one or both are invalid
             if register_un_valid + register_pw_valid < 2:
-                return register_un_valid, not register_un_valid, register_pw_valid, not register_pw_valid, False, False, no_update, no_update, no_update, no_update, no_update, no_update, welcome, usr_data, no_update
+                return register_un_valid, not register_un_valid, register_pw_valid, not register_pw_valid, False, False, no_update, no_update, no_update, no_update, no_update, no_update, welcome, no_update, no_update
             else:
                 # trying to create account
                 try:
@@ -109,7 +109,7 @@ def users_calls(app, nc):
                     return register_un_valid, not register_un_valid, register_pw_valid, not register_pw_valid, True, False, no_update, no_update, no_update, no_update, no_update, no_update, welcome, usr_data, no_update
                 except:
                     # same user already exists
-                    return not register_un_valid, register_un_valid, not register_pw_valid, register_pw_valid, False, True, no_update, no_update, no_update, no_update, no_update, no_update, welcome, usr_data, no_update
+                    return not register_un_valid, register_un_valid, not register_pw_valid, register_pw_valid, False, True, no_update, no_update, no_update, no_update, no_update, no_update, welcome, no_update, no_update
         # LOGIN ------------------------------------------------------------------------------------------------------------
         if "login_btn" in trigger:
             # checking presence of username and password
@@ -117,7 +117,7 @@ def users_calls(app, nc):
             login_pw_valid = True if login_pw else False
             # one or both are invalid
             if login_un_valid + login_pw_valid < 2:
-                return no_update, no_update, no_update, no_update, no_update, no_update, login_un_valid, not login_un_valid, login_pw_valid, not login_pw_valid, no_update, no_update, welcome, usr_data, no_update
+                return no_update, no_update, no_update, no_update, no_update, no_update, login_un_valid, not login_un_valid, login_pw_valid, not login_pw_valid, no_update, no_update, welcome, no_update, no_update
             # trying to get user's data
             try:
                 usr_data["username"] = login_un
@@ -129,7 +129,7 @@ def users_calls(app, nc):
                 return no_update, no_update, no_update, no_update, no_update, no_update, login_un_valid, not login_un_valid, login_pw_valid, not login_pw_valid, True, False, welcome, usr_data, no_update
             except:
                 # user doesn't exist
-                return no_update, no_update, no_update, no_update, no_update, no_update, not login_un_valid, login_un_valid, not login_pw_valid, login_pw_valid, False, True, welcome, usr_data, no_update
+                return no_update, no_update, no_update, no_update, no_update, no_update, not login_un_valid, login_un_valid, not login_pw_valid, login_pw_valid, False, True, welcome, no_update, no_update
         # LOAD DEMO DATA ----------------------------------------------------------------------------------------------------
         if trigger == ".":
             usr_data["username"] = "demo"
