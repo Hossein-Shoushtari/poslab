@@ -11,18 +11,21 @@ class CopyBibtexText():
     def __init__(self):
         pass
 
-    def copy_2022_9_5_IPIN2022(self):
-        return '''@article{shoushtari2022l5in+,
-      title={L5IN+: From an Analytical Platform to Optimization of Deep Inertial Odometry},
-      author={Shoushtari, Hossein and Kassawat, Firas and Harder, Dorian and Venzke, Korvin and M{\"u}ller-Lietzkow, J{\"o}rg and Sternberg, Harald},
-      year={2022}
+    def copy_ION_2023(self):
+        return '''@article{ION2023,
+      title={Data-Driven Inertial Navigation assisted by 5G UL-TDoA Positioning},
+      author={Shoushtari, Hossein and Harder, Dorian and Kasparek, Maximilian and  Schäfer,Matthias and M{\"u}ller-Lietzkow, J{\"o}rg and Sternberg, Harald},
+      booktitle={Proceedings of the 2023 International Technical Meeting of The Institute of Navigation}
+      pages={1169 - 1183},
+      year={2023}
     }'''
+
     def copy_2022_9_5_IPIN2022(self):
         return'''@article{shoushtari2022l5in+,
-  title={L5IN+: From an Analytical Platform to Optimization of Deep Inertial Odometry},
-  author={Shoushtari, Hossein and Kassawat, Firas and Harder, Dorian and Venzke, Korvin and M{\"u}ller-Lietzkow, J{\"o}rg and Sternberg, Harald},
-  year={2022}
-}'''
+    title={L5IN+: From an Analytical Platform to Optimization of Deep Inertial Odometry},
+    author={Shoushtari, Hossein and Kassawat, Firas and Harder, Dorian and Venzke, Korvin and M{\"u}ller-Lietzkow, J{\"o}rg and Sternberg, Harald},
+    year={2022}
+    }'''
     def copy_2022_4_25_sensors(self):
         return'''@article{harder2022real,
   title={Real-Time Map Matching with a Backtracking Particle Filter Using Geospatial Analysis},
@@ -58,6 +61,36 @@ class CopyBibtexText():
 def modals():
     bibtex_text = CopyBibtexText()
     modals = html.Div([
+        dbc.Modal(
+            dbc.ModalHeader(
+                html.Div(
+                    [
+                        html.P("@article{ION2023,", style={"color": "silver", "margin-bottom": "0px"}),
+                        html.P("      title={Data-Driven Inertial Navigation assisted by 5G UL-TDoA Positioning}," ,style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P( "author={Shoushtari, Hossein and Harder, Dorian and Kasparek, Maximilian and  Schäfer,Matthias and M{\"u}ller-Lietzkow, J{\"o}rg and Sternberg, Harald},",
+                            style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("year={2023}", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("}", style={"color": "silver", "margin-bottom": "0px"}),
+                        dcc.Clipboard(
+                            content=bibtex_text.copy_ION_2023(),
+                            style={
+                                "color": "#9B9B9B",
+                                "position": "absolute",
+                                "top": 11,
+                                "right": 16,
+                                "fontSize": 20,
+                            },
+                        ),
+                    ], style={"padding": "0px", "height": "90%", "width": "95%", "margin": "auto"}
+                ),
+                style={"padding-left": "14px", "background": "#585858", "border-radius": 5,
+                       "border": "1px solid silver"}
+            ),
+            id="ION2023_bibtex_modal",
+            size="xl",
+            is_open=False,
+            backdrop="static"
+        ),
         dbc.Modal(
             dbc.ModalHeader(
                 html.Div(
@@ -244,7 +277,7 @@ def about():
     return about
 
 def publications():
-    papers_list = ["2022_9_5_IPIN2022", "2022_4_25_sensors", "2021_11_29_IPIN2021", "2021_2_5_electronics"] 
+    papers_list = ["ION2023", "2022_9_5_IPIN2022", "2022_4_25_sensors", "2021_11_29_IPIN2021", "2021_2_5_electronics"]
     publications = html.Div([
         html.Div(
             html.H4("Publications",
@@ -276,6 +309,65 @@ def publications():
                 ], width=2, style={"width": "506px", "margin-top": "5px", "margin-bottom": "11px", "padding-left": "0px"}),
                 # papers
                 dbc.Col([
+
+                    html.Div(
+                        html.Div(
+                            html.Button(html.Div(
+                                [
+                                    html.P(html.B(["Data-Driven Inertial Navigation assisted by 5G UL-TDoA Positioning"]),
+                                           style={"margin-bottom": "7px"}),
+                                    html.P(
+                                        "Hossein Shoushtari, Dorian Harder, Maximilian Kasparek,Matthias Schäfer, Jörg Müller-Lietzkow, Harald Sternberg",
+                                        style={"line-height": "120%", "margin-bottom": "0px"}),
+                                    html.P(
+                                        [
+                                            html.P("|", style={"display": "inline-block"}),
+                                            html.Button(
+                                                "bibtex",
+                                                id="ION2023_bibtex_btn",
+                                                style={"background": "transparent", "border": "0px",
+                                                       "text-decoration": "underline", "color": "#00BC8C",
+                                                       "padding": "0px", "width": "50px", "margin-left": "-1px",
+                                                       "margin-right": "-1px"}
+                                            ),
+                                            html.P("|", style={"display": "inline-block"}),
+                                            html.A(
+                                                "code",
+                                                target="_blank",
+                                                href="",
+                                                style={"display": "inline-block", "margin-left": "2px",
+                                                       "margin-right": "2px"}),
+                                            html.P("|", style={"display": "inline-block"}),
+                                            html.A(
+                                                "arxiv",
+                                                target="_blank",
+                                                href="",
+                                                style={"display": "inline-block"}),
+                                            html.P("|", style={"display": "inline-block", "margin-left": "2px",
+                                                               "margin-right": "2px"}),
+                                            html.A(
+                                                "pdf",
+                                                target="_blank",
+                                                href="https://www.ion.org/publications/abstract.cfm?articleID=18645",
+                                                style={"display": "inline-block"}),
+                                            html.P("|", style={"display": "inline-block", "margin-left": "2px",
+                                                               "margin-right": "2px"}),
+                                        ],
+                                        style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
+                                    )
+                                ]),
+                                id="ION2023_show_btn",
+                                style={"margin-left": "8px", "border": "0px", "background": "transparent",
+                                       "height": "130px", "color": "white", "text-align": "left", "padding": "0px"}
+                            ),
+                            style={"margin": "auto"}
+                        ),
+                        id="ION2023_paper",
+                        className="d-flex align-items-center",
+                        style={"margin-bottom": "15px", "padding": "5px", "color": "white", "height": "130px",
+                               "width": "500px", "background-color": "#737373", "border-left": "4px solid white",
+                               "border-radius": 0, "margin-left": "-10px"}
+                    ),
 
                     html.Div(
                         html.Div(
