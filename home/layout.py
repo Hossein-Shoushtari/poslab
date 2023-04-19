@@ -364,7 +364,7 @@ def publications():
                         ),
                         id="ION2023_paper",
                         className="d-flex align-items-center",
-                        style={"margin-bottom": "15px", "padding": "5px", "color": "white", "height": "130px",
+                        style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px",
                                "width": "500px", "background-color": "#737373", "border-left": "4px solid white",
                                "border-radius": 0, "margin-left": "-10px"}
                     ),
@@ -407,13 +407,13 @@ def publications():
                                     )
                                 ]),
                                 id="2022_9_5_IPIN2022_show_btn",
-                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "white", "text-align": "left", "padding": "0px"}
+                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "silver", "text-align": "left", "padding": "0px"}
                             ),
                             style={"margin": "auto"}                           
                         ),
                         id="2022_9_5_IPIN2022_paper",
                         className="d-flex align-items-center",
-                        style={"margin-bottom": "15px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid white", "border-radius": 0, "margin-left": "-10px"}
+                        style={"margin-bottom": "14px", "padding": "5px", "color": "silve", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                     ),
                     html.Div(
                         html.Div(
@@ -459,7 +459,7 @@ def publications():
                         ),
                         id="2022_4_25_sensors_paper",
                         className="d-flex align-items-center",
-                        style={"margin-bottom": "15px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
+                        style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                     ),
                     html.Div(
                         html.Div(
@@ -505,7 +505,7 @@ def publications():
                         ),
                         id="2021_11_29_IPIN2021_paper",
                         className="d-flex align-items-center",
-                        style={"margin-bottom": "15px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
+                        style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                     ),
                     html.Div(
                         html.Div(
@@ -551,7 +551,7 @@ def publications():
                         ),
                         id="2021_2_5_electronics_paper",
                         className="d-flex align-items-center",
-                        style={"margin-bottom": "15px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
+                        style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                     )
                 ], width=2, style={"width": "506px", "margin-top": "5px", "margin-bottom": "11px"})
             ], justify="center"
