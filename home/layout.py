@@ -334,21 +334,20 @@ def publications():
                                             html.A(
                                                 "code",
                                                 target="_blank",
-                                                href="",
-                                                style={"display": "inline-block", "margin-left": "2px",
-                                                       "margin-right": "2px"}),
+                                                href="https://github.com/Hossein-Shoushtari/poslab",
+                                                style={"display": "inline-block", "margin-left": "2px","margin-right": "2px"}),
                                             html.P("|", style={"display": "inline-block"}),
                                             html.A(
                                                 "arxiv",
                                                 target="_blank",
-                                                href="",
+                                                href="https://www.ion.org/publications/abstract.cfm?articleID=18645",
                                                 style={"display": "inline-block"}),
                                             html.P("|", style={"display": "inline-block", "margin-left": "2px",
                                                                "margin-right": "2px"}),
                                             html.A(
                                                 "pdf",
                                                 target="_blank",
-                                                href="https://www.ion.org/publications/abstract.cfm?articleID=18645",
+                                                href="https://www.researchgate.net/publication/368501717_Data-Driven_Inertial_Navigation_assisted_by_5G_UL-TDoA_Positioning",
                                                 style={"display": "inline-block"}),
                                             html.P("|", style={"display": "inline-block", "margin-left": "2px",
                                                                "margin-right": "2px"}),
@@ -387,19 +386,19 @@ def publications():
                                             html.A(
                                                 "code",
                                                 target="_blank",
-                                                href="",
+                                                href="https://github.com/Hossein-Shoushtari/poslab",
                                                 style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
                                             html.P("|", style={"display": "inline-block"}),
                                             html.A(
                                                 "arxiv",
                                                 target="_blank",
-                                                href="",
+                                                href="https://ceur-ws.org/Vol-3248/",
                                                 style={"display": "inline-block"}),
                                             html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
                                             html.A(
                                                 "pdf",
                                                 target="_blank",
-                                                href="https://www.researchgate.net/publication/362134877_L5IN_From_an_Analytical_Platform_to_Optimization_of_Deep_Inertial_Odometry",
+                                                href="https://ceur-ws.org/Vol-3248/paper24.pdf",
                                                 style={"display": "inline-block"}),
                                             html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
                                         ],
@@ -433,13 +432,13 @@ def publications():
                                             html.A(
                                                 "code",
                                                 target="_blank",
-                                                href="",
+                                                href="https://github.com/DorianHarder/PF_backtracking_cluster",
                                                 style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
                                             html.P("|", style={"display": "inline-block"}),
                                             html.A(
                                                 "arxiv",
                                                 target="_blank",
-                                                href="",
+                                                href="https://www.mdpi.com/1424-8220/22/9/3289",
                                                 style={"display": "inline-block"}),
                                             html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
                                             html.A(
@@ -479,13 +478,13 @@ def publications():
                                             html.A(
                                                 "code",
                                                 target="_blank",
-                                                href="",
+                                                href="https://github.com/Hossein-Shoushtari/IPIN21Data",
                                                 style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
                                             html.P("|", style={"display": "inline-block"}),
                                             html.A(
                                                 "arxiv",
                                                 target="_blank",
-                                                href="",
+                                                href="https://ieeexplore.ieee.org/document/9662636",
                                                 style={"display": "inline-block"}),
                                             html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
                                             html.A(
@@ -525,13 +524,13 @@ def publications():
                                             html.A(
                                                 "code",
                                                 target="_blank",
-                                                href="",
+                                                href="https://github.com/Hossein-Shoushtari/ElectronicsData",
                                                 style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
                                             html.P("|", style={"display": "inline-block"}),
                                             html.A(
                                                 "arxiv",
                                                 target="_blank",
-                                                href="",
+                                                href="https://www.mdpi.com/1424-8220/22/9/3289",
                                                 style={"display": "inline-block"}),
                                             html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
                                             html.A(
@@ -619,15 +618,17 @@ def contact():
         ),
         dbc.Row(
             [
-                dbc.Col([
-                    html.P(html.B("Georg Fjodorow", style={"color": "silver", "margin-top": "-12px"})),
-                    html.P("Former Master Student at HafenCity University Hamburg (HCU)",
-                        style={"line-height": "110%", "color": "silver", "margin-top": "-18px"}),
-                ], width=3, style={"height": "101px", "width": "337px"}),
+
 
                 dbc.Col([
                     html.P(html.B("Dorian Harder", style={"color": "silver", "margin-top": "-12px"})),
                     html.P("Research assistant at HafenCity University Hamburg (HCU)",
+                           style={"line-height": "110%", "color": "silver", "margin-top": "-18px"}),
+                ], width=3, style={"height": "101px", "width": "337px"}),
+
+                dbc.Col([
+                    html.P(html.B("Georg Fjodorow", style={"color": "silver", "margin-top": "-12px"})),
+                    html.P("Former Master Student at HafenCity University Hamburg (HCU)",
                            style={"line-height": "110%", "color": "silver", "margin-top": "-18px"}),
                 ], width=3, style={"height": "101px", "width": "337px"})
             ], justify="center"
