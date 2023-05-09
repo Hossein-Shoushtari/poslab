@@ -14,7 +14,7 @@ dash-html-components, dash-leaflet, dash-table, plotly, pyncclient
 ```
 Simulation & Evaluation:
 ```
-geojson, geopandas, numpy, pandas, scipy 
+geojson, geopandas, numpy, pandas, scipy, Shapely 
 ```
 
 ### Dash
