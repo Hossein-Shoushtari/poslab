@@ -455,7 +455,7 @@ def traj2marker(user: dict, quantity: int) -> list:
     un = user["username"]
     pw = user["password"]
     # icon colors
-    colors = ["purple", "green", "blue", "red", "orange", "yellow","black", "brown"]
+    colors = ["purple", "orange", "blue", "red", "green", "yellow","black", "brown"]
     # getting list of all files only in the given directory
     list_of_files = filter(lambda x: os.path.isfile(os.path.join(f"assets/users/{un}_{pw}/trajectories", x)), os.listdir(f"assets/users/{un}_{pw}/trajectories"))
     # sorting list of files based on last modification time in ascending order

@@ -610,7 +610,7 @@ def contact():
                     html.P("Bachelor Student at HafenCity University Hamburg (HCU)",
                         style={"line-height": "110%", "color": "silver", "margin-top": "-18px"}),
                     html.P(
-                        html.A("dorian.harder@hcu-hamburg.de", href="mailto: korvin.venzke@hcu-hamburg.de", style={"color": "silver"}),
+                        html.A("korvin.venzke@hcu-hamburg.de", href="mailto: korvin.venzke@hcu-hamburg.de", style={"color": "silver"}),
                         style={"color": "silver", "margin-top": "-18px"}
                     )
                 ], width=3, style={"height": "101px", "width": "337px"})
