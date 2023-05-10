@@ -2,7 +2,7 @@
 
 #   L5IN⁺: Level 5 Indoor-Navigation Plus  
 
-**Website**: https://poslab.herokuapp.com/  
+**Website**: https://poslab.onrender.com/  
 **Demo**: https://youtu.be/ABc6WXrFHIs
 
 ---
@@ -14,7 +14,7 @@ dash-html-components, dash-leaflet, dash-table, plotly, pyncclient
 ```
 Simulation & Evaluation:
 ```
-geojson, geopandas, numpy, pandas, scipy 
+geojson, geopandas, numpy, pandas, scipy, Shapely 
 ```
 
 ### Dash
