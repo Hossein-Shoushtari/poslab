@@ -129,19 +129,12 @@ def home_calls(app):
         list : a list of booleans indicating whether the corresponding paper's 
                bibtex modal should be open or not
         """
-        button = [p["prop_id"] for p in callback_context.triggered][0]
+        return_string = [p["prop_id"] for p in callback_context.triggered][0]
         output = [False for _ in range(len(papers_list))]
-        if papers_list[0] in button:
-            output[0] = True
-            return output
-        if papers_list[1] in button:
-            output[1] = True
-            return output
-        if papers_list[2] in button:
-            output[2] = True
-            return output
-        if papers_list[3] in button:
-            output[3] = True
+        if return_string == ".":
             return output
         else:
-          return output
+            paper_title = return_string.split('_bibtex_btn')[0]
+            index = papers_list.index(paper_title)
+            output[index] = True
+            return output
