@@ -7,7 +7,7 @@ from dash import Output, Input, no_update, callback_context
 
 def home_calls(app):
 
-    papers_list = ["ION2023", "2022_9_5_IPIN2022", "2022_4_25_sensors", "2021_11_29_IPIN2021", "2021_2_5_electronics"]
+    papers_list = ["IVK2023", "ION2023", "2022_9_5_IPIN2022", "2022_4_25_sensors", "2021_11_29_IPIN2021", "2021_2_5_electronics"]
 
     @app.callback(
         Output("paper_carousel", "active_index"),
@@ -60,7 +60,7 @@ def home_calls(app):
             "padding": "5px",
             "color": "silver",
             "height": "130px",
-            "width": "500px",
+            "width": "475px",
             "background-color": "#737373",
             "border-left": "4px solid silver",
             "border-radius": 0,
@@ -82,7 +82,7 @@ def home_calls(app):
                 "padding": "5px",
                 "color": "white",
                 "height": "130px",
-                "width": "500px",
+                "width": "475px",
                 "background-color": "#737373",
                 "border-left": "4px solid white",
                 "border-radius": 0,
@@ -103,7 +103,7 @@ def home_calls(app):
                 "padding": "5px",
                 "color": "white",
                 "height": "130px",
-                "width": "500px",
+                "width": "475px",
                 "background-color": "#737373",
                 "border-left": "4px solid white",
                 "border-radius": 0,

@@ -135,3 +135,31 @@
 .ds-card {
     background: #FAE7D9
 }
+
+/* --------------- SCROLLBAR PAPERS --------------- */
+#scrollable_paper_list::-webkit-scrollbar {
+    width: 10px;
+    background-color: transparent;
+    border-radius: 5px;
+}
+
+#scrollable_paper_list::-webkit-scrollbar-thumb {
+    background-color: silver;
+    border-radius: 5px;
+}
+
+#scrollable_paper_list {
+    scrollbar-width: thin;
+    scrollbar-color: silver;
+}
+
+#scrollable_paper_list::-moz-scrollbar {
+    width: 10px;
+    background-color: transparent;
+    border-radius: 5px;
+}
+
+#scrollable_paper_list::-moz-scrollbar-thumb {
+    background-color: silver;
+    border-radius: 5px;
+}

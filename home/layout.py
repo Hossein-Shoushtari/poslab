@@ -11,52 +11,63 @@ class CopyBibtexText():
     def __init__(self):
         pass
 
+    def copy_IVK_2023(self):
+        return '''@article{IVK2023,
+      title={Optimierte Trajektorie aus Smartphone-Sensoren und 5G UL-TDoA mit Cluster-Partikel-Filter},
+      author={Shoushtari, Hossein and Harder, Dorian and Willemsen, Thomas and Sternberg, Harald},
+      booktitle={Beiträge zum 20. Internationalen Ingenieurvermessungskurs - Zürich, 2023},
+      pages={291 - 304},
+      year={2023},
+      publisher={Herbert Wichmann Verlag},
+      address={Berlin}
+    }'''
+
     def copy_ION_2023(self):
         return '''@article{ION2023,
       title={Data-Driven Inertial Navigation assisted by 5G UL-TDoA Positioning},
-      author={Shoushtari, Hossein and Harder, Dorian and Kasparek, Maximilian and  Schäfer,Matthias and M{\"u}ller-Lietzkow, J{\"o}rg and Sternberg, Harald},
+      author={Shoushtari, Hossein and Harder, Dorian and Kasparek, Maximilian and  Schäfer, Matthias and M{\"u}ller-Lietzkow, J{\"o}rg and Sternberg, Harald},
       booktitle={Proceedings of the 2023 International Technical Meeting of The Institute of Navigation}
       pages={1169 - 1183},
-      year={2023}
+      year={2023},
     }'''
 
     def copy_2022_9_5_IPIN2022(self):
         return'''@article{shoushtari2022l5in+,
-    title={L5IN+: From an Analytical Platform to Optimization of Deep Inertial Odometry},
-    author={Shoushtari, Hossein and Kassawat, Firas and Harder, Dorian and Venzke, Korvin and M{\"u}ller-Lietzkow, J{\"o}rg and Sternberg, Harald},
-    year={2022}
+      title={L5IN+: From an Analytical Platform to Optimization of Deep Inertial Odometry},
+      author={Shoushtari, Hossein and Kassawat, Firas and Harder, Dorian and Venzke, Korvin and M{\"u}ller-Lietzkow, J{\"o}rg and Sternberg, Harald},
+      year={2022}
     }'''
     def copy_2022_4_25_sensors(self):
         return'''@article{harder2022real,
-  title={Real-Time Map Matching with a Backtracking Particle Filter Using Geospatial Analysis},
-  author={Harder, Dorian and Shoushtari, Hossein and Sternberg, Harald},
-  journal={Sensors},
-  volume={22},
-  number={9},
-  pages={3289},
-  year={2022},
-  publisher={MDPI}
-}'''
+      title={Real-Time Map Matching with a Backtracking Particle Filter Using Geospatial Analysis},
+      author={Harder, Dorian and Shoushtari, Hossein and Sternberg, Harald},
+      journal={Sensors},
+      volume={22},
+      number={9},
+      pages={3289},
+      year={2022},
+      publisher={MDPI}
+    }'''
     def copy_2021_11_29_IPIN2021(self):
         return'''@inproceedings{shoushtari20213d,
-  title={3D Indoor Localization using 5G-based Particle Filtering and CAD Plans},
-  author={Shoushtari, Hossein and Askar, Cigdem and Harder, Dorian and Willemsen, Thomas and Sternberg, Harald},
-  booktitle={2021 International Conference on Indoor Positioning and Indoor Navigation (IPIN)},
-  pages={1--8},
-  year={2021},
-  organization={IEEE}
-}'''
+      title={3D Indoor Localization using 5G-based Particle Filtering and CAD Plans},
+      author={Shoushtari, Hossein and Askar, Cigdem and Harder, Dorian and Willemsen, Thomas and Sternberg, Harald},
+      booktitle={2021 International Conference on Indoor Positioning and Indoor Navigation (IPIN)},
+      pages={1--8},
+      year={2021},
+      organization={IEEE}
+    }'''
     def copy_2021_2_5_electronics(self):
         return'''@article{shoushtari2021many,
-  title={Many ways lead to the goal—Possibilities of autonomous and infrastructure-based indoor positioning},
-  author={Shoushtari, Hossein and Willemsen, Thomas and Sternberg, Harald},
-  journal={Electronics},
-  volume={10},
-  number={4},
-  pages={397},
-  year={2021},
-  publisher={MDPI}
-}'''
+      title={Many ways lead to the goal—Possibilities of autonomous and infrastructure-based indoor positioning},
+      author={Shoushtari, Hossein and Willemsen, Thomas and Sternberg, Harald},
+      journal={Electronics},
+      volume={10},
+      number={4},
+      pages={397},
+      year={2021},
+      publisher={MDPI}
+    }'''
 
 def modals():
     bibtex_text = CopyBibtexText()
@@ -65,9 +76,39 @@ def modals():
             dbc.ModalHeader(
                 html.Div(
                     [
+                        html.P("@article{IVK2023,", style={"color": "silver", "margin-bottom": "0px"}),
+                        html.P("      title={Optimierte Trajektorie aus Smartphone-Sensoren und 5G UL-TDoA mit Cluster-Partikel-Filter}," ,style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P( "author={Shoushtari, Hossein and Harder, Dorian and Willemsen, Thomas and Sternberg, Harald},",
+                            style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("year={2023}", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("}", style={"color": "silver", "margin-bottom": "0px"}),
+                        dcc.Clipboard(
+                            content=bibtex_text.copy_IVK_2023(),
+                            style={
+                                "color": "#9B9B9B",
+                                "position": "absolute",
+                                "top": 11,
+                                "right": 16,
+                                "fontSize": 20,
+                            },
+                        ),
+                    ], style={"padding": "0px", "height": "90%", "width": "95%", "margin": "auto"}
+                ),
+                style={"padding-left": "14px", "background": "#585858", "border-radius": 5,
+                       "border": "1px solid silver"}
+            ),
+            id="IVK2023_bibtex_modal",
+            size="xl",
+            is_open=False,
+            backdrop="static"
+        ),
+        dbc.Modal(
+            dbc.ModalHeader(
+                html.Div(
+                    [
                         html.P("@article{ION2023,", style={"color": "silver", "margin-bottom": "0px"}),
                         html.P("      title={Data-Driven Inertial Navigation assisted by 5G UL-TDoA Positioning}," ,style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
-                        html.P( "author={Shoushtari, Hossein and Harder, Dorian and Kasparek, Maximilian and  Schäfer,Matthias and M{\"u}ller-Lietzkow, J{\"o}rg and Sternberg, Harald},",
+                        html.P( "author={Shoushtari, Hossein and Harder, Dorian and Kasparek, Maximilian and  Schäfer, Matthias and M{\"u}ller-Lietzkow, J{\"o}rg and Sternberg, Harald},",
                             style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
                         html.P("year={2023}", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
                         html.P("}", style={"color": "silver", "margin-bottom": "0px"}),
@@ -277,7 +318,7 @@ def about():
     return about
 
 def publications():
-    papers_list = ["ION2023", "2022_9_5_IPIN2022", "2022_4_25_sensors", "2021_11_29_IPIN2021", "2021_2_5_electronics"]
+    papers_list = ["IVK2023", "ION2023", "2022_9_5_IPIN2022", "2022_4_25_sensors", "2021_11_29_IPIN2021", "2021_2_5_electronics"]
     publications = html.Div([
         html.Div(
             html.H4("Publications",
@@ -309,249 +350,307 @@ def publications():
                 ], width=2, style={"width": "506px", "margin-top": "5px", "margin-bottom": "11px", "padding-left": "0px"}),
                 # papers
                 dbc.Col([
-
-                    html.Div(
+                    html.Div([
                         html.Div(
-                            html.Button(html.Div(
-                                [
-                                    html.P(html.B(["Data-Driven Inertial Navigation assisted by 5G UL-TDoA Positioning"]),
-                                           style={"margin-bottom": "7px"}),
-                                    html.P(
-                                        "Hossein Shoushtari, Dorian Harder, Maximilian Kasparek,Matthias Schäfer, Jörg Müller-Lietzkow, Harald Sternberg",
-                                        style={"line-height": "120%", "margin-bottom": "0px"}),
-                                    html.P(
-                                        [
-                                            html.P("|", style={"display": "inline-block"}),
-                                            html.Button(
-                                                "bibtex",
-                                                id="ION2023_bibtex_btn",
-                                                style={"background": "transparent", "border": "0px",
-                                                       "text-decoration": "underline", "color": "#00BC8C",
-                                                       "padding": "0px", "width": "50px", "margin-left": "-1px",
-                                                       "margin-right": "-1px"}
-                                            ),
-                                            html.P("|", style={"display": "inline-block"}),
-                                            html.A(
-                                                "code",
-                                                target="_blank",
-                                                href="https://github.com/Hossein-Shoushtari/poslab",
-                                                style={"display": "inline-block", "margin-left": "2px","margin-right": "2px"}),
-                                            html.P("|", style={"display": "inline-block"}),
-                                            html.A(
-                                                "arxiv",
-                                                target="_blank",
-                                                href="https://www.ion.org/publications/abstract.cfm?articleID=18645",
-                                                style={"display": "inline-block"}),
-                                            html.P("|", style={"display": "inline-block", "margin-left": "2px",
-                                                               "margin-right": "2px"}),
-                                            html.A(
-                                                "pdf",
-                                                target="_blank",
-                                                href="https://www.researchgate.net/publication/368501717_Data-Driven_Inertial_Navigation_assisted_by_5G_UL-TDoA_Positioning",
-                                                style={"display": "inline-block"}),
-                                            html.P("|", style={"display": "inline-block", "margin-left": "2px",
-                                                               "margin-right": "2px"}),
-                                        ],
-                                        style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
-                                    )
-                                ]),
-                                id="ION2023_show_btn",
-                                style={"margin-left": "8px", "border": "0px", "background": "transparent",
-                                       "height": "130px", "color": "white", "text-align": "left", "padding": "0px"}
+                            html.Div(
+                                html.Button(html.Div(
+                                    [
+                                        html.P(html.B(["Optimierte Trajektorie aus Smartphone-Sensoren und 5G UL-TDoA mit Cluster-Partikel-Filter"]),
+                                            style={"margin-bottom": "7px"}),
+                                        html.P(
+                                            "Hossein Shoushtari, Dorian Harder, Thomas Willemsen, Harald Sternberg",
+                                            style={"line-height": "120%", "margin-bottom": "0px"}),
+                                        html.P(
+                                            [
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.Button(
+                                                    "bibtex",
+                                                    id="IVK2023_bibtex_btn",
+                                                    style={"background": "transparent", "border": "0px",
+                                                        "text-decoration": "underline", "color": "#00BC8C",
+                                                        "padding": "0px", "width": "50px", "margin-left": "-1px",
+                                                        "margin-right": "-1px"}
+                                                ),
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.A(
+                                                    "code",
+                                                    target="_blank",
+                                                    href="https://github.com/Hossein-Shoushtari/poslab",
+                                                    style={"display": "inline-block", "margin-left": "2px","margin-right": "2px"}),
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.A(
+                                                    "arxiv",
+                                                    target="_blank",
+                                                    href="", #!#############################################
+                                                    style={"display": "inline-block"}),
+                                                html.P("|", style={"display": "inline-block", "margin-left": "2px",
+                                                                "margin-right": "2px"}),
+                                                html.A(
+                                                    "pdf",
+                                                    target="_blank",
+                                                    href="", #!#############################################
+                                                    style={"display": "inline-block"}),
+                                                html.P("|", style={"display": "inline-block", "margin-left": "2px",
+                                                                "margin-right": "2px"}),
+                                            ],
+                                            style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
+                                        )
+                                    ]),
+                                    id="IVK2023_show_btn",
+                                    style={"margin-left": "8px", "border": "0px", "background": "transparent",
+                                        "height": "130px", "color": "white", "text-align": "left", "padding": "0px"}
+                                ),
+                                style={"margin": "auto"}
                             ),
-                            style={"margin": "auto"}
+                            id="IVK2023_paper",
+                            className="d-flex align-items-center",
+                            style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px",
+                                "width": "475px", "background-color": "#737373", "border-left": "4px solid white",
+                                "border-radius": 0, "margin-left": "-10px"}
                         ),
-                        id="ION2023_paper",
-                        className="d-flex align-items-center",
-                        style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px",
-                               "width": "500px", "background-color": "#737373", "border-left": "4px solid white",
-                               "border-radius": 0, "margin-left": "-10px"}
-                    ),
-
-                    html.Div(
                         html.Div(
-                            html.Button(html.Div(
-                                [
-                                    html.P(html.B(["L5IN", html.Sup("+"), ": From an Analytical Platform to Optimization of Deep Inertial Odometry (2022)"]), style={"margin-bottom": "7px"}),
-                                    html.P("Hossein Shoushtari, Firas Kassawat, Dorian Harder, Korvin Venzke, Jörg Müller-Lietzkow, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"}),
-                                    html.P(
-                                        [
-                                            html.P("|", style={"display": "inline-block"}),
-                                            html.Button(
-                                                "bibtex",
-                                                id="2022_9_5_IPIN2022_bibtex_btn",
-                                                style={"background": "transparent", "border": "0px", "text-decoration": "underline", "color": "#00BC8C", "padding": "0px", "width": "50px", "margin-left": "-1px", "margin-right": "-1px"}
-                                            ),
-                                            html.P("|", style={"display": "inline-block"}),
-                                            html.A(
-                                                "code",
-                                                target="_blank",
-                                                href="https://github.com/Hossein-Shoushtari/poslab",
-                                                style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
-                                            html.P("|", style={"display": "inline-block"}),
-                                            html.A(
-                                                "arxiv",
-                                                target="_blank",
-                                                href="https://ceur-ws.org/Vol-3248/",
-                                                style={"display": "inline-block"}),
-                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
-                                            html.A(
-                                                "pdf",
-                                                target="_blank",
-                                                href="https://ceur-ws.org/Vol-3248/paper24.pdf",
-                                                style={"display": "inline-block"}),
-                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
-                                        ],
-                                        style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
-                                    )
-                                ]),
-                                id="2022_9_5_IPIN2022_show_btn",
-                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "silver", "text-align": "left", "padding": "0px"}
+                            html.Div(
+                                html.Button(html.Div(
+                                    [
+                                        html.P(html.B(["Data-Driven Inertial Navigation assisted by 5G UL-TDoA Positioning"]),
+                                            style={"margin-bottom": "7px"}),
+                                        html.P(
+                                            "Hossein Shoushtari, Dorian Harder, Maximilian Kasparek, Matthias Schäfer, Jörg Müller-Lietzkow, Harald Sternberg",
+                                            style={"line-height": "120%", "margin-bottom": "0px"}),
+                                        html.P(
+                                            [
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.Button(
+                                                    "bibtex",
+                                                    id="ION2023_bibtex_btn",
+                                                    style={"background": "transparent", "border": "0px",
+                                                        "text-decoration": "underline", "color": "#00BC8C",
+                                                        "padding": "0px", "width": "50px", "margin-left": "-1px",
+                                                        "margin-right": "-1px"}
+                                                ),
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.A(
+                                                    "code",
+                                                    target="_blank",
+                                                    href="https://github.com/Hossein-Shoushtari/poslab",
+                                                    style={"display": "inline-block", "margin-left": "2px","margin-right": "2px"}),
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.A(
+                                                    "arxiv",
+                                                    target="_blank",
+                                                    href="https://www.ion.org/publications/abstract.cfm?articleID=18645",
+                                                    style={"display": "inline-block"}),
+                                                html.P("|", style={"display": "inline-block", "margin-left": "2px",
+                                                                "margin-right": "2px"}),
+                                                html.A(
+                                                    "pdf",
+                                                    target="_blank",
+                                                    href="https://www.researchgate.net/publication/368501717_Data-Driven_Inertial_Navigation_assisted_by_5G_UL-TDoA_Positioning",
+                                                    style={"display": "inline-block"}),
+                                                html.P("|", style={"display": "inline-block", "margin-left": "2px",
+                                                                "margin-right": "2px"}),
+                                            ],
+                                            style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
+                                        )
+                                    ]),
+                                    id="ION2023_show_btn",
+                                    style={"margin-left": "8px", "border": "0px", "background": "transparent",
+                                        "height": "130px", "color": "silver", "text-align": "left", "padding": "0px"}
+                                ),
+                                style={"margin": "auto"}
                             ),
-                            style={"margin": "auto"}                           
+                            id="ION2023_paper",
+                            className="d-flex align-items-center",
+                            style={"margin-bottom": "14px", "padding": "5px", "color": "silver", "height": "130px",
+                                "width": "475px", "background-color": "#737373", "border-left": "4px solid silver",
+                                "border-radius": 0, "margin-left": "-10px"}
                         ),
-                        id="2022_9_5_IPIN2022_paper",
-                        className="d-flex align-items-center",
-                        style={"margin-bottom": "14px", "padding": "5px", "color": "silve", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
-                    ),
-                    html.Div(
                         html.Div(
-                            html.Button(html.Div(
-                                [
-                                    html.P(html.B("Real-Time Map Matching with a Backtracking Particle Filter Using Geospatial Analysis (2022)"), style={"margin-bottom": "7px"}),
-                                    html.P("Dorian Harder, Hossein Shoushtari, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"}),
-                                    html.P(
-                                        [
-                                            html.P("|", style={"display": "inline-block"}),
-                                            html.Button(
-                                                "bibtex",
-                                                id="2022_4_25_sensors_bibtex_btn",
-                                                style={"background": "transparent", "border": "0px", "text-decoration": "underline", "color": "#00BC8C", "padding": "0px", "width": "50px", "margin-left": "-1px", "margin-right": "-1px"}
-                                            ),
-                                            html.P("|", style={"display": "inline-block"}),
-                                            html.A(
-                                                "code",
-                                                target="_blank",
-                                                href="https://github.com/DorianHarder/PF_backtracking_cluster",
-                                                style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
-                                            html.P("|", style={"display": "inline-block"}),
-                                            html.A(
-                                                "arxiv",
-                                                target="_blank",
-                                                href="https://www.mdpi.com/1424-8220/22/9/3289",
-                                                style={"display": "inline-block"}),
-                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
-                                            html.A(
-                                                "pdf",
-                                                target="_blank",
-                                                href="https://www.mdpi.com/1424-8220/22/9/3289",
-                                                style={"display": "inline-block"}),
-                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
-                                        ],
-                                        style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
-                                    )
-                                ]),
-                                id="2022_4_25_sensors_show_btn",
-                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "silver", "text-align": "left", "padding": "0px"}
+                            html.Div(
+                                html.Button(html.Div(
+                                    [
+                                        html.P(html.B(["L5IN", html.Sup("+"), ": From an Analytical Platform to Optimization of Deep Inertial Odometry (2022)"]), style={"margin-bottom": "7px"}),
+                                        html.P("Hossein Shoushtari, Firas Kassawat, Dorian Harder, Korvin Venzke, Jörg Müller-Lietzkow, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"}),
+                                        html.P(
+                                            [
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.Button(
+                                                    "bibtex",
+                                                    id="2022_9_5_IPIN2022_bibtex_btn",
+                                                    style={"background": "transparent", "border": "0px", "text-decoration": "underline", "color": "#00BC8C", "padding": "0px", "width": "50px", "margin-left": "-1px", "margin-right": "-1px"}
+                                                ),
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.A(
+                                                    "code",
+                                                    target="_blank",
+                                                    href="https://github.com/Hossein-Shoushtari/poslab",
+                                                    style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.A(
+                                                    "arxiv",
+                                                    target="_blank",
+                                                    href="https://ceur-ws.org/Vol-3248/",
+                                                    style={"display": "inline-block"}),
+                                                html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                                html.A(
+                                                    "pdf",
+                                                    target="_blank",
+                                                    href="https://ceur-ws.org/Vol-3248/paper24.pdf",
+                                                    style={"display": "inline-block"}),
+                                                html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                            ],
+                                            style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
+                                        )
+                                    ]),
+                                    id="2022_9_5_IPIN2022_show_btn",
+                                    style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "silver", "text-align": "left", "padding": "0px"}
+                                ),
+                                style={"margin": "auto"}                           
                             ),
-                            style={"margin": "auto"}                           
+                            id="2022_9_5_IPIN2022_paper",
+                            className="d-flex align-items-center",
+                            style={"margin-bottom": "14px", "padding": "5px", "color": "silver", "height": "130px", "width": "475px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                         ),
-                        id="2022_4_25_sensors_paper",
-                        className="d-flex align-items-center",
-                        style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
-                    ),
-                    html.Div(
                         html.Div(
-                            html.Button(html.Div(
-                                [
-                                    html.P(html.B("3D Indoor Localization using 5G-based Particle Filtering and CAD Plans (2021)"), style={"margin-bottom": "7px"}),
-                                    html.P("Hossein Shoushtari, Cigdem Askar, Dorian Harder, Thomas Willemsen, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"}),
-                                    html.P(
-                                        [
-                                            html.P("|", style={"display": "inline-block"}),
-                                            html.Button(
-                                                "bibtex",
-                                                id="2021_11_29_IPIN2021_bibtex_btn",
-                                                style={"background": "transparent", "border": "0px", "text-decoration": "underline", "color": "#00BC8C", "padding": "0px", "width": "50px", "margin-left": "-1px", "margin-right": "-1px"}
-                                            ),
-                                            html.P("|", style={"display": "inline-block"}),
-                                            html.A(
-                                                "code",
-                                                target="_blank",
-                                                href="https://github.com/Hossein-Shoushtari/IPIN21Data",
-                                                style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
-                                            html.P("|", style={"display": "inline-block"}),
-                                            html.A(
-                                                "arxiv",
-                                                target="_blank",
-                                                href="https://ieeexplore.ieee.org/document/9662636",
-                                                style={"display": "inline-block"}),
-                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
-                                            html.A(
-                                                "pdf",
-                                                target="_blank",
-                                                href="https://www.researchgate.net/publication/357594689_3D_Indoor_Localization_using_5G-based_Particle_Filtering_and_CAD_Plans",
-                                                style={"display": "inline-block"}),
-                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
-                                        ],
-                                        style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
-                                    )
-                                ]),
-                                id="2021_11_29_IPIN2021_show_btn",
-                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "silver", "text-align": "left", "padding": "0px"}
+                            html.Div(
+                                html.Button(html.Div(
+                                    [
+                                        html.P(html.B("Real-Time Map Matching with a Backtracking Particle Filter Using Geospatial Analysis (2022)"), style={"margin-bottom": "7px"}),
+                                        html.P("Dorian Harder, Hossein Shoushtari, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"}),
+                                        html.P(
+                                            [
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.Button(
+                                                    "bibtex",
+                                                    id="2022_4_25_sensors_bibtex_btn",
+                                                    style={"background": "transparent", "border": "0px", "text-decoration": "underline", "color": "#00BC8C", "padding": "0px", "width": "50px", "margin-left": "-1px", "margin-right": "-1px"}
+                                                ),
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.A(
+                                                    "code",
+                                                    target="_blank",
+                                                    href="https://github.com/DorianHarder/PF_backtracking_cluster",
+                                                    style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.A(
+                                                    "arxiv",
+                                                    target="_blank",
+                                                    href="https://www.mdpi.com/1424-8220/22/9/3289",
+                                                    style={"display": "inline-block"}),
+                                                html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                                html.A(
+                                                    "pdf",
+                                                    target="_blank",
+                                                    href="https://www.mdpi.com/1424-8220/22/9/3289",
+                                                    style={"display": "inline-block"}),
+                                                html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                            ],
+                                            style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
+                                        )
+                                    ]),
+                                    id="2022_4_25_sensors_show_btn",
+                                    style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "silver", "text-align": "left", "padding": "0px"}
+                                ),
+                                style={"margin": "auto"}                           
                             ),
-                            style={"margin": "auto"}                           
+                            id="2022_4_25_sensors_paper",
+                            className="d-flex align-items-center",
+                            style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px", "width": "475px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                         ),
-                        id="2021_11_29_IPIN2021_paper",
-                        className="d-flex align-items-center",
-                        style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
-                    ),
-                    html.Div(
                         html.Div(
-                            html.Button(html.Div(
-                                [
-                                    html.P(html.B("Many Ways Lead to the Goal — Possibilities of Autonomous and Infrastructure-Based Indoor Positioning (2021)"), style={"margin-bottom": "7px"}),
-                                    html.P("Hossein Shoushtari, Thomas Willemsen, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"}),
-                                    html.P(
-                                        [
-                                            html.P("|", style={"display": "inline-block"}),
-                                            html.Button(
-                                                "bibtex",
-                                                id="2021_2_5_electronics_bibtex_btn",
-                                                style={"background": "transparent", "border": "0px", "text-decoration": "underline", "color": "#00BC8C", "padding": "0px", "width": "50px", "margin-left": "-1px", "margin-right": "-1px"}
-                                            ),
-                                            html.P("|", style={"display": "inline-block"}),
-                                            html.A(
-                                                "code",
-                                                target="_blank",
-                                                href="https://github.com/Hossein-Shoushtari/ElectronicsData",
-                                                style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
-                                            html.P("|", style={"display": "inline-block"}),
-                                            html.A(
-                                                "arxiv",
-                                                target="_blank",
-                                                href="https://www.mdpi.com/1424-8220/22/9/3289",
-                                                style={"display": "inline-block"}),
-                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
-                                            html.A(
-                                                "pdf",
-                                                target="_blank",
-                                                href="https://www.mdpi.com/2079-9292/10/4/397",
-                                                style={"display": "inline-block"}),
-                                            html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
-                                        ],
-                                        style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
-                                    )
-                                ]),
-                                id="2021_2_5_electronics_show_btn",
-                                style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "silver", "text-align": "left", "padding": "0px"}
+                            html.Div(
+                                html.Button(html.Div(
+                                    [
+                                        html.P(html.B("3D Indoor Localization using 5G-based Particle Filtering and CAD Plans (2021)"), style={"margin-bottom": "7px"}),
+                                        html.P("Hossein Shoushtari, Cigdem Askar, Dorian Harder, Thomas Willemsen, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"}),
+                                        html.P(
+                                            [
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.Button(
+                                                    "bibtex",
+                                                    id="2021_11_29_IPIN2021_bibtex_btn",
+                                                    style={"background": "transparent", "border": "0px", "text-decoration": "underline", "color": "#00BC8C", "padding": "0px", "width": "50px", "margin-left": "-1px", "margin-right": "-1px"}
+                                                ),
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.A(
+                                                    "code",
+                                                    target="_blank",
+                                                    href="https://github.com/Hossein-Shoushtari/IPIN21Data",
+                                                    style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.A(
+                                                    "arxiv",
+                                                    target="_blank",
+                                                    href="https://ieeexplore.ieee.org/document/9662636",
+                                                    style={"display": "inline-block"}),
+                                                html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                                html.A(
+                                                    "pdf",
+                                                    target="_blank",
+                                                    href="https://www.researchgate.net/publication/357594689_3D_Indoor_Localization_using_5G-based_Particle_Filtering_and_CAD_Plans",
+                                                    style={"display": "inline-block"}),
+                                                html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                            ],
+                                            style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
+                                        )
+                                    ]),
+                                    id="2021_11_29_IPIN2021_show_btn",
+                                    style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "silver", "text-align": "left", "padding": "0px"}
+                                ),
+                                style={"margin": "auto"}                           
                             ),
-                            style={"margin": "auto"}                           
+                            id="2021_11_29_IPIN2021_paper",
+                            className="d-flex align-items-center",
+                            style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px", "width": "475px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
                         ),
-                        id="2021_2_5_electronics_paper",
-                        className="d-flex align-items-center",
-                        style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px", "width": "500px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
-                    )
+                        html.Div(
+                            html.Div(
+                                html.Button(html.Div(
+                                    [
+                                        html.P(html.B("Many Ways Lead to the Goal — Possibilities of Autonomous and Infrastructure-Based Indoor Positioning (2021)"), style={"margin-bottom": "7px"}),
+                                        html.P("Hossein Shoushtari, Thomas Willemsen, Harald Sternberg", style={"line-height": "120%", "margin-bottom": "0px"}),
+                                        html.P(
+                                            [
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.Button(
+                                                    "bibtex",
+                                                    id="2021_2_5_electronics_bibtex_btn",
+                                                    style={"background": "transparent", "border": "0px", "text-decoration": "underline", "color": "#00BC8C", "padding": "0px", "width": "50px", "margin-left": "-1px", "margin-right": "-1px"}
+                                                ),
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.A(
+                                                    "code",
+                                                    target="_blank",
+                                                    href="https://github.com/Hossein-Shoushtari/ElectronicsData",
+                                                    style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.A(
+                                                    "arxiv",
+                                                    target="_blank",
+                                                    href="https://www.mdpi.com/1424-8220/22/9/3289",
+                                                    style={"display": "inline-block"}),
+                                                html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                                html.A(
+                                                    "pdf",
+                                                    target="_blank",
+                                                    href="https://www.mdpi.com/2079-9292/10/4/397",
+                                                    style={"display": "inline-block"}),
+                                                html.P("|", style={"display": "inline-block", "margin-left": "2px", "margin-right": "2px"}),
+                                            ],
+                                            style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
+                                        )
+                                    ]),
+                                    id="2021_2_5_electronics_show_btn",
+                                    style={"margin-left": "8px", "border": "0px", "background": "transparent", "height": "130px", "color": "silver", "text-align": "left", "padding": "0px"}
+                                ),
+                                style={"margin": "auto"}                           
+                            ),
+                            id="2021_2_5_electronics_paper",
+                            className="d-flex align-items-center",
+                            style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px", "width": "475px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
+                        )],
+                    id="scrollable_paper_list",
+                    style={"height": "706px", "overflow": "hidden", "overflow-y": "auto"})
                 ], width=2, style={"width": "506px", "margin-top": "5px", "margin-bottom": "11px"})
             ], justify="center"
         ),
