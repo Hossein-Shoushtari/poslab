@@ -88,8 +88,6 @@
 
 /* --------------- FOOTERS --------------- */
 .home-footer {
-    background-image: url(/assets/images/svg/footers/home_footer.svg);
-    background-color: transparent;
     padding: 0;
     padding-top: 20px;
     width: 100%;
@@ -100,10 +98,8 @@
     z-index: 1000;
 }
 .sim-footer {
-    background-image: url(/assets/images/svg/footers/sim_footer.svg);
-    background-color: transparent;
     padding: 0;
-    padding-top: 20px;
+    padding-top: 15px;
     width: 100%;
     border: 0px;
     text-align: center;
@@ -111,10 +107,8 @@
     height: 50px;
 }
 .eval-footer {
-    background-image: url(/assets/images/svg/footers/eval_footer.svg);
-    background-color: transparent;
     padding: 0;
-    padding-top: 20px;
+    padding-top: 15px;
     width: 100%;
     border: 0px;
     text-align: center;
@@ -122,10 +116,8 @@
     height: 50px;
 }
 .ds-footer {
-    background-image: url(/assets/images/svg/footers/ds_footer.svg);
-    background-color: transparent;
     padding: 0;
-    padding-top: 20px;
+    padding-top: 15px;
     width: 100%;
     border: 0px;
     text-align: center;
