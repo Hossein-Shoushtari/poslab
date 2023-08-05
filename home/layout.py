@@ -355,7 +355,7 @@ def publications():
                             html.Div(
                                 html.Button(html.Div(
                                     [
-                                        html.P(html.B(["Optimierte Trajektorie aus Smartphone-Sensoren und 5G UL-TDoA mit Cluster-Partikel-Filter"]),
+                                        html.P(html.B(["Optimierte Trajektorie aus Smartphone-Sensoren und 5G UL-TDoA mit Cluster-Partikel-Filter (2023)"]),
                                             style={"margin-bottom": "7px"}),
                                         html.P(
                                             "Hossein Shoushtari, Dorian Harder, Thomas Willemsen, Harald Sternberg",
@@ -404,15 +404,25 @@ def publications():
                             ),
                             id="IVK2023_paper",
                             className="d-flex align-items-center",
-                            style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px",
-                                "width": "475px", "background-color": "#737373", "border-left": "4px solid white",
-                                "border-radius": 0, "margin-left": "-10px"}
+                            style={
+                                "margin-bottom": "14px",
+                                "padding": "5px",
+                                "color": "white",
+                                "height": "130px",
+                                "width": "465px",
+                                "background-color": "#737373",
+                                "border-radius": "10px",
+                                "border-left": "4px solid white",
+                                "margin-left": "0px",
+                                "padding-left": "5px",
+                                "padding-right": "5px"
+                            }
                         ),
                         html.Div(
                             html.Div(
                                 html.Button(html.Div(
                                     [
-                                        html.P(html.B(["Data-Driven Inertial Navigation assisted by 5G UL-TDoA Positioning"]),
+                                        html.P(html.B(["Data-Driven Inertial Navigation assisted by 5G UL-TDoA Positioning (2023)"]),
                                             style={"margin-bottom": "7px"}),
                                         html.P(
                                             "Hossein Shoushtari, Dorian Harder, Maximilian Kasparek, Matthias Schäfer, Jörg Müller-Lietzkow, Harald Sternberg",
@@ -461,9 +471,19 @@ def publications():
                             ),
                             id="ION2023_paper",
                             className="d-flex align-items-center",
-                            style={"margin-bottom": "14px", "padding": "5px", "color": "silver", "height": "130px",
-                                "width": "475px", "background-color": "#737373", "border-left": "4px solid silver",
-                                "border-radius": 0, "margin-left": "-10px"}
+                            style={
+                                "margin-bottom": "14px",
+                                "padding": "5px",
+                                "color": "silver",
+                                "height": "130px",
+                                "width": "465px",
+                                "background-color": "#737373",
+                                "border-radius": "10px",
+                                "border-left": "4px solid silver",
+                                "margin-left": "0px",
+                                "padding-left": "5px",
+                                "padding-right": "5px"
+                            }
                         ),
                         html.Div(
                             html.Div(
@@ -509,7 +529,19 @@ def publications():
                             ),
                             id="2022_9_5_IPIN2022_paper",
                             className="d-flex align-items-center",
-                            style={"margin-bottom": "14px", "padding": "5px", "color": "silver", "height": "130px", "width": "475px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
+                            style={
+                                "margin-bottom": "14px",
+                                "padding": "5px",
+                                "color": "silver",
+                                "height": "130px",
+                                "width": "465px",
+                                "background-color": "#737373",
+                                "border-radius": "10px",
+                                "border-left": "4px solid silver",
+                                "margin-left": "0px",
+                                "padding-left": "5px",
+                                "padding-right": "5px"
+                            }
                         ),
                         html.Div(
                             html.Div(
@@ -555,7 +587,19 @@ def publications():
                             ),
                             id="2022_4_25_sensors_paper",
                             className="d-flex align-items-center",
-                            style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px", "width": "475px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
+                            style={
+                                "margin-bottom": "14px",
+                                "padding": "5px",
+                                "color": "silver",
+                                "height": "130px",
+                                "width": "465px",
+                                "background-color": "#737373",
+                                "border-radius": "10px",
+                                "border-left": "4px solid silver",
+                                "margin-left": "0px",
+                                "padding-left": "5px",
+                                "padding-right": "5px"
+                            }
                         ),
                         html.Div(
                             html.Div(
@@ -601,7 +645,19 @@ def publications():
                             ),
                             id="2021_11_29_IPIN2021_paper",
                             className="d-flex align-items-center",
-                            style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px", "width": "475px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
+                            style={
+                                "margin-bottom": "14px",
+                                "padding": "5px",
+                                "color": "silver",
+                                "height": "130px",
+                                "width": "465px",
+                                "background-color": "#737373",
+                                "border-radius": "10px",
+                                "border-left": "4px solid silver",
+                                "margin-left": "0px",
+                                "padding-left": "5px",
+                                "padding-right": "5px"
+                            }
                         ),
                         html.Div(
                             html.Div(
@@ -647,7 +703,19 @@ def publications():
                             ),
                             id="2021_2_5_electronics_paper",
                             className="d-flex align-items-center",
-                            style={"margin-bottom": "14px", "padding": "5px", "color": "white", "height": "130px", "width": "475px", "background-color": "#737373", "border-left": "4px solid silver", "border-radius": 0, "margin-left": "-10px"}
+                            style={
+                                "margin-bottom": "14px",
+                                "padding": "5px",
+                                "color": "silver",
+                                "height": "130px",
+                                "width": "465px",
+                                "background-color": "#737373",
+                                "border-radius": "10px",
+                                "border-left": "4px solid silver",
+                                "margin-left": "0px",
+                                "padding-left": "5px",
+                                "padding-right": "5px"
+                            }
                         )],
                     id="scrollable_paper_list",
                     style={"height": "706px", "overflow": "hidden", "overflow-y": "auto"})

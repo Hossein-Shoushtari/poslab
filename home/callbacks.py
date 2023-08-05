@@ -60,11 +60,13 @@ def home_calls(app):
             "padding": "5px",
             "color": "silver",
             "height": "130px",
-            "width": "475px",
+            "width": "465px",
             "background-color": "#737373",
+            "border-radius": "10px",
             "border-left": "4px solid silver",
-            "border-radius": 0,
-            "margin-left": "-10px"
+            "margin-left": "0px",
+            "padding-left": "5px",
+            "padding-right": "5px"
             } for _ in range(n_papers)]
         outputs = show_btns + papers
         if slide:
@@ -82,11 +84,13 @@ def home_calls(app):
                 "padding": "5px",
                 "color": "white",
                 "height": "130px",
-                "width": "475px",
+                "width": "465px",
                 "background-color": "#737373",
+                "border-radius": "10px",
                 "border-left": "4px solid white",
-                "border-radius": 0,
-                "margin-left": "-10px"
+                "margin-left": "0px",
+                "padding-left": "5px",
+                "padding-right": "5px"
             }
         else:
             show_btns[0] = {
@@ -103,11 +107,13 @@ def home_calls(app):
                 "padding": "5px",
                 "color": "white",
                 "height": "130px",
-                "width": "475px",
+                "width": "465px",
                 "background-color": "#737373",
+                "border-radius": "10px",
                 "border-left": "4px solid white",
-                "border-radius": 0,
-                "margin-left": "-10px"
+                "margin-left": "0px",
+                "padding-left": "5px",
+                "padding-right": "5px"
             }
         outputs = show_btns + papers
         return outputs

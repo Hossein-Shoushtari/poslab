@@ -138,6 +138,7 @@
 #scrollable_paper_list::-webkit-scrollbar-thumb {
     background-color: silver;
     border-radius: 5px;
+    
 }
 
 #scrollable_paper_list {
@@ -154,4 +155,10 @@
 #scrollable_paper_list::-moz-scrollbar-thumb {
     background-color: silver;
     border-radius: 5px;
+}
+
+
+/* --------------- CAROUSEL --------------- */
+#paper_carousel img{
+    border-radius: 10px;
 }
