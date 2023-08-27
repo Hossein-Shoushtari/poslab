@@ -2,7 +2,7 @@
 
 #   L5IN⁺: Level 5 Indoor-Navigation Plus  
 
-**Website**: https://poslab-24ac1d08a0af.herokuapp.com/ | It might take a few moments to load the page.  
+**Website**: https://poslab-24ac1d08a0af.herokuapp.com/ | It may take a few moments for the page to load.  
 **Demo**: https://youtu.be/ABc6WXrFHIs
 
 ---
