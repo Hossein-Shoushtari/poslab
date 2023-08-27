@@ -21,7 +21,6 @@ class CopyBibtexText():
       publisher={Herbert Wichmann Verlag},
       address={Berlin}
     }'''
-
     def copy_ION_2023(self):
         return '''@article{ION2023,
       title={Data-Driven Inertial Navigation assisted by 5G UL-TDoA Positioning},
@@ -30,7 +29,6 @@ class CopyBibtexText():
       pages={1169 - 1183},
       year={2023},
     }'''
-
     def copy_2022_9_5_IPIN2022(self):
         return'''@article{shoushtari2022l5in+,
       title={L5IN+: From an Analytical Platform to Optimization of Deep Inertial Odometry},
@@ -268,7 +266,8 @@ def header():
         html.Div(html.Iframe(
             src="https://www.youtube.com/embed/soP7hb5o_D8",
             width="900px",
-            height="508px" 
+            height="508px",
+            style={"border-radius": "10px"}
         ), style={"textAlign": "center"}),
     ])
     return header
@@ -339,7 +338,7 @@ def publications():
                     dbc.Carousel(
                         items=[
                             {
-                                "src": f"assets/images/papers/{paper}.png"
+                                "src": f"assets/images/papers/{paper}.jpg"
                             } 
                             for paper in papers_list
                         ],
@@ -388,7 +387,7 @@ def publications():
                                                 html.A(
                                                     "pdf",
                                                     target="_blank",
-                                                    href="", #!#############################################
+                                                    href="https://www.researchgate.net/publication/373255308_Optimierte_Trajektorie_aus_Smartphone-Sensoren_und_5G_UL-TDOA_mit_Cluster-Partikel-Filter",
                                                     style={"display": "inline-block"}),
                                                 html.P("|", style={"display": "inline-block", "margin-left": "2px",
                                                                 "margin-right": "2px"}),

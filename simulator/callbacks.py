@@ -63,7 +63,8 @@ def sim_calls(app, nc):
                     gp_file = gp.read_file(decoded_content)
                     converted = gp.GeoDataFrame(gp_file, crs=gp_file.crs).to_crs(4326) # converting crs from uploaded file to WGS84
                     converted.to_file(f"assets/users/{un}_{pw}/maps/{map_filenames[i]}", driver="GeoJSON") # saving converted layer
-                    u.update_user_data(nc, f"{un}_{pw}/maps/{map_filenames[i]}") # push to cloud
+                    if un != "demo" or pw != "data": # if user is not demo
+                        u.update_user_data(nc, f"{un}_{pw}/maps/{map_filenames[i]}") # push to cloud
                 lon, lat = u.extract_coordinates(gp_file)
                 bounds = u.boundaries(lon, lat) # boundaries for latest uploaded map
                 layers = {
