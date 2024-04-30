@@ -775,10 +775,7 @@ def contact():
                     html.P(html.B("Korvin Venzke", style={"color": "silver", "margin-top": "-12px"})),
                     html.P("Bachelor Student at HafenCity University Hamburg (HCU)",
                         style={"line-height": "110%", "color": "silver", "margin-top": "-18px"}),
-                    html.P(
-                        html.A("korvin.venzke@hcu-hamburg.de", href="mailto: korvin.venzke@hcu-hamburg.de", style={"color": "silver"}),
-                        style={"color": "silver", "margin-top": "-18px"}
-                    )
+                   
                 ], width=3, style={"height": "101px", "width": "337px"})
             ], justify="center"
         ),
