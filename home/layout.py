@@ -439,7 +439,7 @@ def publications():
                                             style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
                                         )
                                     ]),
-                                    id="IVK2023_show_btn",
+                                    id="DGON2023_show_btn",
                                     style={"margin-left": "8px", "border": "0px", "background": "transparent",
                                            "height": "130px", "color": "white", "text-align": "left", "padding": "0px"}
                                 ),
