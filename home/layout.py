@@ -66,10 +66,52 @@ class CopyBibtexText():
       year={2021},
       publisher={MDPI}
     }'''
+    def copy_2023_DGON_ISS(self):
+        return'''@article{shoushtari2023dgon,
+      title={Supervised Learning Regression for Sensor Calibration},
+      author={Shoushtari, Hossein and Willemsen, Thomas and Sternberg, Harald},
+      year={2023},
+      publisher={IEEE Xplore},
+      address={Braunschweig}
+    }'''
+
 
 def modals():
     bibtex_text = CopyBibtexText()
     modals = html.Div([
+        dbc.Modal(
+            dbc.ModalHeader(
+                html.Div(
+                    [
+                        html.P("@article{dgon2023,", style={"color": "silver", "margin-bottom": "0px"}),
+                        html.P(
+                            "      title={Supervised Learning Regression for Sensor Calibration},",
+                            style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P(
+                            "author={Shoushtari, Hossein and Willemsen, Thomas and Sternberg, Harald},",
+                            style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("year={2023}", style={"color": "silver", "margin-bottom": "0px", "text-indent": "15px"}),
+                        html.P("}", style={"color": "silver", "margin-bottom": "0px"}),
+                        dcc.Clipboard(
+                            content=bibtex_text.copy_2023_DGON_ISS(),
+                            style={
+                                "color": "#9B9B9B",
+                                "position": "absolute",
+                                "top": 11,
+                                "right": 16,
+                                "fontSize": 20,
+                            },
+                        ),
+                    ], style={"padding": "0px", "height": "90%", "width": "95%", "margin": "auto"}
+                ),
+                style={"padding-left": "14px", "background": "#585858", "border-radius": 5,
+                       "border": "1px solid silver"}
+            ),
+            id="DGON2023_bibtex_modal",
+            size="xl",
+            is_open=False,
+            backdrop="static"
+        ),
         dbc.Modal(
             dbc.ModalHeader(
                 html.Div(
@@ -317,7 +359,7 @@ def about():
     return about
 
 def publications():
-    papers_list = ["IVK2023", "ION2023", "2022_9_5_IPIN2022", "2022_4_25_sensors", "2021_11_29_IPIN2021", "2021_2_5_electronics"]
+    papers_list = ["DGON2023","IVK2023", "ION2023", "2022_9_5_IPIN2022", "2022_4_25_sensors", "2021_11_29_IPIN2021", "2021_2_5_electronics"]
     publications = html.Div([
         html.Div(
             html.H4("Publications",
@@ -350,6 +392,75 @@ def publications():
                 # papers
                 dbc.Col([
                     html.Div([
+                        html.Div(
+                            html.Div(
+                                html.Button(html.Div(
+                                    [
+                                        html.P(html.B([
+                                                          "Supervised Learning Regression for Sensor Calibration (2023)"]),
+                                               style={"margin-bottom": "7px"}),
+                                        html.P(
+                                            "Hossein Shoushtari, Thomas Willemsen, Harald Sternberg",
+                                            style={"line-height": "120%", "margin-bottom": "0px"}),
+                                        html.P(
+                                            [
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.Button(
+                                                    "bibtex",
+                                                    id="DGON2023_bibtex_btn",
+                                                    style={"background": "transparent", "border": "0px",
+                                                           "text-decoration": "underline", "color": "#00BC8C",
+                                                           "padding": "0px", "width": "50px", "margin-left": "-1px",
+                                                           "margin-right": "-1px"}
+                                                ),
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.A(
+                                                    "code",
+                                                    target="_blank",
+                                                    href="https://github.com/Hossein-Shoushtari/ISSDGON2023",
+                                                    style={"display": "inline-block", "margin-left": "2px",
+                                                           "margin-right": "2px"}),
+                                                html.P("|", style={"display": "inline-block"}),
+                                                html.A(
+                                                    "arxiv",
+                                                    target="_blank",
+                                                    href="https://ieeexplore.ieee.org/abstract/document/10361922/",  # !#############################################
+                                                    style={"display": "inline-block"}),
+                                                html.P("|", style={"display": "inline-block", "margin-left": "2px",
+                                                                   "margin-right": "2px"}),
+                                                html.A(
+                                                    "pdf",
+                                                    target="_blank",
+                                                    href="https://www.researchgate.net/publication/376766834_Supervised_Learning_Regression_for_Sensor_Calibration",
+                                                    style={"display": "inline-block"}),
+                                                html.P("|", style={"display": "inline-block", "margin-left": "2px",
+                                                                   "margin-right": "2px"}),
+                                            ],
+                                            style={"line-height": "120%", "margin-bottom": "0px", "text-align": "right"}
+                                        )
+                                    ]),
+                                    id="IVK2023_show_btn",
+                                    style={"margin-left": "8px", "border": "0px", "background": "transparent",
+                                           "height": "130px", "color": "white", "text-align": "left", "padding": "0px"}
+                                ),
+                                style={"margin": "auto"}
+                            ),
+                            id="DGON2023_paper",
+                            className="d-flex align-items-center",
+                            style={
+                                "margin-bottom": "14px",
+                                "padding": "5px",
+                                "color": "white",
+                                "height": "130px",
+                                "width": "465px",
+                                "background-color": "#737373",
+                                "border-radius": "10px",
+                                "border-left": "4px solid white",
+                                "margin-left": "0px",
+                                "padding-left": "5px",
+                                "padding-right": "5px"
+                            }
+                        ),
                         html.Div(
                             html.Div(
                                 html.Button(html.Div(
